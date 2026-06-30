@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -62,7 +62,7 @@ aside.deleteTarget{outline:2px dashed var(--red);outline-offset:-8px;background:
     #codePanel{border-left:1px solid var(--line);position:relative;z-index:6}
     .vResize{background:var(--line);cursor:col-resize;position:relative;z-index:8}.vResize:hover,.vResize.active{background:var(--blue)}.vResize:after{content:'';position:absolute;top:50%;left:50%;width:2px;height:42px;border-radius:2px;background:rgba(255,255,255,.22);transform:translate(-50%,-50%)}
     #tabResize{height:6px;flex-shrink:0;background:var(--line);cursor:row-resize;position:relative}#tabResize:hover,#tabResize.active{background:var(--blue)}#tabResize:after{content:'';position:absolute;left:50%;top:50%;width:42px;height:2px;border-radius:2px;background:rgba(255,255,255,.22);transform:translate(-50%,-50%)}
-    .tabs{height:58px;flex-shrink:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;padding:8px;border-bottom:1px solid var(--line);overflow:hidden;background:var(--panel2);scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+    .tabs{height:58px;flex-shrink:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;padding:8px;border-bottom:1px solid var(--line);overflow-y:auto;overflow-x:hidden;background:var(--panel2);scrollbar-width:thin;scrollbar-color:var(--muted) transparent}.tabs::-webkit-scrollbar{width:6px}.tabs::-webkit-scrollbar-track{background:transparent}.tabs::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}.tabs:hover::-webkit-scrollbar-thumb{background:var(--muted)}
     .tab{width:48px;height:48px;flex:0 0 48px;border:0;background:transparent;color:var(--muted);border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:950;transition:.15s;position:relative}
     .tab .ico{font-size:17px;filter:grayscale(.35);transition:.15s}.tab:hover,.tab.active{color:var(--bright);background:rgba(255,255,255,.045)}.tab.active:after{content:"";position:absolute;bottom:3px;width:22px;height:3px;background:var(--cat);border-radius:3px}.tab.active .ico{filter:none}
     #palette{padding:12px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#palette::-webkit-scrollbar{width:6px}#palette::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
@@ -457,7 +457,7 @@ M(A.fx,'✨','playParticleEffect',[pp('opts','{ texture: "glint", pos1: [0, 0, 0
 registerApiMethods(API_METHODS);
 let active='variables',blocks=[],vars=[],customFns=[],uid=1,drag=null,blockSearch='';
 
-let lang=localStorage.getItem('bloxd-lang')||'fr';
+let lang=localStorage.getItem('bloxd-lang')||'en';
 let theme=localStorage.getItem('bloxd-theme')||'dark';
 let codeWrap=localStorage.getItem('bloxd-code-wrap')==='1';
 const I18N={
@@ -733,5 +733,5 @@ sidebar.ondragleave=e=>{if(!sidebar.contains(e.relatedTarget))sidebar.classList.
 sidebar.ondrop=e=>{let bid=e.dataTransfer.getData('application/x-block-id');if(bid){e.preventDefault();removeBlock(bid);sidebar.classList.remove('deleteTarget');renderAll()}};
 applyLangStatic();applyTheme();applyCodeWrap();renderTabs();renderAll();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a13ff7887e84d6c6',t:'MTc4Mjg1MTgyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
