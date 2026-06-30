@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bloxd Blocks Studio — Éditeur visuel JavaScript</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#070914;--panel:#0d1122;--panel2:#11172d;--panel3:#161d37;--line:#222b4c;
+      --text:#c7d1ef;--muted:#6b789f;--dim:#404a70;--bright:#f4f7ff;
+      --blue:#3d6fff;--cyan:#00d4ff;--green:#22c55e;--orange:#f97316;--pink:#ec4899;
+      --yellow:#fbbf24;--purple:#a78bfa;--red:#ef4444;--shadow:rgba(0,0,0,.45)
+    }
+    body.light{--bg:#f4f7ff;--panel:#ffffff;--panel2:#eef3ff;--panel3:#e3ebfb;--line:#c8d3ea;--text:#26324f;--muted:#60708f;--dim:#8a98b4;--bright:#111827;--shadow:rgba(37,54,90,.18)}
+    body.light main{background:radial-gradient(circle at 20% 15%,rgba(61,111,255,.13),transparent 28%),var(--bg)}
+    body.light #code{background:#f9fbff}
+    body.light header{background:linear-gradient(180deg,#ffffff,#eef3ff)}
+    body.light #workspace{background-image:radial-gradient(circle,#c8d3ea 1px,transparent 1px)}
+    body.light .tool{background:linear-gradient(180deg,#ffffff,#eef3ff);box-shadow:0 8px 22px rgba(37,54,90,.10)}
+    body.light .tool:hover{background:#f8fbff}
+    body.light .block{background:linear-gradient(180deg,#ffffff,#f4f7ff);box-shadow:0 12px 28px rgba(37,54,90,.13)}
+    body.light .empty{background:rgba(255,255,255,.72);border-color:rgba(61,111,255,.24)}
+    body.light .inp,body.light .sel{background:#ffffff;border-color:#c8d3ea;color:#25603a}
+    body.light .miniBtn,body.light .hbtn,body.light .iconBtn,body.light .zoomBadge,body.light .count{background:#ffffff;border-color:#c8d3ea;color:#52617f}
+    body.light .miniBtn:hover,body.light .hbtn:hover,body.light .iconBtn:hover{color:#111827;background:#f8fbff}
+    body.light .body{background:rgba(244,247,255,.55)}
+    body.light .dropzone.dragover{background:rgba(61,111,255,.10)}
+    body.light .line{color:#26324f}
+    body.light .ln{color:#9aa8c3}
+    body.light .cmt{color:#7a8aab}
+    body.light .tag{background:rgba(61,111,255,.08)}
+    body.light aside.deleteTarget{background:linear-gradient(180deg,rgba(239,68,68,.08),#ffffff)}
+    body.light .workspaceTop{background:rgba(255,255,255,.86);border-bottom-color:#c8d3ea;backdrop-filter:blur(10px)}
+    body.light .codeMini{color:#383A42}
+    body.light .tok-kw{color:#A626A4}.body.light .tok-prop,body.light .tok-var{color:#383A42}
+    body.light .tok-fn{color:#4078F2}.body.light .tok-pun,body.light .tok-op{color:#0184BC}
+    body.light .tok-str{color:#50A14F}.body.light .tok-num{color:#E45649}
+    body.light .tok-bool,body.light .tok-null{color:#C18401}.body.light .tok-class{color:#C18401}.body.light .tok-cmt{color:#A0A1A7}
+    body.light .kw{color:#A626A4}.body.light .prop,body.light .var{color:#383A42}.body.light .fn{color:#4078F2}
+    body.light .str{color:#50A14F}.body.light .num{color:#E45649}.body.light .pun,body.light .op{color:#0184BC}
+    body.light .bool,body.light .nul{color:#C18401}.body.light .cls{color:#C18401}.body.light .cmt{color:#8A8F99}
+    body.light .line{color:#383A42}
+    html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,system-ui,sans-serif;user-select:none}
+    body{display:flex;flex-direction:column}
+    header{height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;background:linear-gradient(180deg,#11162b,#0b0f1d);border-bottom:1px solid var(--line);z-index:10}
+    .logo{font-weight:900;letter-spacing:-.04em;font-size:20px;color:var(--bright)}
+    .logo b{color:var(--blue)}
+    .tag{display:flex;align-items:center;gap:8px;border:1px solid rgba(61,111,255,.25);background:rgba(61,111,255,.09);color:#9eb6ff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .tag:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+    .header-actions{margin-left:auto;display:flex;gap:8px;align-items:center}.header-actions .hbtn{min-width:118px;text-align:center;white-space:nowrap}.header-actions #langToggle{min-width:78px}.header-actions #themeToggle{min-width:108px}
+    button{font:inherit} input,textarea,select{user-select:text}
+    .hbtn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:7px 11px;cursor:pointer;font-weight:800;font-size:12px;transition:.15s}
+    .hbtn:hover{border-color:var(--blue);color:var(--bright);transform:translateY(-1px)}
+    .hbtn.danger:hover{border-color:var(--red);color:#ff8a8a;background:rgba(239,68,68,.08)}
+
+    #app{--leftW:270px;--codeW:360px;flex:1;min-height:0;display:grid;grid-template-columns:var(--leftW) 6px minmax(180px,1fr) 6px var(--codeW);background:var(--bg)}
+    aside,#codePanel{background:var(--panel);border-color:var(--line);min-width:0;display:flex;flex-direction:column}
+aside{position:relative;min-height:0;overflow:hidden}
+    aside{border-right:1px solid var(--line)}
+aside.deleteTarget{outline:2px dashed var(--red);outline-offset:-8px;background:linear-gradient(180deg,rgba(239,68,68,.12),var(--panel))} aside.deleteTarget:after{content:attr(data-delete-text);position:absolute;left:14px;right:14px;bottom:14px;text-align:center;color:#ff9a9a;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.12);border-radius:12px;padding:10px;font-weight:950;font-size:12px;pointer-events:none}
+    #codePanel{border-left:1px solid var(--line);position:relative;z-index:6}
+    .vResize{background:var(--line);cursor:col-resize;position:relative;z-index:8}.vResize:hover,.vResize.active{background:var(--blue)}.vResize:after{content:'';position:absolute;top:50%;left:50%;width:2px;height:42px;border-radius:2px;background:rgba(255,255,255,.22);transform:translate(-50%,-50%)}
+    #tabResize{height:6px;flex-shrink:0;background:var(--line);cursor:row-resize;position:relative}#tabResize:hover,#tabResize.active{background:var(--blue)}#tabResize:after{content:'';position:absolute;left:50%;top:50%;width:42px;height:2px;border-radius:2px;background:rgba(255,255,255,.22);transform:translate(-50%,-50%)}
+    .tabs{height:58px;flex-shrink:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;padding:8px;border-bottom:1px solid var(--line);overflow:hidden;background:var(--panel2);scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+    .tab{width:48px;height:48px;flex:0 0 48px;border:0;background:transparent;color:var(--muted);border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:950;transition:.15s;position:relative}
+    .tab .ico{font-size:17px;filter:grayscale(.35);transition:.15s}.tab:hover,.tab.active{color:var(--bright);background:rgba(255,255,255,.045)}.tab.active:after{content:"";position:absolute;bottom:3px;width:22px;height:3px;background:var(--cat);border-radius:3px}.tab.active .ico{filter:none}
+    #palette{padding:12px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#palette::-webkit-scrollbar{width:6px}#palette::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
+    .catTitle{display:flex;align-items:center;gap:8px;color:var(--cat);text-transform:uppercase;font-size:12px;font-weight:950;letter-spacing:.1em;margin:4px 2px 12px}
+    .tool{display:flex;align-items:center;gap:9px;width:100%;background:linear-gradient(180deg,var(--panel2),#0f1428);border:1px solid var(--line);border-left:4px solid var(--cat);color:var(--bright);border-radius:11px;padding:10px 11px;margin-bottom:8px;cursor:grab;user-select:none;box-shadow:0 5px 18px rgba(0,0,0,.14);transition:.15s}
+    .tool:hover{border-color:var(--cat);transform:translateX(3px);background:var(--panel3)}.tool:active{cursor:grabbing}
+    .tool .name{font-family:"JetBrains Mono",Consolas,monospace;font-size:12px;font-weight:800}.tool .desc{display:block;color:var(--muted);font-family:inherit;font-weight:700;font-size:10px;margin-top:2px}
+    .specialBtn{border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.035);color:var(--bright);border-radius:12px;padding:11px;margin-bottom:12px;cursor:pointer;font-weight:900;width:100%;text-align:left}.specialBtn:hover{border-color:var(--cat);background:rgba(255,255,255,.06)}
+    .chipRow{display:flex;align-items:center;gap:7px;margin:6px 0;padding:4px 2px}.chip{display:inline-flex;align-items:center;border-radius:999px;background:var(--blue);color:white;padding:4px 9px;font-family:"JetBrains Mono",Consolas,monospace;font-size:12px;font-weight:800}.kind{font-family:"JetBrains Mono",Consolas,monospace;font-size:10px;color:var(--yellow);border:1px solid rgba(251,191,36,.25);border-radius:999px;padding:2px 6px;background:rgba(251,191,36,.08)}
+
+    main{min-width:0;display:flex;flex-direction:column;background:radial-gradient(circle at 20% 15%,rgba(61,111,255,.12),transparent 28%),var(--bg);overflow:visible;position:relative}
+    .workspaceTop{height:42px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(13,17,34,.8);backdrop-filter:blur(10px);white-space:nowrap;overflow:visible;min-width:max-content;position:relative;z-index:1}.workspaceTop>*{flex-shrink:0}
+    .workspaceTop h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+    .count{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900;color:var(--muted)}
+    .hint{margin-left:auto;color:var(--dim);font-size:12px;font-weight:700}.hint.hidden{display:none}.hintClose{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:7px;width:23px;height:23px;cursor:pointer;font-weight:950;line-height:1}.hintClose:hover{border-color:var(--red);color:var(--red)}.kbd{border:1px solid var(--line);background:var(--panel2);border-radius:5px;padding:2px 5px;color:var(--muted);font-family:Consolas,monospace;font-size:11px}
+    #workspace{position:relative;flex:1;overflow:hidden;background-image:radial-gradient(circle,#202949 1px,transparent 1px);background-size:24px 24px;cursor:grab;touch-action:none}
+    #workspace.panning{cursor:grabbing}
+    .canvas{position:absolute;left:0;top:0;width:1200px;min-height:1600px;padding:28px 28px 180px;transform-origin:0 0;will-change:transform}
+    .viewControls{display:flex;align-items:center;gap:6px;margin-left:8px}.zoomBadge{min-width:46px;text-align:center;color:var(--muted);font-family:Consolas,monospace;font-size:11px;font-weight:900;border:1px solid var(--line);background:var(--panel2);border-radius:7px;padding:4px 6px}.iconBtn{width:28px;height:28px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;cursor:pointer;font-weight:950}.iconBtn:hover{border-color:var(--blue);color:var(--bright)}
+    .empty{height:230px;border:2px dashed rgba(61,111,255,.28);border-radius:20px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted);background:rgba(13,17,34,.45)}.empty strong{font-size:18px;color:var(--bright)}
+    .dropzone{height:16px;border-radius:8px;margin:1px 0;transition:.12s;position:relative}.dropzone.dragover{height:42px;border:2px dashed var(--blue);background:rgba(61,111,255,.08)}
+    .block{position:relative;display:table;width:max-content;min-width:330px;max-width:none;border:1px solid color-mix(in srgb,var(--bc) 35%,var(--line));background:linear-gradient(180deg,#11172d,#0c1020);border-radius:12px;margin:0 0 0 0;box-shadow:0 12px 32px rgba(0,0,0,.18);overflow:hidden}.block.dragging{opacity:.35}.block:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--bc)}
+    .blockHead{min-height:46px;display:flex;align-items:center;gap:7px;padding:8px 12px 8px 14px}.handle{color:var(--dim);cursor:grab;font-size:16px}.codeMini{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;white-space:nowrap;font-family:"JetBrains Mono",Consolas,monospace;font-size:13px;color:#E5E5E5;line-height:1.8;flex:1}.tok-kw{color:#C678DD}.tok-prop,.tok-var{color:#E5E5E5}.tok-fn{color:#61AFEF}.tok-pun,.tok-op{color:#56B6C2}.tok-str{color:#98C379}.tok-num{color:#E06C75}.tok-bool{color:#D19A66}.tok-null{color:#D19A66}.tok-class{color:#E5C07B}.tok-cmt{color:#5C6370}.blockActions{display:flex;gap:5px}.miniBtn{border:1px solid var(--line);background:rgba(255,255,255,.035);color:var(--muted);border-radius:7px;width:25px;height:25px;cursor:pointer;font-weight:900}.miniBtn:hover{border-color:var(--bc);color:var(--bright)}
+    .inp,.sel{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:7px;color:#c3e88d;font-family:"JetBrains Mono",Consolas,monospace;font-size:12px;padding:4px 7px;outline:0;min-width:66px;max-width:none}.sel{color:#ff9d6c;cursor:pointer}.inp:focus,.sel:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(61,111,255,.14)}
+    .valueBlock{display:inline-flex;align-items:center;gap:5px;border:1px solid color-mix(in srgb,var(--bc,var(--blue)) 40%,var(--line));background:rgba(61,111,255,.07);border-radius:9px;padding:4px 6px;white-space:nowrap}.valueBlock.obj{background:rgba(167,139,250,.09)}.valueBlock.list{background:rgba(34,197,94,.09)}.valueItem{display:inline-flex;align-items:center;gap:4px}.keyInput{min-width:54px;color:#82aaff}.valueDrop{display:inline-flex;align-items:center;min-width:52px;border-radius:7px}.valueDrop.dragOver{outline:2px dashed var(--blue);outline-offset:2px}.valueAdd{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;font-weight:950}.valueAdd:hover{border-color:var(--blue);color:var(--bright)}.returnWrap{display:inline-flex;align-items:center;gap:4px}.returnSelect{width:auto;min-width:92px;padding:4px 8px;text-align:center;color:var(--muted);font-size:11px;border-color:var(--blue);background:var(--panel2)}
+    .body{margin:0 12px 12px 30px;border-left:2px solid color-mix(in srgb,var(--bc) 45%,transparent);border-bottom:2px solid color-mix(in srgb,var(--bc) 35%,transparent);border-radius:0 0 0 10px;padding:8px 0 8px 16px;min-height:54px;min-width:300px}.body .dropzone{margin-right:10px}.bodyEmpty{color:var(--dim);font-size:12px;font-weight:800;padding:10px 0 12px}.closeBrace{font-family:"JetBrains Mono",Consolas,monospace;color:#6f7dac;padding:0 0 10px 28px;font-size:14px}
+
+    .codeTop{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel2)}.codeTop .label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.1em}.badge{background:rgba(61,111,255,.15);border:1px solid rgba(61,111,255,.35);color:#9eb6ff;border-radius:6px;padding:2px 6px;font-family:Consolas,monospace}
+    #code{flex:1;overflow:auto;padding:14px 0 22px;background:#080b16;scrollbar-width:none;overscroll-behavior:contain}#code::-webkit-scrollbar{display:none}.line{display:block;white-space:pre;font-family:"JetBrains Mono",Consolas,monospace;font-size:12.5px;line-height:1.9}#code.wrap .line{white-space:pre-wrap;overflow-wrap:anywhere}.ln{display:inline-block;width:34px;text-align:right;margin-right:18px;color:#334061;user-select:none}.cmt{color:#5C6370;font-style:italic}.kw{color:#C678DD}.prop,.var{color:#E5E5E5}.fn{color:#61AFEF}.str{color:#98C379}.num{color:#E06C75}.pun,.op{color:#56B6C2}.bool{color:#D19A66}.nul{color:#D19A66}.cls{color:#E5C07B}
+
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50}.box{width:min(360px,calc(100vw - 30px));background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 26px 80px rgba(0,0,0,.65)}.box h3{color:var(--bright);margin-bottom:14px}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:950}.field input{background:var(--panel3);border:1px solid var(--line);border-radius:10px;color:var(--bright);padding:10px;font-family:Consolas,monospace;outline:0}.seg{display:flex;gap:7px}.seg button{flex:1;border:1px solid var(--line);background:var(--panel3);color:var(--muted);border-radius:10px;padding:9px;cursor:pointer;font-weight:900}.seg button.active{background:var(--blue);border-color:var(--blue);color:white}.boxFoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.err{display:none;color:#ff8181;font-size:12px;font-weight:800;margin-top:8px}
+    @media(max-width:1050px){#app{--leftW:230px;--codeW:320px}.hint{display:none}}@media(max-width:820px){#app{grid-template-columns:1fr}.vResize,aside,#codePanel{display:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Bloxd<b>Blocks</b> Studio</div>
+    <div class="tag">Éditeur visuel JavaScript</div>
+    <div class="header-actions">
+      <button class="hbtn" id="langToggle">🇬🇧 EN</button>
+      <button class="hbtn" id="themeToggle">☀️ Clair</button>
+      <button class="hbtn" id="saveBtn">💾 Sauvegarder</button>
+      <button class="hbtn" id="loadBtn">↩ Charger</button>
+      <button class="hbtn danger" id="clearBtn">Tout effacer</button>
+    </div>
+  </header>
+  <div id="app">
+    <aside>
+      <div class="tabs" id="tabs"></div>
+      <div id="tabResize" title="Resize category selector"></div>
+      <div id="palette"></div>
+    </aside>
+    <div class="vResize" id="leftResize" title="Resize category panel"></div>
+    <main>
+      <div class="workspaceTop"><h2>Workspace</h2><span class="count" id="count">0 bloc</span><div class="viewControls"><button class="iconBtn" id="zoomOut">−</button><span class="zoomBadge" id="zoomLabel">100%</span><button class="iconBtn" id="zoomIn">+</button><button class="iconBtn" id="resetView" title="Réinitialiser la vue">⌂</button></div><span class="hint"><span class="kbd">Molette</span> déplacer · <span class="kbd">Ctrl + molette</span> zoom · <span class="kbd">Espace + glisser</span> naviguer</span><button class="hintClose" id="hintClose" title="Masquer l’aide">×</button></div>
+      <div id="workspace"><div class="canvas" id="canvas"></div></div>
+    </main>
+    <div class="vResize" id="codeResize" title="Resize code panel"></div>
+    <section id="codePanel">
+      <div class="codeTop"><div class="label"><span class="badge">JS</span>Code généré</div><div style="display:flex;gap:8px;align-items:center"><button class="hbtn" id="wrapBtn">↩ Retour ligne</button><button class="hbtn" id="copyBtn">📋 Copier</button></div></div>
+      <pre id="code"></pre>
+    </section>
+  </div>
+
+<script>
+const cats=[
+ {id:'variables',name:'VAR',short:'Var',icon:'📦',label:'Variables',color:'#fbbf24'},
+ {id:'logic',name:'LOG',short:'If',icon:'❓',label:'Logique',color:'#06b6d4'},
+ {id:'events',name:'FN',short:'Func',icon:'⚡',label:'Fonctions',color:'#a78bfa'},
+ {id:'search',name:'SRC',short:'Search',icon:'🔎',label:'Recherche de blocs',color:'#64748b'},
+ {id:'api_message',name:'MSG+',short:'Msg+',icon:'💬',label:'API Messages & UI',color:'#00d4ff'},
+ {id:'api_sound',name:'SND',short:'Snd',icon:'🔊',label:'API Sons & Musique',color:'#38bdf8'},
+ {id:'api_player',name:'PLY',short:'Ply',icon:'🙂',label:'API Joueurs',color:'#60a5fa'},
+ {id:'api_blocks',name:'BLK',short:'Blk',icon:'🧱',label:'API Blocs & Monde',color:'#a3e635'},
+ {id:'api_inventory',name:'INV',short:'Inv',icon:'🎒',label:'API Inventaires & Coffres',color:'#facc15'},
+ {id:'api_items',name:'ITEM',short:'Item',icon:'💎',label:'API Items & Drops',color:'#fb923c'},
+ {id:'api_combat',name:'FIG',short:'Fight',icon:'⚔️',label:'API Vie, Effets & Combat',color:'#ef4444'},
+ {id:'api_entities',name:'ENT',short:'Ent',icon:'🧍',label:'API Entités & Mouvement',color:'#f97316'},
+ {id:'api_mobs',name:'MOB',short:'Mob',icon:'🐺',label:'API Mobs',color:'#c084fc'},
+ {id:'api_mesh',name:'MSH',short:'Mesh',icon:'🧊',label:'API Mesh & Throwables',color:'#818cf8'},
+ {id:'api_shop',name:'SHP',short:'Shop',icon:'🛒',label:'API Shop',color:'#22c55e'},
+ {id:'api_db',name:'DB',short:'DB',icon:'🗄️',label:'API Base de données',color:'#94a3b8'},
+ {id:'api_client',name:'OPT',short:'Opt',icon:'⚙️',label:'API Options client',color:'#14b8a6'},
+ {id:'api_settings',name:'SET',short:'Set',icon:'🎛️',label:'API Réglages entités',color:'#e879f9'},
+ {id:'api_qte',name:'QTE',short:'QTE',icon:'🎯',label:'API QTE',color:'#f43f5e'},
+ {id:'api_fx',name:'FX',short:'FX',icon:'✨',label:'API Particules & Skins',color:'#d946ef'},
+ {id:'debug',name:'DBG',short:'Bug',icon:'🐞',label:'Debug',color:'#22c55e'}
+];
+const eventFns=[
+ ['tick',['ms']],
+ ['onClose',['serverIsShuttingDown']],
+ ['onPlayerJoin',['playerId','fromGameReset']],
+ ['onPlayerLeave',['playerId','serverIsShuttingDown']],
+ ['onPlayerJump',['playerId']],
+ ['onRespawnRequest',['playerId']],
+ ['playerCommand',['playerId','command']],
+ ['onPlayerChat',['playerId','chatMessage','channelName']],
+ ['onPlayerChangeBlock',['playerId','x','y','z','fromBlock','toBlock','droppedItem','fromBlockInfo','toBlockInfo']],
+ ['onPlayerDropItem',['playerId','x','y','z','itemName','itemAmount','fromIdx']],
+ ['onPlayerPickedUpItem',['playerId','itemName','itemAmount']],
+ ['onPlayerSelectInventorySlot',['playerId','slotIndex']],
+ ['onBlockStand',['playerId','x','y','z','blockName']],
+ ['onPlayerAttemptCraft',['playerId','itemName','craftingIdx','craftTimes']],
+ ['onPlayerCraft',['playerId','itemName','craftingIdx','recipe','craftTimes']],
+ ['onPlayerAttemptOpenChest',['playerId','x','y','z','isMoonstoneChest','isIronChest']],
+ ['onPlayerOpenedChest',['playerId','x','y','z','isMoonstoneChest','isIronChest']],
+ ['onPlayerMoveItemOutOfInventory',['playerId','itemName','itemAmount','fromIdx','movementType']],
+ ['onPlayerMoveInvenItem',['playerId','fromIdx','toStartIdx','toEndIdx','amt']],
+ ['onPlayerMoveItemIntoIdxs',['playerId','start','end','moveIdx','itemAmount']],
+ ['onPlayerSwapInvenSlots',['playerId','i','j']],
+ ['onPlayerMoveInvenItemWithAmt',['playerId','i','j','amt']],
+ ['onPlayerAttemptAltAction',['playerId','x','y','z','block','targetEId']],
+ ['onPlayerAltAction',['playerId','x','y','z','block','targetEId']],
+ ['onPlayerClick',['playerId','wasAltClick','x','y','z','block','targetEId']],
+ ['onPlayerClickUp',['playerId','wasAltClick','x','y','z','block','targetEId']],
+ ['onClientOptionUpdated',['playerId','option','value']],
+ ['onMobSettingUpdated',['mobId','setting','value']],
+ ['onInventoryUpdated',['playerId']],
+ ['onChestUpdated',['initiatorEId','isMoonstoneChest','x','y','z']],
+ ['onWorldChangeBlock',['x','y','z','fromBlock','toBlock','initiatorDbId','extraInfo']],
+ ['onCreateBloxdMeshEntity',['eId','type','initiatorId']],
+ ['onEntityCollision',['eId','otherEId']],
+ ['onPlayerAttemptSpawnMob',['playerId','mobType','x','y','z']],
+ ['onWorldAttemptSpawnMob',['mobType','x','y','z']],
+ ['onPlayerSpawnMob',['playerId','mobId','mobType','x','y','z','mobHerdId','playSoundOnSpawn']],
+ ['onWorldSpawnMob',['mobId','mobType','x','y','z','mobHerdId','playSoundOnSpawn']],
+ ['onWorldAttemptDespawnMob',['mobId']],
+ ['onMobDespawned',['mobId']],
+ ['onPlayerAttack',['playerId']],
+ ['onPlayerDamagingOtherPlayer',['attackingPlayer','damagedPlayer','damageDealt','withItem','bodyPartHit','damagerDbId']],
+ ['onPlayerDamagingMob',['playerId','mobId','damageDealt','withItem','damagerDbId']],
+ ['onMobDamagingPlayer',['attackingMob','damagedPlayer','damageDealt','withItem']],
+ ['onMobDamagingOtherMob',['attackingMob','damagedMob','damageDealt','withItem']],
+ ['onAttemptKillPlayer',['killedPlayer','attackingLifeform']],
+ ['onPlayerKilledOtherPlayer',['attackingPlayer','killedPlayer','damageDealt','withItem']],
+ ['onMobKilledPlayer',['attackingMob','killedPlayer','damageDealt','withItem']],
+ ['onPlayerKilledMob',['playerId','mobId','damageDealt','withItem']],
+ ['onMobKilledOtherMob',['attackingMob','killedMob','damageDealt','withItem']],
+ ['onPlayerPotionEffect',['initiatorId','targetId','effectName']],
+ ['onPlayerDamagingMeshEntity',['playerId','damagedId','damageDealt','withItem']],
+ ['onPlayerBreakMeshEntity',['playerId','entityId']],
+ ['onPlayerUsedThrowable',['playerId','throwableName','thrownEntityId']],
+ ['onPlayerThrowableHitTerrain',['playerId','throwableName','thrownEntityId']],
+ ['onTouchscreenActionButton',['playerId','touchDown']],
+ ['onTaskClaimed',['playerId','taskId','isPromoTask','claimedRewards']],
+ ['onChunkLoaded',['chunkId','chunk','wasPersistedChunk']],
+ ['onPlayerRequestChunk',['playerId','chunkX','chunkY','chunkZ','chunkId']],
+ ['onItemDropCreated',['itemEId','itemName','itemAmount','x','y','z']],
+ ['onPlayerStartChargingItem',['playerId','itemName']],
+ ['onPlayerFinishChargingItem',['playerId','used','itemName','duration']],
+ ['onPlayerFinishQTE',['playerId','qteId','result']],
+ ['onPlayerToggledShopMenu',['playerId','isOpen']],
+ ['onPlayerBoughtShopItem',['playerId','categoryKey','itemKey','item','userInput']],
+ ['doPeriodicSave',[]]
+];
+const CALLBACK_INFO_EN={
+ tick:'Called every tick, about 20 times per second. Parameter ms is the fixed timestep.',
+ onClose:'Called when the lobby is shutting down. serverIsShuttingDown tells whether the server is shutting down.',
+ onPlayerJoin:'Called when a player joins the lobby.',
+ onPlayerLeave:'Called when a player leaves the lobby.',
+ onPlayerJump:'Called when a player jumps.',
+ onRespawnRequest:'Called when a player requests to respawn. Can return true or a position array to handle respawn.',
+ playerCommand:'Called when a player sends a command. Can return boolean.',
+ onPlayerChat:'Called when a player sends a chat message. Can prevent or modify chat output.',
+ onPlayerChangeBlock:'Called when a player places or breaks a block. Can prevent change/drop or return dropped item position.',
+ onPlayerDropItem:'Called when a player drops an item. Can prevent the drop or allow discard without creating a dropped item.',
+ onPlayerPickedUpItem:'Called when a player picks up an item.',
+ onPlayerSelectInventorySlot:'Called when a player selects another inventory slot.',
+ onBlockStand:'Called when a player stands on a block.',
+ onPlayerAttemptCraft:'Called before a player crafts an item. Return "preventCraft" to cancel.',
+ onPlayerCraft:'Called after a player crafts an item.',
+ onPlayerAttemptOpenChest:'Called before a player opens a chest. Return "preventOpen" to cancel.',
+ onPlayerOpenedChest:'Called after a player opens a chest.',
+ onPlayerMoveItemOutOfInventory:'Called when a player moves an item out of their inventory. Can return "preventChange".',
+ onPlayerMoveInvenItem:'Called for inventory item movements. Can return "preventChange".',
+ onPlayerMoveItemIntoIdxs:'Called when a player moves an item into a range of inventory slots. Can return "preventChange".',
+ onPlayerSwapInvenSlots:'Called when a player swaps inventory slots. Can return "preventChange".',
+ onPlayerMoveInvenItemWithAmt:'Called when a player moves an inventory item with a specific amount. Can return "preventChange".',
+ onPlayerAttemptAltAction:'Called before an alt action/right click. Return "preventAction" to cancel when supported.',
+ onPlayerAltAction:'Called when an alt action/right click completes.',
+ onPlayerClick:'Called when a player clicks. Includes targeted block/entity data when available.',
+ onPlayerClickUp:'Called when a player releases a click or touch.',
+ onClientOptionUpdated:'Called when a client option is updated.',
+ onMobSettingUpdated:'Called when a mob setting is updated.',
+ onInventoryUpdated:'Called when a player inventory is updated.',
+ onChestUpdated:'Called when a chest is updated by a player.',
+ onWorldChangeBlock:'Called when a block changes in the world. Can prevent change/drop.',
+ onCreateBloxdMeshEntity:'Called when a mesh entity is created.',
+ onEntityCollision:'Called when an entity collides with another entity.',
+ onPlayerAttemptSpawnMob:'Called when a player attempts to spawn a mob. Return "preventSpawn" to cancel.',
+ onWorldAttemptSpawnMob:'Called when the world attempts to spawn a mob. Return "preventSpawn" to cancel.',
+ onPlayerSpawnMob:'Called when a mob is spawned by a player.',
+ onWorldSpawnMob:'Called when a mob is spawned by the world.',
+ onWorldAttemptDespawnMob:'Called when the world attempts to despawn a mob. Return "preventDespawn" to cancel.',
+ onMobDespawned:'Called when a mob is despawned.',
+ onPlayerAttack:'Called when a player attacks another player.',
+ onPlayerDamagingOtherPlayer:'Called when a player damages another player. Can prevent or change damage.',
+ onPlayerDamagingMob:'Called when a player damages a mob. Can prevent or change damage.',
+ onMobDamagingPlayer:'Called when a mob damages a player. Can prevent or change damage.',
+ onMobDamagingOtherMob:'Called when a mob damages another mob. Can prevent or change damage.',
+ onAttemptKillPlayer:'Called before a player is killed. Return "preventDeath" to stop death.',
+ onPlayerKilledOtherPlayer:'Called when a player kills another player. Return "keepInventory" to keep inventory.',
+ onMobKilledPlayer:'Called when a mob kills a player. Return "keepInventory" to keep inventory.',
+ onPlayerKilledMob:'Called when a player kills a mob. Return "preventDrop" to stop item drops.',
+ onMobKilledOtherMob:'Called when a mob kills another mob. Return "preventDrop" to stop item drops.',
+ onPlayerPotionEffect:'Called when a player receives a potion effect. Can return "preventEffect".',
+ onPlayerDamagingMeshEntity:'Called when a player damages a mesh entity.',
+ onPlayerBreakMeshEntity:'Called when a player breaks a mesh entity.',
+ onPlayerUsedThrowable:'Called when a player uses a throwable item.',
+ onPlayerThrowableHitTerrain:'Called when a thrown projectile hits terrain.',
+ onTouchscreenActionButton:'Called when a touchscreen action button is pressed or released.',
+ onTaskClaimed:'Called when a player claims a task.',
+ onChunkLoaded:'Called when a chunk is first loaded. Avoid persisted chunk modifications here.',
+ onPlayerRequestChunk:'Called when a player requests a chunk.',
+ onItemDropCreated:'Called when an item drop entity is created.',
+ onPlayerStartChargingItem:'Called when a player starts charging an item. Can return "preventCharge".',
+ onPlayerFinishChargingItem:'Called when a player finishes charging an item.',
+ onPlayerFinishQTE:'Called when a player finishes a QTE.',
+ onPlayerToggledShopMenu:'Called when a player opens or closes the shop menu.',
+ onPlayerBoughtShopItem:'Called after a player successfully buys a shop item.',
+ doPeriodicSave:'Called periodically. Use it to save custom database values or S3 objects.'
+};
+const CALLBACK_INFO_FR={
+ tick:'Appelé à chaque tick, environ 20 fois par seconde. ms est le pas de temps fixe.',
+ onClose:'Appelé quand le lobby se ferme.',
+ onPlayerJoin:'Appelé quand un joueur rejoint le lobby.',
+ onPlayerLeave:'Appelé quand un joueur quitte le lobby.',
+ onPlayerJump:'Appelé quand un joueur saute.',
+ onRespawnRequest:'Appelé quand un joueur demande à réapparaître. Peut retourner true ou une position.',
+ playerCommand:'Appelé quand un joueur envoie une commande.',
+ onPlayerChat:'Appelé quand un joueur envoie un message. Peut empêcher ou modifier le chat.',
+ onPlayerChangeBlock:'Appelé quand un joueur place ou casse un bloc. Peut empêcher le changement ou le drop.',
+ onPlayerDropItem:'Appelé quand un joueur jette un item. Peut empêcher le drop.',
+ onBlockStand:'Appelé quand un joueur se tient sur un bloc.',
+ onPlayerAttemptCraft:'Appelé avant un craft. Retourne "preventCraft" pour annuler.',
+ onPlayerAttemptOpenChest:'Appelé avant ouverture d’un coffre. Retourne "preventOpen" pour annuler.',
+ onPlayerAttemptAltAction:'Appelé avant une action alternative / clic droit. Peut retourner "preventAction".',
+ onPlayerClick:'Appelé quand un joueur clique.',
+ onPlayerClickUp:'Appelé quand un joueur relâche un clic.',
+ onWorldChangeBlock:'Appelé quand un bloc change dans le monde. Peut empêcher le changement/drop.',
+ onPlayerAttemptSpawnMob:'Appelé quand un joueur tente de spawn un mob. Retourne "preventSpawn" pour annuler.',
+ onWorldAttemptSpawnMob:'Appelé quand le monde tente de spawn un mob. Retourne "preventSpawn" pour annuler.',
+ onWorldAttemptDespawnMob:'Appelé quand le monde tente de despawn un mob. Retourne "preventDespawn" pour annuler.',
+ onPlayerDamagingOtherPlayer:'Appelé quand un joueur inflige des dégâts à un autre joueur. Peut empêcher ou modifier les dégâts.',
+ onPlayerDamagingMob:'Appelé quand un joueur inflige des dégâts à un mob. Peut empêcher ou modifier les dégâts.',
+ onMobDamagingPlayer:'Appelé quand un mob inflige des dégâts à un joueur. Peut empêcher ou modifier les dégâts.',
+ onAttemptKillPlayer:'Appelé avant qu’un joueur soit tué. Retourne "preventDeath" pour empêcher la mort.',
+ onPlayerKilledMob:'Appelé quand un joueur tue un mob. Retourne "preventDrop" pour empêcher les drops.',
+ doPeriodicSave:'Appelé périodiquement. Utilise-le pour sauvegarder des valeurs custom.'
+};
+function callbackInfo(name){return (lang==='fr'?(CALLBACK_INFO_FR[name]||('Callback natif Bloxd. Paramètres: '+((eventFns.find(f=>f[0]===name)||['',[]])[1].join(', ')||tr('noArgs')))):(CALLBACK_INFO_EN[name]||''));}
+const RETURN_OPTIONS={
+  // Respawn / commands / chat
+  onRespawnRequest:['true','[0, 0, 0]'],
+  playerCommand:['true','false'],
+  onPlayerChat:['false','null','"prefix"','{}'],
+
+  // Blocks / inventory / crafting / chests
+  onPlayerChangeBlock:['"preventChange"','"preventDrop"','[x, y, z]'],
+  onWorldChangeBlock:['"preventChange"','"preventDrop"'],
+  onPlayerDropItem:['"preventDrop"','"allowButNoDroppedItemCreated"'],
+  onPlayerAttemptCraft:['"preventCraft"'],
+  onPlayerAttemptOpenChest:['"preventOpen"'],
+  onPlayerMoveItemOutOfInventory:['"preventChange"'],
+  onPlayerMoveInvenItem:['"preventChange"'],
+  onPlayerMoveItemIntoIdxs:['"preventChange"'],
+  onPlayerSwapInvenSlots:['"preventChange"'],
+  onPlayerMoveInvenItemWithAmt:['"preventChange"'],
+
+  // Actions / mobs spawning
+  onPlayerAttemptAltAction:['"preventAction"'],
+  onPlayerAttemptSpawnMob:['"preventSpawn"'],
+  onWorldAttemptSpawnMob:['"preventSpawn"'],
+  onWorldAttemptDespawnMob:['"preventDespawn"'],
+  onPlayerStartChargingItem:['"preventCharge"'],
+
+  // Damage / death / kills
+  onAttemptKillPlayer:['"preventDeath"'],
+  onPlayerDamagingOtherPlayer:['"preventDamage"','0','damageDealt'],
+  onPlayerDamagingMob:['"preventDamage"','0','damageDealt'],
+  onMobDamagingPlayer:['"preventDamage"','0','damageDealt'],
+  onMobDamagingOtherMob:['"preventDamage"','0','damageDealt'],
+  onPlayerKilledOtherPlayer:['"keepInventory"'],
+  onMobKilledPlayer:['"keepInventory"'],
+  onPlayerKilledMob:['"preventDrop"'],
+  onMobKilledOtherMob:['"preventDrop"'],
+  onPlayerPotionEffect:['"preventEffect"']
+};
+function findParentFuncName(targetId,list=blocks,current=null){
+  for(const b of list){
+    const nextCurrent=b.type==='func'?String(b.params?.[0]||'').trim():current;
+    if(b.id===targetId)return current;
+    if(b.children){const r=findParentFuncName(targetId,b.children,nextCurrent);if(r!==null&&r!==undefined)return r;}
+  }
+  return null;
+}
+function nearestFuncBefore(targetId,list=blocks,last=null){
+  for(const b of list){
+    if(b.id===targetId)return last;
+    const nextLast=b.type==='func'?String(b.params?.[0]||'').trim():last;
+    if(b.children){const r=nearestFuncBefore(targetId,b.children,nextLast);if(r!==null&&r!==undefined)return r;}
+    last=nextLast;
+  }
+  return null;
+}
+function allReturnSuggestions(){return [...new Set(Object.values(RETURN_OPTIONS).flat())];}
+function returnOptionsForBlock(b){
+  const fn=(findParentFuncName(b.id)||nearestFuncBefore(b.id)||'').trim();
+  if(fn&&RETURN_OPTIONS[fn])return RETURN_OPTIONS[fn];
+  return fn?[]:allReturnSuggestions();
+}
+
+
+
+const defs={
+ assign:{cat:'variables',icon:'📝',desc:'Créer / modifier une variable',params:['','','var'],inline:b=>[['varkind',2],['input',0],['pun','='],['input',1],['pun',';']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,fmt(b.params[1]))},
+ objectValue:{cat:'variables',icon:'🧩',valueOnly:true,valueKind:'object',snippet:'{ key: value }',desc:'Valeur objet à déposer dans une case',params:[]},
+ listValue:{cat:'variables',icon:'📚',valueOnly:true,valueKind:'list',snippet:'[item1, item2]',desc:'Valeur liste à déposer dans une case',params:[]},
+ objectVar:{cat:'variables',icon:'🧩',hidden:true,params:['','key: value','var'],inline:b=>[['varkind',2],['input',0],['pun','= {'],['input',1],['pun','};']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,objLiteral(b.params[1]))},
+ listVar:{cat:'variables',icon:'📚',hidden:true,params:['','item1, item2','var'],inline:b=>[['varkind',2],['input',0],['pun','= ['],['callargs',1],['pun','];']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,'['+parseCallArgs(b.params[1]).map(fmt).join(', ')+']')},
+ if:{cat:'logic',icon:'❓',container:true,desc:'Condition',params:['true'],inline:b=>[['kw','if'],['pun','('],['input',0],['pun',') {']],gen:(b,ctx,ind)=>ind+'if ('+(b.params[0]||'true')+') {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'}'},
+ else:{cat:'logic',icon:'↩️',container:true,desc:'Sinon',params:[],inline:b=>[['kw','else'],['pun',' {']],gen:(b,ctx,ind)=>ind+'else {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'}'},
+ for:{cat:'logic',icon:'🔁',container:true,desc:'Boucle for classique',params:['let i = 0; i < 10; i++'],inline:b=>[['kw','for'],['pun','('],['input',0],['pun',') {']],gen:(b,ctx,ind)=>ind+'for ('+(b.params[0]||'let i = 0; i < 10; i++')+') {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'}'},
+ forOf:{cat:'logic',icon:'🔂',container:true,desc:'Boucle for...of',params:['item','array'],inline:b=>[['kw','for'],['pun','('],['kw','const'],['input',0],['kw','of'],['input',1],['pun',') {']],gen:(b,ctx,ind)=>{let v=String(b.params[0]||'item').trim()||'item',list=String(b.params[1]||'array').trim()||'array';let local=new Set([...ctx,v]);return ind+'for (const '+v+' of '+list+') {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'}'}},
+ forIn:{cat:'logic',icon:'🔃',container:true,desc:'Boucle for...in',params:['key','object'],inline:b=>[['kw','for'],['pun','('],['kw','const'],['input',0],['kw','in'],['input',1],['pun',') {']],gen:(b,ctx,ind)=>{let k=String(b.params[0]||'key').trim()||'key',obj=String(b.params[1]||'object').trim()||'object';let local=new Set([...ctx,k]);return ind+'for (const '+k+' in '+obj+') {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'}'}},
+ func:{cat:'events',icon:'⚡',container:true,hat:true,desc:'Déclarer une fonction',params:['','playerId'],inline:b=>[['kw','function'],['input',0],['pun','('],['args',1],['pun',') {']],gen:(b,ctx,ind)=>{let name=cleanFnName(b.params[0]||tr('phFn')),ps=parseArgs(b.params[1]);let local=new Set([...ctx,...ps]);return ind+'function '+name+'('+ps.join(', ')+') {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'}'}},
+ call:{cat:'events',icon:'📞',desc:'Appeler une fonction',params:['','playerId'],inline:b=>[['fn','call'],['input',0],['pun','('],['callargs',1],['pun',');']],gen:(b,ctx,ind)=>ind+cleanFnName(b.params[0]||tr('phFn'))+'('+parseCallArgs(b.params[1]).map(fmt).join(', ')+');'},
+ return:{cat:'events',icon:'↩️',desc:'Retourner une valeur',params:[''],inline:b=>[['kw','return'],['returnval',0],['pun',';']],gen:(b,ctx,ind)=>{let v=String(b.params[0]??'').trim();return ind+(v?'return '+fmt(v)+';':'return;')}},
+ log:{cat:'debug',icon:'📤',desc:'api.log(message)',params:['"Hello"'],inline:b=>[['prop','api'],['pun','.'],['fn','log'],['pun','('],['input',0],['pun',');']],gen:(b,ctx,ind)=>ind+'api.log('+fmt(b.params[0])+');'},
+ sendMessage:{cat:'message',icon:'✉️',desc:'Envoyer un message joueur',params:['playerId','"Bienvenue !"','{ color: "cyan" }'],inline:apiInline('sendMessage'),gen:apiGen('sendMessage')},
+ broadcastMessage:{cat:'message',icon:'📣',desc:'Message à tout le monde',params:['"Annonce"','{ color: "yellow" }'],inline:apiInline('broadcastMessage'),gen:apiGen('broadcastMessage')},
+ sendTopRightHelper:{cat:'message',icon:'🔔',desc:'Helper en haut à droite',params:['playerId','"fa-solid fa-bolt"','"Objectif"','{ duration: 3000 }'],inline:apiInline('sendTopRightHelper'),gen:apiGen('sendTopRightHelper')},
+ setPosition:{cat:'move',icon:'📍',desc:'Téléporter une entité',params:['playerId','0','10','0'],inline:apiInline('setPosition'),gen:apiGen('setPosition')},
+ getPosition:{cat:'move',icon:'🧭',desc:'Récupérer la position',params:['playerId'],inline:apiInline('getPosition'),gen:apiGen('getPosition')},
+ setVelocity:{cat:'move',icon:'🚀',desc:'Définir la vélocité',params:['playerId','0','10','0'],inline:apiInline('setVelocity'),gen:apiGen('setVelocity')},
+ applyImpulse:{cat:'move',icon:'💥',desc:'Appliquer une impulsion',params:['playerId','5','5','5'],inline:apiInline('applyImpulse'),gen:apiGen('applyImpulse')}
+};
+function apiInline(name){return b=>[['prop','api'],['pun','.'],['fn',name],['pun','('],...b.params.flatMap((_,i)=> i<b.params.length-1 ? [['input',i],['pun',', ']] : [['input',i]]),['pun',');']]}
+function apiGen(name){return (b,ctx,ind)=>ind+'api.'+name+'('+b.params.map(fmt).join(', ')+');'}
+function q(v){return JSON.stringify(v)}
+function choiceList(arr){return arr.map(v=>({label:String(v),value:q(v)}))}
+const API_CHOICES={
+ clientOption:choiceList(['airAccScale','airFrictionScale','airJumpCount','airMomentumConservation','ambientLightColourOverride','arrowPotionEffectDuration','auraPerLevel','autoRespawn','bounciness','bunnyhopMaxMultiplier','cameraRoll','cameraRollTransitionMs','cameraTint','canAltAction','canChange','canClimbWalls','canCraft','canCrouch','canCustomiseChar','canPickBlocks','canPickUpItems','canSeeNametagsThroughWalls','cantBreakError','cantBuildError','cantChangeError','canUseZoomKey','chatChannels','compassTarget','creative','crosshairText','crouchingSpeed','crouchMobDetectionRadiusMultiplier','dealingDamageDefaultMultiplier','dealingDamageHeadMultiplier','dealingDamageLegMultiplier','dealingDamageMultiplier','defaultBlock','droppedItemScale','effectDamageDuration','effectDamageReductionDuration','effectHealthRegenDuration','effectSpeedDuration','fallDamage','flySpeedMultiplier','fogChunkDistanceOverride','fogColourOverride','forcedCameraDirection','forcedCameraDirectionTransitionMs','groundArrowPath','groundFrictionScale','healthRegenAmount','healthRegenInterval','healthRegenStartAfter','heldLightColourOverride','hideCoordinates','horizontalKnockbackMultiplier','initialHealth','initialShield','inventoryItemsMoveable','invincible','jumpAmount','killstreakDuration','lightingOverride','lobbyLeaderboardInfo','maxAuraLevel','maxHealth','maxPlayerZoom','maxShield','middleTextLower','middleTextUpper','minChunkAddDist','movementBasedFovScale','music','musicVolumeLevel','numClosestPlayersVisible','playerZoom','potionEffectDuration','proximityFadeDistance','proximityFadeMinOpacity','receivingDamageMultiplier','respawnButtonText','RightInfoText','runningSpeed','secsToRespawn','showBasicMovementControls','showKillfeed','showPlayersInUnloadedChunks','showProgressBar','skyBox','skyLightColourOverride','speedMultiplier','splashPotionEffectDuration','stompDamageMultiplier','stompDamageRadius','strictFluidBuckets','touchscreenActionButton','ttbMultiplier','useFullInventory','useInventory','usePlayAgainButton','verticalKnockbackMultiplier','walkingSpeed','zoomOutDistance']),
+ entitySetting:choiceList(['canAttack','canSee','colorInLobbyLeaderboard','hasPriorityNametag','killfeedColour','lobbyLeaderboardValues','meshScaling','nameColour','nameTagInfo','opacity','overlayColour','showDamageAmounts','zIndex']),
+ nameColour:choiceList(['default','yellow','lime','green','aqua','cyan','blue','purple','pink','red','orange']),
+ mobSetting:choiceList(['attackDamage','attackEffectDuration','attackEffectName','attackImpulse','attackInterval','attackItemName','attackRadius','attackSound','baseJumpImpulseXZ','baseJumpImpulseY','baseRunningSpeed','baseWalkingSpeed','burstAttackInfo','chaseRadius','combatTetherInfo','evadeInfo','healthRegen','heldItemName','hostilityRadius','hurtSound','idleSound','initialHealth','isRideable','jumpCount','jumpMultiplier','maxFollowingRadius','maxHealth','metaInfo','minFollowingRadius','name','onDeathAura','onDeathItemDrops','onDeathParticleTexture','onTamedHealthMultiplier','ownerDbId','petInfo','rangedAttackInaccuracy','ridingSpeedMult','runAwayRadius','runningSpeedMultiplier','secondaryAttackDamage','secondaryAttackImpulse','secondaryAttackItemName','secondaryAttackRadius','secondaryAttackSound','secondaryBurstAttackInfo','stoppingRadius','swingArmOnAttack','swingArmOnSecondaryAttack','tameInfo','territoryRadius','variation','walkingSpeedMultiplier','warpTargetSpecialAttackInfo']),
+ mobAiState:choiceList(['idle','disabled','idleBeforeTurning','turning','idleBeforeWalking','walking','runningAway','chasing','following','watching','walkingToPosition','runningToPosition']),
+ mobType:choiceList(['Pig','Cow','Sheep','Horse','Cave Golem','Draugr Zombie','Draugr Skeleton','Frost Golem','Frost Zombie','Frost Skeleton','Draugr Knight','Wolf','Bear','Deer','Stag','Gold Watermelon Stag','Gorilla','Wildcat','Magma Golem','Draugr Huntress','Spirit Golem','Spirit Wolf','Spirit Bear','Spirit Stag','Spirit Gorilla','Draugr Warper','Frost Wraith','Draugr Reaver','NPC','Bobino Musculino','Capitano Explovissimo']),
+ meshType:choiceList(['Box','BloxdBlock','Person','ParticleEmitter']),
+ entityNode:choiceList(['TorsoNode','HeadMesh','ArmRightMesh','ArmLeftMesh','LegLeftMesh','LegRightMesh']),
+ qteType:choiceList(['progressBar','timedClick','gravityBar','precisionBar','rhythmClick']),
+ particleTexture:choiceList(['arrow','bubble','critical_hit','drift','effect_5','generic_2','glint','heart','scary_face','soul_0','square_particle','z-particle']),
+ particlePreset:choiceList(['brainRot','stomp','fertiliser','bonemeal','mobTameSuccess','mobTameFailure','mobCatch','spawnCaughtMob','mobFeedDefault','mobFeedSuperliked','mobFeedLike','mobFeedNeutral','mobFeedDisliked','mobDeath','mobDeathSoul','boardShopSuccess','mobSpawnerBlockFail','mobSpawnerBlockPassive','mobSpawnerBlockNeutral','mobSpawnerBlockHostile','mobSpawnOrb','aura','yellowFirecrackerSmall','yellowFirecrackerLarge','whiteFirecrackerSmall','whiteFirecrackerLarge','redFirecrackerSmall','redFirecrackerLarge','purpleFirecrackerSmall','purpleFirecrackerLarge','pinkFirecrackerSmall','pinkFirecrackerLarge','orangeFirecrackerSmall','orangeFirecrackerLarge','magentaFirecrackerSmall','magentaFirecrackerLarge','limeFirecrackerSmall','limeFirecrackerLarge','lightGrayFirecrackerSmall','lightGrayFirecrackerLarge','lightBlueFirecrackerSmall','lightBlueFirecrackerLarge','greenFirecrackerSmall','greenFirecrackerLarge','grayFirecrackerSmall','grayFirecrackerLarge','cyanFirecrackerSmall','cyanFirecrackerLarge','brownFirecrackerSmall','brownFirecrackerLarge','blueFirecrackerSmall','blueFirecrackerLarge','blackFirecrackerSmall','blackFirecrackerLarge','defaultFirecrackerSmall','defaultFirecrackerLarge','mango','speedInner','speedOuter','damageReductionInner','damageReductionOuter','damageInner','damageOuter','invisibleInner','invisibleOuter','jumpBoostInner','jumpBoostOuter','knockbackInner','knockbackOuter','poisonedInner','poisonedOuter','slownessInner','slownessOuter','weaknessInner','weaknessOuter','cleansedInner','cleansedOuter','instantDamageInner','instantDamageOuter','healthRegenInner','healthRegenOuter','instantHealthInner','instantHealthOuter','hasteInner','hasteOuter','shieldInner','shieldOuter','doubleJumpInner','doubleJumpOuter','heatResistanceInner','heatResistanceOuter','thiefInner','thiefOuter','xRayVisionInner','xRayVisionOuter','miningYieldInner','miningYieldOuter','brainRotInner','brainRotOuter','auraInner','auraOuter','wallClimbingInner','wallClimbingOuter','airWalkInner','airWalkOuter','pickpocketerInner','pickpocketerOuter','lifestealInner','lifestealOuter','bouncinessInner','bouncinessOuter','blindnessInner','blindnessOuter','poopyInner','poopyOuter']),
+ pose:choiceList(['standing','sitting','zombie','gliding','driving','sleeping','riding']),
+ skinPart:choiceList(['skin','hat','head','eyebrows','eyes','back','body','legs','shoes']),
+ npcSkin:choiceList(['chef','farmer','farmer_gill','monster_hunter_lorenzo','painter_spencer','piggy_banker','portal_mage','trader','trader_black','trader_blue','wizard','zombie']),
+ cosmeticType:choiceList(['skin','hat','head','eyebrows','eyes','back','body','legs','shoes']),
+ music:choiceList(['Adigold - A Place To Be Free','Adigold - Butterfly Effect','Adigold - Dreamless Sleep','Adigold - Frozen Pulse','Adigold - Frozen Skies','Adigold - Healing Thoughts','Adigold - Here Forever','Adigold - Just a Little Hope','Adigold - Just Like Heaven','Adigold - Memories Remain','Adigold - Place To Be','Adigold - The Riverside','Adigold - The Wonder','Adigold - Vetrar (Cut B)','Awkward Comedy Quirky','battle-ship-111902','cdk-Silence-Await','ghost-Reverie-small-theme','happy','Heroic-Demise-New','Juhani Junkala [Retro Game Music Pack] Level 1','Juhani Junkala [Retro Game Music Pack] Level 2','Juhani Junkala [Retro Game Music Pack] Level 3','Juhani Junkala [Retro Game Music Pack] Title Screen','TownTheme','Epic1','Epic2','Emotional Epic','Enemy Marked'])
+};
+function pp(name,def='',choice=null){return {name,default:def,choice}}
+function apiInlineChoice(name,b){let d=defOf(b.type),out=[['prop','api'],['pun','.'],['fn',name],['pun','(']];b.params.forEach((_,i)=>{out.push(d.choices?.[i]?['choice',i,d.choices[i]]:['input',i]);if(i<b.params.length-1)out.push(['pun',', '])});out.push(['pun',');']);return out}
+function registerApiMethods(methods){methods.forEach(m=>{defs[m.name]={cat:m.cat,icon:m.icon||'🔌',label:'api.'+m.name,desc:m.desc||('api.'+m.name+'('+m.params.map(p=>p.name).join(', ')+')'+(m.returns?' → '+m.returns:'')),params:m.params.map(p=>p.default),paramNames:m.params.map(p=>p.name),choices:m.params.map(p=>p.choice||null),api:true,inline:b=>apiInlineChoice(m.name,b),gen:(b,ctx,ind)=>ind+'api.'+m.name+'('+b.params.map(fmt).join(', ')+');'}})}
+const A={msg:'api_message',sound:'api_sound',player:'api_player',blocks:'api_blocks',inv:'api_inventory',items:'api_items',combat:'api_combat',ent:'api_entities',mobs:'api_mobs',mesh:'api_mesh',shop:'api_shop',db:'api_db',client:'api_client',settings:'api_settings',qte:'api_qte',fx:'api_fx'};
+const API_METHODS=[];
+function M(cat,icon,name,params=[],returns=''){API_METHODS.push({cat,icon,name,params,returns})}
+// Messages, UI, sound
+M(A.msg,'✉️','sendMessage',[pp('playerId','playerId'),pp('message','"Bienvenue !"'),pp('style','{ color: "cyan" }')]);M(A.msg,'📣','broadcastMessage',[pp('message','"Annonce"'),pp('style','{ color: "yellow" }')]);M(A.msg,'🔔','sendTopRightHelper',[pp('playerId','playerId'),pp('icon','"fa-solid fa-bolt"'),pp('text','"Objectif"'),pp('opts','{ duration: 3000 }')]);M(A.msg,'🪽','sendFlyingMiddleMessage',[pp('playerId','playerId'),pp('message','"Go !"'),pp('distanceFromAction','0'),pp('lifetimeMs','2000')]);M(A.msg,'📊','initiateMiddleScreenBar',[pp('playerId','playerId'),pp('duration','5000'),pp('chargeExpiresAutomatically','true'),pp('horizontalBarRemOffset','0')]);M(A.msg,'📊','progressBarUpdate',[pp('playerId','playerId'),pp('toFraction','1'),pp('toDuration','1000')]);M(A.msg,'📊','removeMiddleScreenBar',[pp('playerId','playerId')]);M(A.msg,'🏹','setDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"'),pp('position','[0, 10, 0]'),pp('text','"Ici"'),pp('showDistance','true'),pp('style','{}')]);M(A.msg,'🏹','clearDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"')]);M(A.msg,'💀','addCustomKillfeedMessage',[pp('killer','"Killer"'),pp('victim','"Victim"'),pp('withItem','"Sword"')]);
+M(A.sound,'🔊','playSound',[pp('playerId','playerId'),pp('soundName','"pickUp"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null')]);M(A.sound,'📢','broadcastSound',[pp('soundName','"game_start_countdown_final"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null'),pp('exceptPlayerId','null')]);M(A.sound,'🔮','playClientPredictedSound',[pp('soundName','"pickUp"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null'),pp('predictedBy','playerId')]);
+// Players
+['getPlayerIds','getNumPlayers','getLobbyName','getLobbyType','isPublicLobby','now'].forEach(n=>M(A.player,'ℹ️',n,[]));
+M(A.player,'🔎','getPlayerId',[pp('playerName','"Alex"')]);M(A.player,'🔎','getPlayerIdFromDbId',[pp('dbId','dbId')]);M(A.player,'🆔','getPlayerDbId',[pp('playerId','playerId')]);M(A.player,'✅','playerIsInGame',[pp('playerId','playerId')]);M(A.player,'✅','playerIsLoggedIn',[pp('playerId','playerId')]);M(A.player,'📱','isMobile',[pp('playerId','playerId')]);M(A.player,'🧎','isPlayerCrouching',[pp('playerId','playerId')]);M(A.player,'🎯','getPlayerTargetInfo',[pp('playerId','playerId')]);M(A.player,'🧭','getPlayerFacingInfo',[pp('playerId','playerId')]);M(A.player,'🎉','getPlayerPartyWhenJoined',[pp('playerId','playerId')]);M(A.player,'🦵','getPlayerPhysicsState',[pp('playerId','playerId')]);M(A.player,'🦵','setPlayerPhysicsState',[pp('playerId','playerId'),pp('physicsState','{}'),pp('positionOffset','[0, 0, 0]')]);M(A.player,'📷','setCameraDirection',[pp('playerId','playerId'),pp('direction','[0, 0, 1]')]);M(A.player,'🔎','setCameraZoom',[pp('playerId','playerId'),pp('zoom','1')]);M(A.player,'🫥','setPlayerOpacity',[pp('playerId','playerId'),pp('opacity','0.5')]);M(A.player,'🫥','setPlayerOpacityForOnePlayer',[pp('playerIdWhoViewsOpacityPlayer','viewerId'),pp('playerIdOfOpacityPlayer','playerId'),pp('opacity','0.5')]);M(A.player,'🎭','setPlayerPose',[pp('playerId','playerId'),pp('pose','"standing"','pose'),pp('poseOffset','null')]);M(A.player,'👕','changePlayerIntoSkin',[pp('playerId','playerId'),pp('cosmeticType','"skin"','cosmeticType'),pp('cosmeticName','"skin_0_0"')]);M(A.player,'👕','removeAppliedSkin',[pp('playerId','playerId')]);M(A.player,'👕','getPlayerCosmetic',[pp('playerId','playerId'),pp('cosmeticType','"skin"','cosmeticType')]);M(A.player,'📏','scalePlayerMeshNodes',[pp('playerId','playerId'),pp('nodeScales','{}')]);M(A.player,'🔄','forceRespawn',[pp('playerId','playerId'),pp('respawnPos','[0, 10, 0]')]);M(A.player,'🚪','kickPlayer',[pp('playerId','playerId'),pp('reason','"Raison"')]);M(A.player,'🎮','matchmakePlayer',[pp('playerId','playerId'),pp('game','"worlds"'),pp('lobbyName','"lobby"')]);M(A.player,'👥','setMaxPlayers',[pp('softMaxPlayers','20'),pp('maxPlayers','40')]);
+// Blocks/world
+['getEmptyChunk'].forEach(n=>M(A.blocks,'🧩',n,[]));M(A.blocks,'🧱','getBlock',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','setBlock',[pp('x','x'),pp('y','y'),pp('z','z'),pp('blockName','"Air"')]);M(A.blocks,'🧱','getBlockId',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','blockIdToBlockName',[pp('blockId','blockId')]);M(A.blocks,'🧱','blockNameToBlockId',[pp('blockName','"Grass Block"'),pp('allowInvalidBlock','false')]);M(A.blocks,'🧱','getBlockData',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','setBlockData',[pp('x','x'),pp('y','y'),pp('z','z'),pp('data','{}')]);M(A.blocks,'🧱','getBlockSolidity',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','getMetaInfo',[pp('blockName','"Grass Block"')]);M(A.blocks,'🧍','getBlockCoordinatesPlayerStandingOn',[pp('playerId','playerId')]);M(A.blocks,'🧍','getBlockTypesPlayerStandingOn',[pp('playerId','playerId')]);M(A.blocks,'⬛','setBlockRect',[pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('blockName','"Stone"')]);M(A.blocks,'🧱','setBlockWalls',[pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('blockName','"Stone"'),pp('hasFloor','true'),pp('hasCeiling','true')]);M(A.blocks,'📋','copyChunk',[pp('fromPos','[0, 0, 0]'),pp('toPos','[32, 0, 0]')]);M(A.blocks,'🌍','getChunk',[pp('pos','[0, 0, 0]')]);M(A.blocks,'🌍','blockCoordToChunkId',[pp('pos','[0, 0, 0]')]);M(A.blocks,'🌍','chunkIdToBotLeftCoord',[pp('chunkId','chunkId')]);M(A.blocks,'🌍','isBlockInLoadedChunk',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🌍','raycastForBlock',[pp('fromPos','[0, 10, 0]'),pp('dirVec','[0, -1, 0]')]);M(A.blocks,'🌍','isInsideRect',[pp('coordsToCheck','[0, 0, 0]'),pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('addOneToMax','true')]);M(A.blocks,'✋','attemptWorldChangeBlock',[pp('initiatorDbId','dbId'),pp('x','x'),pp('y','y'),pp('z','z'),pp('blockName','"Air"'),pp('extraInfo','{}')]);M(A.blocks,'✅','setCanChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'✅','setCanChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'✅','setCanChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'🚫','setCantChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🚫','setCantChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'🚫','setCantChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'↩️','resetCanChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'↩️','resetCanChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'↩️','resetCanChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'🚶','setWalkThroughRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]'),pp('updateType','true')]);M(A.blocks,'🚶','setWalkThroughType',[pp('playerId','playerId'),pp('blockName','"Glass"'),pp('disable','true')]);
+// Inventory/items/chests
+['clearInventory','inventoryIsFull','getInventoryFreeSlotCount','getHeldItem','getSelectedInventorySlotI','getMoonstoneChestItems'].forEach(n=>M(A.inv,'🎒',n,[pp('playerId','playerId')]));M(A.inv,'🎒','setSelectedInventorySlotI',[pp('playerId','playerId'),pp('newI','0')]);M(A.inv,'🎒','getItemSlot',[pp('playerId','playerId'),pp('itemSlotIndex','0')]);M(A.inv,'🎒','setItemSlot',[pp('playerId','playerId'),pp('itemSlotIndex','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('attributes','{}'),pp('tellClient','true')]);M(A.inv,'💎','giveItem',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('attributes','{}')]);M(A.inv,'🔎','findItem',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'🔢','getInventoryItemAmount',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'✅','hasItem',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'➖','removeItemName',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('amount','1')]);M(A.inv,'📊','getItemStat',[pp('lifeformId','playerId'),pp('itemName','"Sword"'),pp('stat','"damage"')]);M(A.inv,'📊','setItemStat',[pp('playerId','playerId'),pp('itemName','"Sword"'),pp('stat','"damage"'),pp('value','10')]);M(A.inv,'🧾','getInitialItemMetadata',[pp('itemName','"Dirt"')]);M(A.inv,'🔨','editItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('recipesForItem','[]')]);M(A.inv,'🔨','removeItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'🔨','resetItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'🌙','getMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0')]);M(A.inv,'🌙','setMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('metadata','{}')]);M(A.inv,'📦','openChestForPlayer',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.inv,'📦','closeChestForPlayer',[pp('playerId','playerId')]);M(A.inv,'📦','canOpenStandardChest',[pp('playerId','playerId'),pp('chestX','x'),pp('chestY','y'),pp('chestZ','z')]);M(A.inv,'📦','getStandardChestItems',[pp('chestPos','[x, y, z]')]);M(A.inv,'📦','getStandardChestItemSlot',[pp('chestPos','[x, y, z]'),pp('idx','0')]);M(A.inv,'📦','setStandardChestItemSlot',[pp('chestPos','[x, y, z]'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('playerId','playerId'),pp('attributes','{}')]);M(A.inv,'📦','giveStandardChestItem',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('playerId','playerId'),pp('attributes','{}')]);M(A.inv,'📦','removeItemNameFromStandardChest',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"'),pp('amount','1'),pp('playerId','playerId')]);M(A.inv,'📦','findStandardChestItem',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"')]);M(A.inv,'📦','getStandardChestItemAmount',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"')]);M(A.inv,'📦','getStandardChestFreeSlotCount',[pp('chestPos','[x, y, z]')]);
+M(A.items,'💧','createItemDrop',[pp('x','x'),pp('y','y'),pp('z','z'),pp('itemName','"Dirt"'),pp('amount','1'),pp('mergeItems','true'),pp('attributes','{}'),pp('timeTillDespawn','30000'),pp('dropperId','playerId'),pp('options','{}')]);M(A.items,'🗑️','deleteItemDrop',[pp('itemId','itemId')]);M(A.items,'🧹','deleteAllItems',[]);M(A.items,'🏷️','getItemDropName',[pp('itemEId','itemEId')]);M(A.items,'👣','getItemIDsOverlappingWithPlayer',[pp('playerId','playerId')]);M(A.items,'✋','setCantPickUpItem',[pp('playerId','playerId'),pp('itemId','itemId')]);M(A.items,'↩️','resetCanPickUpItem',[pp('playerId','playerId'),pp('itemId','itemId')]);M(A.items,'🔢','setItemAmount',[pp('itemId','itemId'),pp('newAmount','1')]);
+// Combat/effects/aura
+['isAlive','getHealth','getShieldAmount','getEffects'].forEach(n=>M(A.combat,'❤️',n,[pp('lifeformId','playerId')]));M(A.combat,'❤️','setHealth',[pp('entityId','playerId'),pp('newHealth','100'),pp('whoDidDamage','null'),pp('increaseMaxHealthIfNeeded','true')]);M(A.combat,'❤️','applyHealthChange',[pp('lifeformId','playerId'),pp('changeAmount','-10'),pp('whoDidDamage','null'),pp('broadcastLifeformHurt','true')]);M(A.combat,'🛡️','setShieldAmount',[pp('lifeformId','playerId'),pp('newShieldAmount','50')]);M(A.combat,'☠️','killLifeform',[pp('lifeformId','playerId'),pp('whoKilled','null')]);M(A.combat,'✨','applyEffect',[pp('lifeformId','playerId'),pp('effectName','"Speed"'),pp('duration','5000'),pp('customEffectInfo','{}')]);M(A.combat,'✨','removeEffect',[pp('lifeformId','playerId'),pp('name','"Speed"')]);M(A.combat,'✨','hasEffect',[pp('lifeformId','playerId'),pp('name','"Speed"'),pp('atOrAboveLevel','1')]);M(A.combat,'✨','getEffectLevel',[pp('lifeformId','playerId'),pp('name','"Speed"')]);M(A.combat,'⚔️','applyMeleeHit',[pp('hittingEId','playerId'),pp('hitEId','targetId'),pp('dirFacing','[0, 0, 1]'),pp('bodyPartHit','"Torso"'),pp('overrides','{}')]);M(A.combat,'⚔️','attemptApplyDamage',[pp('damageInfo','{ eId: playerId, hitEId: targetId, attemptedDmgAmt: 10 }')]);M(A.combat,'💥','calcExplosionForce',[pp('eId','playerId'),pp('explosionType','"default"'),pp('knockbackFactor','1'),pp('explosionRadius','5'),pp('explosionPos','[0, 0, 0]'),pp('ignoreProjectiles','true')]);M(A.combat,'🎯','sendHitmarker',[pp('playerId','playerId'),pp('isCrit','false'),pp('directionVector','[0, 0, 1]')]);M(A.combat,'🛬','preventFallDamageNextGrounding',[pp('playerId','playerId')]);M(A.combat,'🔥','getCurrentKillstreak',[pp('playerId','playerId')]);M(A.combat,'🔥','clearKillstreak',[pp('playerId','playerId')]);M(A.combat,'💫','getAuraInfo',[pp('playerId','playerId')]);M(A.combat,'💫','applyAuraChange',[pp('playerId','playerId'),pp('auraDiff','1')]);M(A.combat,'💫','setAuraLevel',[pp('playerId','playerId'),pp('level','1')]);M(A.combat,'💫','setTotalAura',[pp('playerId','playerId'),pp('totalAura','100')]);
+// Entities/movement
+M(A.ent,'✅','checkValid',[pp('entityId','playerId')]);M(A.ent,'📍','getPosition',[pp('entityId','playerId')]);M(A.ent,'📍','setPosition',[pp('entityId','playerId'),pp('x','0'),pp('y','10'),pp('z','0')]);M(A.ent,'🚀','getVelocity',[pp('eId','playerId')]);M(A.ent,'🚀','setVelocity',[pp('eId','playerId'),pp('x','0'),pp('y','10'),pp('z','0')]);M(A.ent,'💥','applyImpulse',[pp('eId','playerId'),pp('xImpulse','5'),pp('yImpulse','5'),pp('zImpulse','5')]);M(A.ent,'🧭','getEntityHeading',[pp('entityId','playerId')]);M(A.ent,'🧭','setEntityHeading',[pp('entityId','playerId'),pp('newHeading','0')]);M(A.ent,'🔄','getEntityRotation',[pp('entityId','playerId')]);M(A.ent,'🔄','setEntityRotation',[pp('entityId','playerId'),pp('xRotation','0'),pp('yRotation','0'),pp('zRotation','0')]);M(A.ent,'🏷️','getEntityName',[pp('entityId','playerId')]);M(A.ent,'🏷️','getEntityType',[pp('entityId','playerId')]);M(A.ent,'📦','getEntitiesInRect',[pp('minCoords','[0, 0, 0]'),pp('maxCoords','[10, 10, 10]')]);M(A.ent,'📐','getUnitCoordinatesLifeformWithin',[pp('lifeformId','playerId')]);M(A.ent,'🔗','addFollowingEntityToPlayer',[pp('playerId','playerId'),pp('eId','entityId'),pp('offset','[0, 2, 0]'),pp('followsPlayerRotation','true')]);M(A.ent,'🔗','removeFollowingEntityFromPlayer',[pp('playerId','playerId'),pp('entityEId','entityId')]);M(A.ent,'🎞️','animateEntity',[pp('entityId','entityId'),pp('animationSchema','{}'),pp('initialTimeFraction','0'),pp('animationSpeed','1')]);
+// Mobs
+M(A.mobs,'🐺','attemptSpawnMob',[pp('mobType','"Pig"','mobType'),pp('x','x'),pp('y','y'),pp('z','z'),pp('opts','{}')]);M(A.mobs,'🐺','despawnMob',[pp('mobId','mobId')]);M(A.mobs,'🐺','getMobIds',[]);M(A.mobs,'🐺','getNumMobs',[]);M(A.mobs,'🐺','getMobDbId',[pp('mobId','mobId')]);M(A.mobs,'🐺','createMobHerd',[]);M(A.mobs,'⚙️','getDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting')]);M(A.mobs,'⚙️','setDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting'),pp('value','100')]);M(A.mobs,'⚙️','getMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('returnDefaultIfNotOverridden','true')]);M(A.mobs,'⚙️','setMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('value','100')]);M(A.mobs,'🧠','getMobAiState',[pp('mobId','mobId')]);M(A.mobs,'🧠','setMobAiState',[pp('mobId','mobId'),pp('state','"idle"','mobAiState'),pp('params','{}')]);M(A.mobs,'🕊️','passifyHostility',[pp('mobId','mobId'),pp('targetLifeformId','playerId')]);M(A.mobs,'🐺','onPlayerAttemptSpawnMob',[pp('playerId','playerId'),pp('mobType','"Pig"','mobType'),pp('x','x'),pp('y','y'),pp('z','z')]);
+// Mesh/throwables
+M(A.mesh,'🧊','attemptCreateMeshEntity',[pp('type','"Box"','meshType'),pp('opts','{}'),pp('name','"mesh"'),pp('physicsOptions','{}'),pp('initiatorId','playerId')]);M(A.mesh,'🧊','updateMeshEntity',[pp('eId','entityId'),pp('type','"Box"','meshType'),pp('opts','{}')]);M(A.mesh,'🗑️','deleteMeshEntity',[pp('eId','entityId')]);M(A.mesh,'🪃','attemptCreateThrowable',[pp('throwerEId','playerId'),pp('itemName','"Snowball"'),pp('position','[0, 10, 0]'),pp('direction','[0, 0, 1]'),pp('velocityMult','1'),pp('damageMult','1'),pp('gravityMult','1'),pp('attributes','{}')]);M(A.mesh,'🗑️','deleteThrowable',[pp('eId','entityId')]);M(A.mesh,'🧍','updateEntityNodeMeshAttachment',[pp('eId','entityId'),pp('node','"HeadMesh"','entityNode'),pp('type','"Box"','meshType'),pp('opts','{}'),pp('offset','[0, 0, 0]'),pp('rotation','[0, 0, 0]')]);M(A.mesh,'💨','updateMeshParticleSystems',[pp('updates','[]')]);
+// Shop/db/client/settings/qte/fx
+['configureShopCategory','deleteShopItem'].forEach(n=>M(A.shop,'🛒',n,[pp('categoryKey','"main"'),pp(n==='deleteShopItem'?'itemKey':'config',n==='deleteShopItem'?'"item1"':'{}')]));M(A.shop,'🛒','configureShopCategoryForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('config','{}')]);M(A.shop,'🛒','createShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('item','{}')]);M(A.shop,'🛒','createShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('item','{}')]);M(A.shop,'🛒','updateShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{}')]);M(A.shop,'🛒','updateShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{}')]);M(A.shop,'🛒','resetShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"')]);M(A.shop,'🛒','openShop',[pp('playerId','playerId'),pp('toggle','true'),pp('forceCategoryKey','"main"'),pp('onlyIfNonEmpty','false')]);M(A.shop,'🛒','showShopTutorial',[pp('playerId','playerId')]);M(A.shop,'🛒','sendOverShopInfo',[pp('playerId','playerId'),pp('info','{}')]);
+M(A.db,'🗄️','getLobbyDbValue',[pp('key','"key"')]);M(A.db,'🗄️','setLobbyDbValue',[pp('key','"key"'),pp('value','"value"')]);M(A.db,'🗑️','deleteLobbyDbValue',[pp('key','"key"')]);M(A.db,'🗑️','deleteAllLobbyDbValues',[]);M(A.db,'🗄️','getPlayerDbValue',[pp('playerId','playerId'),pp('key','"key"')]);M(A.db,'🗄️','setPlayerDbValue',[pp('playerId','playerId'),pp('key','"key"'),pp('value','"value"')]);M(A.db,'🗑️','deletePlayerDbValue',[pp('playerId','playerId'),pp('key','"key"')]);M(A.db,'🗑️','deleteAllPlayerDbValues',[pp('playerId','playerId')]);
+M(A.client,'⚙️','setClientOption',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption'),pp('value','1')]);M(A.client,'⚙️','getClientOption',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption')]);M(A.client,'⚙️','setClientOptions',[pp('playerId','playerId'),pp('optionsObj','{}')]);M(A.client,'⚙️','setClientOptionToDefault',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption')]);M(A.client,'📌','setCallbackValueFallback',[pp('callbackName','"onPlayerChat"'),pp('defaultValue','null')]);
+M(A.settings,'🎛️','setTargetedPlayerSettingForEveryone',[pp('targetedPlayerId','playerId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','nameColour'),pp('includeNewJoiners','true')]);M(A.settings,'🎛️','setEveryoneSettingForPlayer',[pp('playerId','playerId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','nameColour'),pp('includeNewJoiners','true')]);M(A.settings,'🎛️','setOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','nameColour')]);M(A.settings,'🎛️','setOtherEntitySettings',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingsObject','{}')]);M(A.settings,'🎛️','getOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);M(A.settings,'🎛️','setOtherEntitySettingToDefault',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
+M(A.qte,'🎯','addQTE',[pp('playerId','playerId'),pp('qteParameters','{ type: "progressBar" }')]);M(A.qte,'🎯','deleteQTE',[pp('playerId','playerId'),pp('id','qteId')]);M(A.qte,'🎯','hasActiveQTE',[pp('playerId','playerId')]);
+M(A.fx,'✨','playParticleEffect',[pp('opts','{ texture: "glint", pos1: [0, 0, 0], pos2: [0, 1, 0] }'),pp('clientPredictedBy','null')]);M(A.fx,'✨','updateMeshParticleSystems',[pp('updates','[]')]);
+registerApiMethods(API_METHODS);
+let active='variables',blocks=[],vars=[],customFns=[],uid=1,drag=null,blockSearch='';
+
+let lang=localStorage.getItem('bloxd-lang')||'fr';
+let theme=localStorage.getItem('bloxd-theme')||'dark';
+let codeWrap=localStorage.getItem('bloxd-code-wrap')==='1';
+const I18N={
+ fr:{
+  title:'Bloxd Blocks Studio — Éditeur visuel JavaScript', tag:'Éditeur visuel JavaScript', save:'💾 Sauvegarder', load:'↩ Charger', clear:'Tout effacer', copy:'📋 Copier', wrapOn:'↩ Retour ligne', wrapOff:'→ Ligne unique', copied:'✓ Copié !', codeLabel:'Code généré', workspace:'Workspace', resetView:'Réinitialiser la vue', hideHint:'Masquer l’aide', langBtn:'🇬🇧 EN', themeLight:'☀️ Clair', themeDark:'🌙 Sombre',
+  hint:'<span class="kbd">Molette</span> déplacer · <span class="kbd">Ctrl + molette</span> zoom · <span class="kbd">Clic fond + glisser</span> naviguer',
+  nativeFns:'Fonctions natives', noArgs:'aucun argument', addArg:'+ arg', deleteDrop:'Déposez ici pour supprimer', emptyTitle:'Glissez un bloc ici', emptySub:'Les blocs s’empilent et génèrent du JavaScript automatiquement.', dropHere:'Déposez des blocs ici', duplicate:'Dupliquer', delete:'Supprimer', saved:'Sauvegardé dans ce navigateur.', clearConfirm:'Effacer tous les blocs ?',
+  blockSing:'bloc', blockPlur:'blocs', codeDrag:'// Glissez des blocs dans l’espace de travail', codeEmpty:'// vide', invalidVar:'// nom de variable invalide',
+  varTypeTitle:'Type utilisé uniquement lors de la première déclaration de cette variable',
+  phVar:'nomVariable', phValue:'valeur', phFn:'nomFonction', phArgs:'arg1, arg2', phCallFn:'fonction', phCallArgs:'valeur1, valeur2',
+  searchPlaceholder:'Rechercher un bloc… ex: getPlayer', searchHint:'Recherche dans les noms, descriptions et catégories.', searchEmpty:'Tapez une recherche pour filtrer les blocs.', searchNoResult:'Aucun bloc trouvé.', searchResult:'résultat', searchResults:'résultats',
+  cats:{variables:'Variables',logic:'Logique',events:'Fonctions',search:'Recherche de blocs',api_message:'API Messages & UI',api_sound:'API Sons & Musique',api_player:'API Joueurs',api_blocks:'API Blocs & Monde',api_inventory:'API Inventaires & Coffres',api_items:'API Items & Drops',api_combat:'API Vie, Effets & Combat',api_entities:'API Entités & Mouvement',api_mobs:'API Mobs',api_mesh:'API Mesh & Throwables',api_shop:'API Shop',api_db:'API Base de données',api_client:'API Options client',api_settings:'API Réglages entités',api_qte:'API QTE',api_fx:'API Particules & Skins',message:'Messages',move:'Position & Movement',debug:'Debug'},
+  catShort:{variables:'Var',logic:'If',events:'Func',search:'Search',api_message:'Msg+',api_sound:'Snd',api_player:'Ply',api_blocks:'Blk',api_inventory:'Inv',api_items:'Item',api_combat:'Fight',api_entities:'Ent',api_mobs:'Mob',api_mesh:'Mesh',api_shop:'Shop',api_db:'DB',api_client:'Opt',api_settings:'Set',api_qte:'QTE',api_fx:'FX',message:'Msg',move:'Pos',debug:'Bug'},
+  blockNames:{assign:'Variable',objectValue:'Objet',listValue:'Liste',if:'Si',else:'Sinon',for:'For classique',forOf:'For...of',forIn:'For...in',func:'Déclarer fonction',call:'Appeler fonction',return:'Return',log:'Log',sendMessage:'Envoyer message',broadcastMessage:'Broadcast message',sendTopRightHelper:'Top-right helper',setPosition:'Set position',getPosition:'Get position',setVelocity:'Set velocity',applyImpulse:'Apply impulse'},
+  desc:{assign:'Créer / modifier une variable',objectValue:'Bloc valeur objet à déposer sur une valeur',listValue:'Bloc valeur liste à déposer sur une valeur',if:'Condition',else:'Sinon',for:'Boucle for classique',forOf:'Boucle for...of',forIn:'Boucle for...in',func:'Déclarer une fonction',call:'Appeler une fonction',return:'Retourner une valeur',log:'api.log(message)',sendMessage:'Envoyer un message joueur',broadcastMessage:'Message à tout le monde',sendTopRightHelper:'Helper en haut à droite',setPosition:'Téléporter une entité',getPosition:'Récupérer la position',setVelocity:'Définir la vélocité',applyImpulse:'Appliquer une impulsion'}
+ },
+ en:{
+  title:'Bloxd Blocks Studio — Visual JavaScript Editor', tag:'Visual JavaScript Editor', save:'💾 Save', load:'↩ Load', clear:'Clear all', copy:'📋 Copy', wrapOn:'↩ Wrap lines', wrapOff:'→ No wrap', copied:'✓ Copied!', codeLabel:'Generated code', workspace:'Workspace', resetView:'Reset view', hideHint:'Hide help', langBtn:'🇫🇷 FR', themeLight:'☀️ Light', themeDark:'🌙 Dark',
+  hint:'<span class="kbd">Wheel</span> pan · <span class="kbd">Ctrl + wheel</span> zoom · <span class="kbd">Background click + drag</span> navigate',
+  nativeFns:'Native functions', noArgs:'no args', addArg:'+ arg', deleteDrop:'Drop here to delete', emptyTitle:'Drag a block here', emptySub:'Blocks stack together and generate JavaScript automatically.', dropHere:'Drop blocks here', duplicate:'Duplicate', delete:'Delete', saved:'Saved in this browser.', clearConfirm:'Clear all blocks?',
+  blockSing:'block', blockPlur:'blocks', codeDrag:'// Drag blocks into the workspace', codeEmpty:'// empty', invalidVar:'// invalid variable name',
+  varTypeTitle:'Type used only on the first declaration of this variable',
+  phVar:'variableName', phValue:'value', phFn:'functionName', phArgs:'arg1, arg2', phCallFn:'function', phCallArgs:'value1, value2',
+  searchPlaceholder:'Search for a block… e.g. getPlayer', searchHint:'Searches names, descriptions and categories.', searchEmpty:'Type a search to filter blocks.', searchNoResult:'No block found.', searchResult:'result', searchResults:'results',
+  cats:{variables:'Variables',logic:'Logic',events:'Functions',search:'Block search',api_message:'API Messages & UI',api_sound:'API Sound & Music',api_player:'API Players',api_blocks:'API Blocks & World',api_inventory:'API Inventories & Chests',api_items:'API Items & Drops',api_combat:'API Health, Effects & Combat',api_entities:'API Entities & Movement',api_mobs:'API Mobs',api_mesh:'API Mesh & Throwables',api_shop:'API Shop',api_db:'API Database',api_client:'API Client Options',api_settings:'API Entity Settings',api_qte:'API QTE',api_fx:'API Particles & Skins',message:'Messages',move:'Position & Movement',debug:'Debug'},
+  catShort:{variables:'Var',logic:'If',events:'Func',search:'Search',api_message:'Msg+',api_sound:'Snd',api_player:'Ply',api_blocks:'Blk',api_inventory:'Inv',api_items:'Item',api_combat:'Fight',api_entities:'Ent',api_mobs:'Mob',api_mesh:'Mesh',api_shop:'Shop',api_db:'DB',api_client:'Opt',api_settings:'Set',api_qte:'QTE',api_fx:'FX',message:'Msg',move:'Pos',debug:'Bug'},
+  blockNames:{assign:'Variable',objectValue:'Object',listValue:'List',if:'If',else:'Else',for:'Classic for',forOf:'For...of',forIn:'For...in',func:'Declare function',call:'Call function',return:'Return',log:'Log',sendMessage:'Send message',broadcastMessage:'Broadcast message',sendTopRightHelper:'Top-right helper',setPosition:'Set position',getPosition:'Get position',setVelocity:'Set velocity',applyImpulse:'Apply impulse'},
+  desc:{assign:'Create / edit a variable',objectValue:'Object value block to drop onto a value',listValue:'List value block to drop onto a value',if:'Condition',else:'Else',for:'Classic for loop',forOf:'for...of loop',forIn:'for...in loop',func:'Declare a function',call:'Call a function',return:'Return a value',log:'api.log(message)',sendMessage:'Send a message to a player',broadcastMessage:'Message everyone',sendTopRightHelper:'Top-right helper',setPosition:'Teleport an entity',getPosition:'Get position',setVelocity:'Set velocity',applyImpulse:'Apply impulse'}
+ }
+};
+const tr=k=>k.split('.').reduce((o,p)=>o&&o[p],I18N[lang])??k;
+function applyLangStatic(){
+ document.documentElement.lang=lang; document.title=tr('title');
+ document.querySelector('.tag').textContent=tr('tag');
+ $('#langToggle').textContent=tr('langBtn'); $('#themeToggle').textContent=theme==='dark'?tr('themeLight'):tr('themeDark'); $('#saveBtn').textContent=tr('save'); $('#loadBtn').textContent=tr('load'); $('#clearBtn').textContent=tr('clear');
+ document.querySelector('.workspaceTop h2').textContent=tr('workspace'); document.querySelector('.hint').innerHTML=tr('hint'); $('#resetView').title=tr('resetView'); $('#hintClose').title=tr('hideHint');
+ document.querySelector('.codeTop .label').innerHTML='<span class="badge">JS</span>'+tr('codeLabel'); $('#copyBtn').textContent=tr('copy'); $('#wrapBtn').textContent=codeWrap?tr('wrapOff'):tr('wrapOn');
+ sidebar?.setAttribute('data-delete-text',tr('deleteDrop'));
+}
+function applyTheme(){document.body.classList.toggle('light',theme==='light');$('#themeToggle').textContent=theme==='dark'?tr('themeLight'):tr('themeDark')}
+function applyCodeWrap(){code.classList.toggle('wrap',codeWrap);$('#wrapBtn').textContent=codeWrap?tr('wrapOff'):tr('wrapOn')}
+
+const $=s=>document.querySelector(s), tabs=$('#tabs'), palette=$('#palette'), canvas=$('#canvas'), workspace=$('#workspace'), sidebar=document.querySelector('aside'), code=$('#code');
+function catOf(id){return cats.find(c=>c.id===id)}function defOf(t){return defs[t]}function newid(){return 'b'+uid++}
+function fnParams(name){let f=eventFns.find(x=>x[0]===name)||customFns.find(x=>x.name===name);return f?f[1]||f.params:[]}
+function cleanFnName(n){n=String(n||tr('phFn')).trim();return /^[a-zA-Z_$][\w$]*$/.test(n)?n:tr('phFn')}
+function parseArgs(s){return String(s||'').split(',').map(x=>x.trim()).filter(x=>/^[a-zA-Z_$][\w$]*$/.test(x))}
+
+function isValueObj(v){return v&&typeof v==='object'&&(v.__value==='list'||v.__value==='object')}
+function makeValue(kind){return kind==='object'?{__value:'object',props:[{key:'exemple1',value:'"text1"'}]}:{__value:'list',items:['"Texte1"']}}
+function valueToCode(v){
+  if(!isValueObj(v)) return fmt(v);
+  if(v.__value==='list') return '['+(v.items||[]).map(valueToCode).join(', ')+']';
+  return '{ '+(v.props||[]).map(p=>`${/^[a-zA-Z_$][\w$]*$/.test(p.key||'')?p.key:JSON.stringify(p.key||'key')}: ${valueToCode(p.value)}`).join(', ')+' }';
+}
+function parseCallArgs(s){return String(s||'').split(',').map(x=>x.trim()).filter(Boolean)}
+function isVarBlock(b){return b.type==='assign'}
+function objLiteral(s){let parts=parseCallArgs(s);if(!parts.length)return '{}';return '{ '+parts.map(part=>{let i=part.indexOf(':');if(i<0)return part;let k=part.slice(0,i).trim(),v=part.slice(i+1).trim();let key=/^[a-zA-Z_$][\w$]*$/.test(k)?k:JSON.stringify(k);return key+': '+fmt(v)}).join(', ')+' }'}
+function varLine(b,ctx,ind,value){let name=String(b.params[0]||tr('phVar')).trim();if(!/^[a-zA-Z_$][\w$]*$/.test(name))return ind+tr('invalidVar');let kind=['var','let','const'].includes(b.params[2])?b.params[2]:'var';if(!ctx.has(name)){ctx.add(name);return ind+kind+' '+name+' = '+value+';'}return ind+name+' = '+value+';'}
+function renameCalls(oldName,newName){oldName=String(oldName||'').trim();newName=String(newName||'').trim();if(!oldName||!newName||oldName===newName)return;function walk(list){list.forEach(b=>{if(b.type==='call'&&b.params[0]===oldName)b.params[0]=newName;if(b.children)walk(b.children)})}walk(blocks)}
+function flatBlocks(list=blocks,out=[]){list.forEach(b=>{out.push(b);if(b.children)flatBlocks(b.children,out)});return out}
+function isFirstVarBlock(b){let name=String(b.params?.[0]||'').trim();if(!name)return true;return flatBlocks().filter(x=>isVarBlock(x)&&String(x.params?.[0]||'').trim()===name)[0]?.id===b.id}
+function fmt(v){if(isValueObj(v))return valueToCode(v);let s=String(v??'').trim(); if(!s)return '""'; if(/^(['"`]).*\1$/.test(s))return s; if(/^(true|false|null|undefined)$/.test(s))return s; if(/^-?\d+(\.\d+)?$/.test(s))return s; if(/^\{.*\}$|^\[.*\]$/.test(s))return s; if(vars.some(x=>x.name===s)||/^[a-zA-Z_$][\w$]*(\.[\w$]+)?$/.test(s))return s; if(/[+\-*/%<>=!&|?:]/.test(s))return s; return JSON.stringify(s)}
+function i18n(path,fallback){let v=tr(path);return v===path?fallback:v}
+function blockLabel(k,d){return i18n('blockNames.'+k,d.label||k)}
+function blockDesc(k,d){return i18n('desc.'+k,d.desc||'')}
+function renderTabs(){tabs.innerHTML=cats.map(c=>`<button class="tab ${c.id===active?'active':''}" title="${i18n('cats.'+c.id,c.label||c.name)}" style="--cat:${c.color}" data-cat="${c.id}"><span class="ico">${c.icon}</span>${i18n('catShort.'+c.id,c.short||c.name)}</button>`).join('');tabs.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{active=b.dataset.cat;renderTabs();renderPalette()})}
+function renderPalette(){let c=catOf(active);palette.style.setProperty('--cat',c.color);palette.innerHTML=`<div class="catTitle"><span>${c.icon}</span>${i18n('cats.'+c.id,c.label||c.name)}</div>`;
+ if(active==='search'){renderSearchPalette();return}
+ Object.entries(defs).filter(([k,d])=>d.cat===active&&!d.hidden).forEach(([k,d])=>tool(k,blockLabel(k,d),blockDesc(k,d)));
+ if(active==='events'){let sep=document.createElement('div');sep.style.cssText='font-size:9px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 2px 6px;border-top:1px solid var(--line);margin-top:8px';sep.textContent=tr('nativeFns');palette.append(sep);eventFns.forEach(f=>tool('func',f[0],f[1].join(', ')||tr('noArgs'),f[0],f[1],`${f[0]}(${f[1].join(', ')})\n\n${callbackInfo(f[0])}`))}
+}
+function renderSearchPalette(){
+  const box=document.createElement('div');box.style.cssText='position:sticky;top:0;z-index:3;background:var(--panel);padding:8px 0 10px;border-bottom:1px solid var(--line);margin-bottom:8px';
+  box.innerHTML=`<input id="blockSearch" class="inp" style="width:100%;box-sizing:border-box" placeholder="${tr('searchPlaceholder')}" value=""><div style="font-size:10px;color:var(--muted);margin-top:6px">${tr('searchHint')}</div>`;
+  palette.append(box);
+  const input=box.querySelector('#blockSearch');input.value=blockSearch;input.oninput=()=>{blockSearch=input.value;renderSearchResults(results)};
+  const results=document.createElement('div');results.id='searchResults';palette.append(results);
+  renderSearchResults(results);setTimeout(()=>{input.focus();input.setSelectionRange(input.value.length,input.value.length)},0);
+}
+function renderSearchResults(host){
+  host.innerHTML='';let q=blockSearch.trim().toLowerCase();
+  if(!q){let em=document.createElement('div');em.className='bodyEmpty';em.textContent=tr('searchEmpty');host.append(em);return}
+  const found=Object.entries(defs).filter(([k,d])=>!d.hidden).filter(([k,d])=>{
+    const cat=catOf(d.cat);const hay=[k,blockLabel(k,d),blockDesc(k,d),d.cat,cat?.label,cat?.name].join(' ').toLowerCase();return hay.includes(q);
+  }).sort((a,b)=>{let al=blockLabel(a[0],a[1]).toLowerCase(),bl=blockLabel(b[0],b[1]).toLowerCase();return (al.startsWith(q)?0:1)-(bl.startsWith(q)?0:1)||al.localeCompare(bl)});
+  let info=document.createElement('div');info.style.cssText='font-size:10px;color:var(--muted);padding:2px 2px 8px';info.textContent=found.length+' '+(found.length>1?tr('searchResults'):tr('searchResult'));host.append(info);
+  if(!found.length){let em=document.createElement('div');em.className='bodyEmpty';em.textContent=tr('searchNoResult');host.append(em);return}
+  found.forEach(([k,d])=>tool(k,blockLabel(k,d),`${catOf(d.cat)?.icon||''} ${i18n('cats.'+d.cat,catOf(d.cat)?.label||d.cat)} — ${blockDesc(k,d)}`,null,null,null,host));
+}
+function tool(type,name,desc,fnName,fnArgs,hoverText,host=palette){let d=defOf(type),c=catOf(d.cat),el=document.createElement('div');el.className='tool';el.draggable=true;el.title=hoverText||desc;el.style.setProperty('--cat',c.color);el.innerHTML=`<span>${d.icon}</span><span class="name">${name}<span class="desc">${desc}</span></span>`;el.ondragstart=e=>{e.dataTransfer.effectAllowed='copy';if(d.valueOnly){e.dataTransfer.setData('application/x-value-kind',d.valueKind);e.dataTransfer.setData('application/x-value-snippet',d.snippet);e.dataTransfer.setData('text/plain',d.snippet);return}e.dataTransfer.setData('application/x-block-type',type);e.dataTransfer.setData('text/plain',type);if(fnName)e.dataTransfer.setData('application/x-fn-name',fnName);if(fnArgs)e.dataTransfer.setData('application/x-fn-args',JSON.stringify(fnArgs))};host.append(el)}
+
+function makeBlock(type,fnName,fnArgs){let d=defOf(type),b={id:newid(),type,params:d.params.map(x=>x),children:d.container?[]:undefined};if(type==='func'&&fnName){b.params=[fnName,(fnArgs||[]).join(', ')]}else if(fnName){b.params=[fnName]}return b}
+function insertAt(parent,index,b){let list=parent?find(parent).children:blocks;list.splice(index,0,b);renderAll()}
+function removeBlock(id,list=blocks){for(let i=0;i<list.length;i++){if(list[i].id===id)return list.splice(i,1)[0];let r=list[i].children&&removeBlock(id,list[i].children);if(r)return r}return null}
+function find(id,list=blocks){for(const b of list){if(b.id===id)return b;let r=b.children&&find(id,b.children);if(r)return r}return null}
+function isDesc(parent,id){let b=find(parent);if(!b?.children)return false;return !!find(id,b.children)}
+function sanitizeBlocks(list=blocks){for(let i=list.length-1;i>=0;i--){let d=defs[list[i].type];if(!d||d.valueOnly){list.splice(i,1);continue}if(list[i].children)sanitizeBlocks(list[i].children)}}
+function renderWorkspace(){sanitizeBlocks();canvas.innerHTML=''; if(!blocks.length)canvas.innerHTML=`<div class="empty"><strong>${tr('emptyTitle')}</strong><span>${tr('emptySub')}</span></div>`;renderList(blocks,canvas,null);let n=countBlocks(blocks);$('#count').textContent=n+' '+(n>1?tr('blockPlur'):tr('blockSing'))}
+function renderList(list,host,parent){drop(host,parent,0);list.forEach((b,i)=>{host.append(blockEl(b));drop(host,parent,i+1)})}
+function drop(host,parent,index){let z=document.createElement('div');z.className='dropzone';z.ondragover=e=>{e.preventDefault();z.classList.add('dragover')};z.ondragleave=()=>z.classList.remove('dragover');z.ondrop=e=>{e.preventDefault();e.stopPropagation();z.classList.remove('dragover');let type=e.dataTransfer.getData('application/x-block-type'),bid=e.dataTransfer.getData('application/x-block-id');if(type&&defs[type]&&!defs[type].valueOnly)insertAt(parent,index,makeBlock(type,e.dataTransfer.getData('application/x-fn-name'),JSON.parse(e.dataTransfer.getData('application/x-fn-args')||'[]')));else if(bid&&bid!==parent&&!isDesc(bid,parent)){let b=removeBlock(bid);if(b)insertAt(parent,index,b)}};host.append(z)}
+
+
+function acceptsValueObject(b,val){
+  if(b.type==='assign'&&val===1) return true;
+  if(b.type==='return'&&val===0) return true;
+  if(defs[b.type]?.api) return true;
+  if(['log','sendMessage','broadcastMessage','sendTopRightHelper','setPosition','setVelocity','applyImpulse','getPosition'].includes(b.type)) return true;
+  return false;
+}
+function renderValueSlot(value,setter,placeholder='value'){
+  const wrap=document.createElement('span');
+  wrap.className='valueDrop';
+  const setAndRefresh=v=>{setter(v);renderCode();renderWorkspace()};
+  wrap.ondragover=e=>{if(e.dataTransfer.types.includes('application/x-value-kind')){e.preventDefault();wrap.classList.add('dragOver')}};
+  wrap.ondragleave=()=>wrap.classList.remove('dragOver');
+  wrap.ondrop=e=>{const kind=e.dataTransfer.getData('application/x-value-kind');if(kind){e.preventDefault();e.stopPropagation();wrap.classList.remove('dragOver');setAndRefresh(makeValue(kind))}};
+  if(isValueObj(value)) wrap.appendChild(valueEditor(value,setAndRefresh));
+  else {
+    const i=document.createElement('input');i.className='inp';i.value=value??'';i.placeholder=placeholder;i.size=Math.max(5,String(i.value).length||5);
+    i.oninput=()=>{setter(i.value,false);i.size=Math.max(5,i.value.length||5);renderCode()};
+    i.ondragover=e=>{if(e.dataTransfer.types.includes('application/x-value-kind'))e.preventDefault()};
+    i.ondrop=e=>{const kind=e.dataTransfer.getData('application/x-value-kind');if(kind){e.preventDefault();e.stopPropagation();setAndRefresh(makeValue(kind))}};
+    wrap.appendChild(i);
+  }
+  return wrap;
+}
+function valueEditor(v,setter){
+  const el=document.createElement('span');el.className='valueBlock '+(v.__value==='list'?'list':'obj');
+  if(v.__value==='list'){
+    el.append(document.createTextNode('['));
+    (v.items ||= []).forEach((item,i)=>{
+      if(i) el.append(document.createTextNode(','));
+      const itemWrap=document.createElement('span');itemWrap.className='valueItem';
+      itemWrap.append(renderValueSlot(item,(nv,refresh)=>{v.items[i]=nv;if(refresh===false)renderCode();else setter(v)},tr('phValue')));
+      el.append(itemWrap);
+    });
+    const add=document.createElement('button');add.className='valueAdd';add.textContent='+';add.onclick=e=>{e.stopPropagation();v.items.push('');setter(v)};el.append(add,document.createTextNode(']'));
+  } else {
+    el.append(document.createTextNode('{'));
+    (v.props ||= []).forEach((prop,i)=>{
+      if(i) el.append(document.createTextNode(','));
+      const itemWrap=document.createElement('span');itemWrap.className='valueItem';
+      const key=document.createElement('input');key.className='inp keyInput';key.value=prop.key||'';key.placeholder='key';key.size=Math.max(3,key.value.length||3);key.oninput=()=>{prop.key=key.value;key.size=Math.max(3,key.value.length||3);renderCode()};
+      itemWrap.append(key,document.createTextNode(': '),renderValueSlot(prop.value,(nv,refresh)=>{prop.value=nv;if(refresh===false)renderCode();else setter(v)},tr('phValue')));
+      el.append(itemWrap);
+    });
+    const add=document.createElement('button');add.className='valueAdd';add.textContent='+';add.onclick=e=>{e.stopPropagation();v.props.push({key:'key'+(v.props.length+1),value:''});setter(v)};el.append(add,document.createTextNode('}'));
+  }
+  return el;
+}
+
+function returnInput(b,idx,placeholder){
+  const wrap=document.createElement('span');wrap.className='returnWrap';
+  wrap.append(renderValueSlot(b.params[idx],nv=>{b.params[idx]=nv},placeholder));
+  let opts=returnOptionsForBlock(b);
+  if(!opts.length) opts=allReturnSuggestions();
+  const sel=document.createElement('select');
+  sel.className='sel returnSelect';
+  const detected=(findParentFuncName(b.id)||nearestFuncBefore(b.id)||'');
+  sel.title=(lang==='fr'?'Valeurs de retour possibles':'Possible return values')+(detected?' — '+detected:'');
+  sel.innerHTML=`<option value="">${lang==='fr'?'Retours ▾':'Returns ▾'}</option>`+opts.map(o=>`<option value="${String(o).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">${o}</option>`).join('');
+  sel.onchange=()=>{if(sel.value){b.params[idx]=sel.value;renderWorkspace();renderCode();}};
+  wrap.append(sel);
+  return wrap;
+}
+function argsEditor(b,idx,identOnly){
+  const wrap=document.createElement('span');
+  wrap.style.cssText='display:inline-flex;align-items:center;gap:4px;white-space:nowrap';
+  let arr=String(b.params[idx]||'').split(',').map(x=>x.trim()).filter(Boolean);
+  if(!arr.length)arr=[''];
+  const sync=()=>{b.params[idx]=arr.map(x=>x.trim()).filter(Boolean).join(', ');renderCode()};
+  arr.forEach((val,i)=>{
+    if(i>0){let comma=document.createElement('span');comma.className='tok-pun';comma.textContent=',';wrap.append(comma)}
+    let inp=document.createElement('input');inp.className='inp';inp.value=val;inp.placeholder=identOnly?`arg${i+1}`:tr('phValue');if(!val&&i===arr.length-1)inp.dataset.newarg='1';inp.size=Math.max(4,val.length||4);
+    inp.oninput=()=>{arr[i]=inp.value;inp.size=Math.max(4,inp.value.length||4);sync()};inp.ondragover=e=>e.preventDefault();inp.ondrop=e=>{let v=e.dataTransfer.getData('application/x-value-snippet')||e.dataTransfer.getData('text/plain');if(v){inp.value=v;arr[i]=v;inp.size=Math.max(4,v.length);sync()}};
+    inp.onkeydown=e=>{if(e.key==='Backspace'&&!inp.value&&arr.length>1){arr.splice(i,1);b.params[idx]=arr.join(', ');renderWorkspace();renderCode()}};
+    wrap.append(inp);
+  });
+  let add=document.createElement('button');add.type='button';add.className='miniBtn';add.textContent='+';add.title=tr('addArg');add.style.width='23px';add.style.height='23px';
+  add.onclick=e=>{e.stopPropagation();arr.push(identOnly?`arg${arr.length+1}`:`value${arr.length+1}`);b.params[idx]=arr.join(', ');renderWorkspace();setTimeout(()=>document.querySelector(`[data-newarg]`)?.focus())};
+  wrap.append(add);
+  return wrap;
+}
+function blockEl(b){let d=defOf(b.type);if(!d||d.valueOnly){let el=document.createElement('div');el.className='block';el.textContent='Bloc inconnu';return el}let c=catOf(d.cat),el=document.createElement('div');el.className='block';el.style.setProperty('--bc',c.color);el.draggable=true;el.ondragstart=e=>{e.stopPropagation();e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-block-id',b.id);setTimeout(()=>el.classList.add('dragging'))};el.ondragend=()=>el.classList.remove('dragging');let head=document.createElement('div');head.className='blockHead';head.innerHTML='<span class="handle">⠿</span>';let mini=document.createElement('div');mini.className='codeMini';if(b.type==='return'){mini.append(token(b,['kw','return']));mini.append(returnInput(b,0,'value'));mini.append(token(b,['pun',';']));}else{d.inline(b).forEach(t=>mini.append(token(b,t)));}let actions=document.createElement('div');actions.className='blockActions';actions.innerHTML=`<button class="miniBtn" title="${tr('duplicate')}">⧉</button><button class="miniBtn" title="${tr('delete')}">×</button>`;actions.children[0].onclick=e=>{e.stopPropagation();let cp=clone(b);cp.id=newid();insertAt(null,blocks.length,cp)};actions.children[1].onclick=e=>{e.stopPropagation();removeBlock(b.id);renderAll()};head.append(mini,actions);el.append(head);if(d.container){let body=document.createElement('div');body.className='body';renderList(b.children,body,b.id);if(!b.children.length){let em=document.createElement('div');em.className='bodyEmpty';em.textContent=tr('dropHere');em.ondragover=e=>{e.preventDefault();em.style.color='var(--bright)'};em.ondragleave=()=>em.style.color='';em.ondrop=e=>{e.preventDefault();e.stopPropagation();em.style.color='';let type=e.dataTransfer.getData('application/x-block-type'),bid=e.dataTransfer.getData('application/x-block-id');if(type)insertAt(b.id,0,makeBlock(type,e.dataTransfer.getData('application/x-fn-name'),JSON.parse(e.dataTransfer.getData('application/x-fn-args')||'[]')));else if(bid&&bid!==b.id&&!isDesc(bid,b.id)){let moved=removeBlock(bid);if(moved)insertAt(b.id,0,moved)}};body.append(em)}el.append(body);let br=document.createElement('div');br.className='closeBrace';br.textContent='}';el.append(br)}return el}
+function token(b,t){let s=document.createElement('span');let [kind,val]=t;if(kind==='returnval')return returnInput(b,val,'value');if(kind==='args'||kind==='callargs'){return argsEditor(b,val,kind==='args')}if(kind==='choice'){let key=t[2],opts=API_CHOICES[key]||[];let sel=document.createElement('select');sel.className='sel';sel.title=key;opts.forEach(opt=>{let o=document.createElement('option');o.value=opt.value;o.textContent=opt.label;if((b.params[val]||'')===opt.value)o.selected=true;sel.append(o)});if(!opts.some(opt=>opt.value===(b.params[val]||''))&&b.params[val]){let o=document.createElement('option');o.value=b.params[val];o.textContent=String(b.params[val]).replace(/^['"]|['"]$/g,'');o.selected=true;sel.prepend(o)}sel.onchange=()=>{b.params[val]=sel.value;renderCode()};return sel}if(kind==='varkind'){if(!isFirstVarBlock(b)){let ghost=document.createElement('span');ghost.style.display='none';return ghost}let sel=document.createElement('select');sel.className='sel';sel.title=tr('varTypeTitle');['var','let','const'].forEach(k=>{let o=document.createElement('option');o.value=k;o.textContent=k;if((b.params[val]||'var')===k)o.selected=true;sel.append(o)});sel.onchange=()=>{b.params[val]=sel.value;renderCode()};return sel}if(kind==='input'){let i=document.createElement('input');i.className='inp';i.value=b.params[val]??'';if(b.type==='assign'&&val===0)i.placeholder=tr('phVar');else if(b.type==='func'&&val===0)i.placeholder=tr('phFn');else if(b.type==='func'&&val===1)i.placeholder=tr('phArgs');else if(b.type==='call'&&val===0)i.placeholder=tr('phCallFn');else if(b.type==='call'&&val===1)i.placeholder=tr('phCallArgs');else if(b.type==='return')i.placeholder='value';else if(b.type==='objectVar'&&val===1)i.placeholder='key: value, name: \"Alex\"';else if(b.type==='listVar'&&val===1)i.placeholder='item1, item2';else if(b.type==='for')i.placeholder='let i = 0; i < 10; i++';else if(b.type==='forOf'&&val===0)i.placeholder='item';else if(b.type==='forOf'&&val===1)i.placeholder='array';else if(b.type==='forIn'&&val===0)i.placeholder='key';else if(b.type==='forIn'&&val===1)i.placeholder='object';else i.placeholder=tr('phValue');if(b.type==='return'&&val===0) return returnInput(b,val,i.placeholder);if(acceptsValueObject(b,val)) return renderValueSlot(b.params[val],nv=>{b.params[val]=nv},i.placeholder);i.size=Math.max(5,String(i.value).length);i.onfocus=()=>i.dataset.oldValue=i.value;i.onblur=()=>{if((b.type==='func'||b.type==='assign')&&val===0)renderWorkspace()};i.oninput=()=>{let old=i.dataset.oldValue;b.params[val]=i.value;i.size=Math.max(5,i.value.length);if(b.type==='func'&&val===0){renameCalls(old,i.value);i.dataset.oldValue=i.value}renderCode()};i.ondragover=e=>e.preventDefault();i.ondrop=e=>{let v=e.dataTransfer.getData('application/x-value-snippet')||e.dataTransfer.getData('text/plain');if(v){i.value=v;b.params[val]=v;i.size=Math.max(5,v.length);renderCode()}};return i}s.className='tok-'+kind;s.textContent=val;return s}
+function clone(o){return JSON.parse(JSON.stringify(o))}function countBlocks(list){return list.reduce((a,b)=>a+1+(b.children?countBlocks(b.children):0),0)}
+function genList(list,ctx,ind){if(!list.length)return ind+tr('codeEmpty');return list.filter(b=>defs[b.type]&&!defs[b.type].valueOnly).map(b=>defOf(b.type).gen(b,ctx,ind)).join('\n')}function genCode(){return blocks.length?genList(blocks,new Set(),''):''}function renderCode(){let out=genCode();if(!out.trim()){code.innerHTML=`<span class="line"><span class="cmt">${tr('codeDrag')}</span></span>`;return}code.innerHTML=out.split('\n').map((l,i)=>`<span class="line"><span class="ln">${i+1}</span>${hl(l)}</span>`).join('')}
+function hl(l){
+  let e=l.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+  return e.replace(/(\/\/.*$)|(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(\bclass\s+)([A-Z_$][\w$]*)|\b(if|else|for|while|function|return|const|let|var|new|typeof|async|await|class|import|export|try|catch|finally|throw|switch|case|break|continue)\b|\b(true|false)\b|\b(null|undefined)\b|\b([a-zA-Z_$][\w$]*)(?=\s*\()|(\b\d+(?:\.\d+)?\b)|(===|!==|==|!=|=&gt;|&&|\|\||[+\-*\/%=<>!?:]+)|([(){}\[\];,.])|\b([a-zA-Z_$][\w$]*)\b/g,
+    (m,cmt,str,classKw,className,kw,bool,nul,fn,num,op,pun,variable)=>{
+      if(cmt)return `<span class="cmt">${m}</span>`;
+      if(str)return `<span class="str">${m}</span>`;
+      if(classKw)return `<span class="kw">${classKw}</span><span class="cls">${className}</span>`;
+      if(kw)return `<span class="kw">${m}</span>`;
+      if(bool)return `<span class="bool">${m}</span>`;
+      if(nul)return `<span class="nul">${m}</span>`;
+      if(fn)return `<span class="fn">${m}</span>`;
+      if(num)return `<span class="num">${m}</span>`;
+      if(op)return `<span class="op">${m}</span>`;
+      if(pun)return `<span class="pun">${m}</span>`;
+      if(variable)return `<span class="var">${m}</span>`;
+      return m;
+    });
+}
+function renderAll(){renderWorkspace();renderCode();renderPalette()}
+function openVarModal(){modal('Nouvelle variable',box=>{box.innerHTML+=`<div class="field"><label>Nom</label><input id="mName" placeholder="maVariable"></div><div class="field"><label>Type</label><div class="seg"><button class="active">let</button><button>const</button><button>var</button></div></div><div class="err"></div>`;let kind='let';box.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{kind=b.textContent;box.querySelectorAll('.seg button').forEach(x=>x.classList.remove('active'));b.classList.add('active')});return()=>{let n=box.querySelector('#mName').value.trim(),err=box.querySelector('.err');if(!/^[a-zA-Z_$][\w$]*$/.test(n)){err.textContent='Nom invalide';err.style.display='block';return false}vars.push({name:n,kind});return true}})}
+function openFnModal(){modal('Nouvelle fonction',box=>{box.innerHTML+=`<div class="field"><label>Nom</label><input id="mName" placeholder="maFonction"></div><div class="field"><label>Paramètres, séparés par des virgules</label><input id="mParams" placeholder="playerId, score"></div><div class="err"></div>`;return()=>{let n=box.querySelector('#mName').value.trim(),p=box.querySelector('#mParams').value.split(',').map(x=>x.trim()).filter(Boolean),err=box.querySelector('.err');if(!/^[a-zA-Z_$][\w$]*$/.test(n)){err.textContent='Nom invalide';err.style.display='block';return false}customFns.push({name:n,params:p});return true}})}
+function modal(title,content){let m=document.createElement('div');m.className='modal';let b=document.createElement('div');b.className='box';b.innerHTML=`<h3>${title}</h3>`;let validate=content(b);let foot=document.createElement('div');foot.className='boxFoot';foot.innerHTML='<button class="hbtn">Annuler</button><button class="hbtn">Créer</button>';foot.children[0].onclick=()=>m.remove();foot.children[1].onclick=()=>{if(validate()){m.remove();renderAll()}};b.append(foot);m.append(b);document.body.append(m);setTimeout(()=>b.querySelector('input')?.focus())}
+
+let view={x:80,y:50,scale:1},spaceDown=false,panStart=null;
+function applyView(){
+  canvas.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.scale})`;
+  const grid=24*view.scale;
+  workspace.style.backgroundSize=`${grid}px ${grid}px`;
+  workspace.style.backgroundPosition=`${view.x%grid}px ${view.y%grid}px`;
+  $('#zoomLabel').textContent=Math.round(view.scale*100)+'%';
+}
+function zoomAt(factor,cx,cy){
+  const r=workspace.getBoundingClientRect(), old=view.scale;
+  const wx=(cx-r.left-view.x)/old, wy=(cy-r.top-view.y)/old;
+  view.scale=Math.max(.35,Math.min(2.2,old*factor));
+  view.x=cx-r.left-wx*view.scale; view.y=cy-r.top-wy*view.scale;
+  applyView();
+}
+document.addEventListener('keydown',e=>{if(e.code==='Space'){if(e.target.closest?.('input,textarea,select,[contenteditable="true"]'))return;spaceDown=true;workspace.style.cursor='grab';e.preventDefault()}});
+document.addEventListener('keyup',e=>{if(e.code==='Space')spaceDown=false});
+workspace.addEventListener('wheel',e=>{
+  e.preventDefault();
+  if(e.ctrlKey||e.metaKey){zoomAt(e.deltaY<0?1.1:.9,e.clientX,e.clientY)}
+  else {view.x-=e.deltaX; view.y-=e.deltaY; applyView()}
+},{passive:false});
+workspace.addEventListener('mousedown',e=>{
+  if(e.target.closest('.block,.dropzone,input,select,button'))return;
+  if(e.button===0||e.button===1||e.button===2||spaceDown){e.preventDefault();panStart={mx:e.clientX,my:e.clientY,x:view.x,y:view.y};workspace.classList.add('panning')}
+});
+document.addEventListener('mousemove',e=>{if(!panStart)return;view.x=panStart.x+e.clientX-panStart.mx;view.y=panStart.y+e.clientY-panStart.my;applyView()});
+document.addEventListener('mouseup',()=>{if(panStart){panStart=null;workspace.classList.remove('panning')}});
+workspace.addEventListener('contextmenu',e=>e.preventDefault());
+$('#zoomIn').onclick=()=>zoomAt(1.15,workspace.getBoundingClientRect().left+workspace.clientWidth/2,workspace.getBoundingClientRect().top+workspace.clientHeight/2);
+$('#zoomOut').onclick=()=>zoomAt(.85,workspace.getBoundingClientRect().left+workspace.clientWidth/2,workspace.getBoundingClientRect().top+workspace.clientHeight/2);
+$('#resetView').onclick=()=>{view={x:80,y:50,scale:1};applyView()};
+applyView();
+
+
+function setupResizers(){
+  const app=$('#app'), tabsEl=$('#tabs');
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  let st=null;
+  const start=(e,type)=>{if(e.button!==0)return;e.preventDefault();st={type,x:e.clientX,y:e.clientY,left:parseInt(getComputedStyle(app).getPropertyValue('--leftW'))||270,code:parseInt(getComputedStyle(app).getPropertyValue('--codeW'))||360,tabs:tabsEl.offsetHeight};document.body.style.cursor=type==='tabs'?'row-resize':'col-resize';document.body.style.userSelect='none';e.currentTarget.classList.add('active')};
+  $('#leftResize').addEventListener('mousedown',e=>start(e,'left'));
+  $('#codeResize').addEventListener('mousedown',e=>start(e,'code'));
+  $('#tabResize').addEventListener('mousedown',e=>start(e,'tabs'));
+  document.addEventListener('mousemove',e=>{if(!st)return;if(st.type==='left'){app.style.setProperty('--leftW',clamp(st.left+e.clientX-st.x,120,520)+'px')}else if(st.type==='code'){app.style.setProperty('--codeW',clamp(st.code-(e.clientX-st.x),0,720)+'px')}else{tabsEl.style.height=clamp(st.tabs+e.clientY-st.y,0,220)+'px'}});
+  document.addEventListener('mouseup',()=>{if(!st)return;document.body.style.cursor='';document.body.style.userSelect='';document.querySelectorAll('.active').forEach(x=>x.classList.remove('active'));st=null});
+}
+setupResizers();
+palette.addEventListener('wheel',e=>{e.stopPropagation()},{passive:true});
+tabs.addEventListener('wheel',e=>{e.stopPropagation()},{passive:true});
+code.addEventListener('wheel',e=>{e.preventDefault();e.stopPropagation();code.scrollTop+=e.deltaY;code.scrollLeft+=e.deltaX},{passive:false});
+
+$('#wrapBtn').onclick=()=>{codeWrap=!codeWrap;localStorage.setItem('bloxd-code-wrap',codeWrap?'1':'0');applyCodeWrap()};
+$('#copyBtn').onclick=async()=>{let txt=genCode();if(!txt.trim())return;await navigator.clipboard?.writeText(txt).catch(()=>{});$('#copyBtn').textContent=tr('copied');setTimeout(()=>$('#copyBtn').textContent=tr('copy'),1300)};
+$('#langToggle').onclick=()=>{lang=lang==='fr'?'en':'fr';localStorage.setItem('bloxd-lang',lang);applyLangStatic();applyTheme();renderAll()};
+$('#themeToggle').onclick=()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem('bloxd-theme',theme);applyTheme()};
+$('#hintClose').onclick=()=>{document.querySelector('.hint').classList.add('hidden');$('#hintClose').style.display='none'};
+$('#clearBtn').onclick=()=>{if(confirm(tr('clearConfirm'))){blocks=[];renderAll()}};$('#saveBtn').onclick=()=>{localStorage.setItem('bloxd-blocks-studio',JSON.stringify({blocks,vars,customFns,uid}));alert(tr('saved'))};$('#loadBtn').onclick=()=>{let s=localStorage.getItem('bloxd-blocks-studio');if(s){Object.assign(window,JSON.parse(s));let data=JSON.parse(s);blocks=data.blocks||[];vars=data.vars||[];customFns=data.customFns||[];uid=data.uid||1;renderAll()}};
+function dropNewBlockAtEnd(e){if(e.defaultPrevented)return;e.preventDefault();let type=e.dataTransfer.getData('application/x-block-type')||e.dataTransfer.getData('text/plain');if(type&&defs[type]&&!defs[type].valueOnly)insertAt(null,blocks.length,makeBlock(type,e.dataTransfer.getData('application/x-fn-name'),JSON.parse(e.dataTransfer.getData('application/x-fn-args')||'[]')))}
+canvas.ondragover=e=>e.preventDefault();canvas.ondrop=dropNewBlockAtEnd;workspace.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('application/x-block-type'))e.preventDefault()});workspace.addEventListener('drop',dropNewBlockAtEnd);
+sidebar.ondragover=e=>{if(e.dataTransfer.types.includes('application/x-block-id')){e.preventDefault();sidebar.classList.add('deleteTarget')}};
+sidebar.ondragleave=e=>{if(!sidebar.contains(e.relatedTarget))sidebar.classList.remove('deleteTarget')};
+sidebar.ondrop=e=>{let bid=e.dataTransfer.getData('application/x-block-id');if(bid){e.preventDefault();removeBlock(bid);sidebar.classList.remove('deleteTarget');renderAll()}};
+applyLangStatic();applyTheme();applyCodeWrap();renderTabs();renderAll();
+</script>
+</body>
+</html>
