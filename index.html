@@ -57,6 +57,7 @@
     button{font:inherit} input,textarea,select{user-select:text}
     .hbtn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:6px 9px;cursor:pointer;font-weight:800;font-size:11.5px;transition:.15s;white-space:nowrap}
     .hbtn:hover{border-color:var(--blue);color:var(--bright);transform:translateY(-1px)}
+    .hbtn .islot svg{stroke:currentColor}
     .hbtn.danger:hover{border-color:var(--red);color:#ff8a8a;background:rgba(239,68,68,.08)}
     .hbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
@@ -75,22 +76,32 @@
     .tabs{height:58px;flex-shrink:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;padding:8px;border-bottom:1px solid var(--line);overflow-y:auto;overflow-x:hidden;background:var(--panel2);scrollbar-width:thin;scrollbar-color:var(--muted) transparent}
     .tabs::-webkit-scrollbar{width:6px}.tabs::-webkit-scrollbar-track{background:transparent}.tabs::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
     .tab{width:48px;height:48px;flex:0 0 48px;border:0;background:transparent;color:var(--muted);border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9.5px;font-weight:900;transition:.15s;position:relative}
-    .tab .ico{font-size:17px;filter:grayscale(.35);transition:.15s}
-    .tab:hover,.tab.active{color:var(--bright);background:rgba(255,255,255,.045)}
+    .ico{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;line-height:0}
+    .svgIco{display:block;flex-shrink:0;overflow:visible}
+    svg{display:block}
+    .islot{display:inline-flex;align-items:center;justify-content:center;line-height:0;flex-shrink:0}
+    .hbtn .islot{margin-right:1px}
+    .hbtn.iconOnly{padding:6px 8px}
+    .hbtn.active{border-color:var(--blue);color:var(--bright);background:rgba(61,111,255,.14)}
+    .tab .ico{transition:.15s;color:var(--muted)}
+    .tab:hover{color:var(--bright);background:rgba(255,255,255,.045)}
+    .tab:hover .ico{color:var(--text)}
+    .tab.active{color:var(--bright);background:rgba(255,255,255,.045)}
     .tab.active:after{content:"";position:absolute;bottom:3px;width:22px;height:3px;background:var(--cat);border-radius:3px}
-    .tab.active .ico{filter:none}
+    .tab.active .ico{color:var(--cat)}
     #palette{padding:12px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
     #palette::-webkit-scrollbar{width:6px}#palette::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
+    .catTitle .titleIco{display:inline-flex;color:var(--cat)}
     .catTitle{display:flex;align-items:center;gap:8px;color:var(--cat);text-transform:uppercase;font-size:12px;font-weight:900;letter-spacing:.1em;margin:4px 2px 12px}
     .tool{display:flex;align-items:center;gap:9px;width:100%;background:linear-gradient(180deg,var(--panel2),#0f1428);border:1px solid var(--line);border-left:4px solid var(--cat);color:var(--bright);border-radius:11px;padding:9px 11px;margin-bottom:8px;cursor:grab;user-select:none;box-shadow:0 5px 18px rgba(0,0,0,.14);transition:.15s;text-align:left}
     .tool:hover{border-color:var(--cat);transform:translateX(3px);background:var(--panel3)}
     .tool:active{cursor:grabbing}
     .tool .name{font-family:"JetBrains Mono",Consolas,monospace;font-size:11.5px;font-weight:800;word-break:break-word}
     .tool .desc{display:block;color:var(--muted);font-family:inherit;font-weight:700;font-size:10px;margin-top:2px;line-height:1.35}
-    .tool .ico{flex-shrink:0;font-size:15px}
+    .tool .ico{color:var(--cat);opacity:.95}
     .tool.valueTool{border-radius:999px;width:max-content;max-width:100%;padding:8px 12px}
     .tool.valueTool .desc{display:none}
-    .specialBtn{border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.035);color:var(--bright);border-radius:12px;padding:10px;margin-bottom:12px;cursor:pointer;font-weight:900;width:100%;text-align:left;font-size:11.5px}
+    .specialBtn{display:flex;align-items:center;gap:8px;border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.035);color:var(--bright);border-radius:12px;padding:10px;margin-bottom:12px;cursor:pointer;font-weight:900;width:100%;text-align:left;font-size:11.5px}
     .specialBtn:hover{border-color:var(--cat);background:rgba(255,255,255,.06)}
         .chip{display:inline-flex;align-items:center;border-radius:999px;background:var(--blue);color:white;padding:3px 8px;font-family:"JetBrains Mono",Consolas,monospace;font-size:11px;font-weight:800}
     .kind{font-family:"JetBrains Mono",Consolas,monospace;font-size:10px;color:var(--yellow);border:1px solid rgba(251,191,36,.3);border-radius:6px;padding:2px 5px}
@@ -180,7 +191,8 @@
     .field textarea{min-height:120px;font-family:"JetBrains Mono",Consolas,monospace;font-size:12px;resize:vertical}
     .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
     .modalActions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-    .btnPrimary{background:var(--blue);border:1px solid var(--blue);color:#fff;border-radius:9px;padding:8px 16px;font-weight:900;cursor:pointer;font-size:12.5px}
+    .btnPrimary{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--blue);border:1px solid var(--blue);color:#fff;border-radius:9px;padding:8px 16px;font-weight:900;cursor:pointer;font-size:12.5px}
+    .btnPrimary svg{stroke:#fff}
     .btnPrimary:hover{filter:brightness(1.12)}
     .btnGhost{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:12.5px}
     .btnGhost:hover{border-color:var(--blue);color:var(--bright)}
@@ -195,6 +207,10 @@
     .contextMenu button.danger:hover{background:rgba(239,68,68,.16);color:#ff9a9a}
     .contextMenu hr{border:0;border-top:1px solid var(--line);margin:4px 2px}
     .contextMenu .cKey{margin-left:auto;font-size:10px;color:var(--dim);font-family:Consolas,monospace}
+    .contextMenu .cmIco{display:inline-flex;width:14px;color:var(--muted)}
+    .contextMenu button:hover .cmIco{color:var(--bright)}
+    .valueRemove svg{stroke:currentColor}
+    .grip{display:inline-flex;opacity:.5}
     .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--panel3);border:1px solid var(--line);color:var(--bright);border-radius:11px;padding:10px 16px;font-size:12.5px;font-weight:800;z-index:90;box-shadow:0 16px 40px rgba(0,0,0,.5);opacity:0;transition:.2s;pointer-events:none}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
     .toast.err{border-color:rgba(239,68,68,.5);color:#ff9a9a}
@@ -215,18 +231,18 @@
     <div class="logo">Bloxd<b>Blocks</b> Studio</div>
     <div class="tag" id="tagline">Éditeur visuel JavaScript</div>
     <div class="header-actions">
-      <button class="hbtn" id="templatesBtn" title="Templates">📚 <span data-i18n="templates">Modèles</span></button>
-      <button class="hbtn" id="newBtn" title="New project">✨ <span data-i18n="newProject">Nouveau</span></button>
-      <button class="hbtn" id="saveBtn" title="Save">💾 <span data-i18n="save">Sauvegarder</span></button>
-      <button class="hbtn" id="loadBtn" title="Load">↩ <span data-i18n="load">Charger</span></button>
-      <button class="hbtn" id="exportBtn" title="Export .json">⬇ <span data-i18n="exportBtn">Exporter</span></button>
-      <button class="hbtn" id="importBtn" title="Import .json">⬆ <span data-i18n="importBtn">Importer</span></button>
-      <button class="hbtn" id="undoBtn" title="Undo (Ctrl+Z)">↶</button>
-      <button class="hbtn" id="redoBtn" title="Redo (Ctrl+Y)">↷</button>
-      <button class="hbtn" id="backpackBtn" title="Backpack">🎒</button>
-      <button class="hbtn" id="langToggle">🇬🇧 EN</button>
-      <button class="hbtn" id="themeToggle">☀️ Clair</button>
-      <button class="hbtn danger" id="clearBtn"><span data-i18n="clear">Tout effacer</span></button>
+      <button class="hbtn" id="templatesBtn" title="Templates"><span class="islot" data-icon="templates"></span><span data-i18n="templates">Modèles</span></button>
+      <button class="hbtn" id="newBtn" title="New project"><span class="islot" data-icon="newDoc"></span><span data-i18n="newProject">Nouveau</span></button>
+      <button class="hbtn" id="saveBtn" title="Save"><span class="islot" data-icon="save"></span><span data-i18n="save">Sauvegarder</span></button>
+      <button class="hbtn" id="loadBtn" title="Load"><span class="islot" data-icon="load"></span><span data-i18n="load">Charger</span></button>
+      <button class="hbtn" id="exportBtn" title="Export .json"><span class="islot" data-icon="export"></span><span data-i18n="exportBtn">Exporter</span></button>
+      <button class="hbtn" id="importBtn" title="Import .json"><span class="islot" data-icon="import"></span><span data-i18n="importBtn">Importer</span></button>
+      <button class="hbtn iconOnly" id="undoBtn" title="Undo (Ctrl+Z)"><span class="islot" data-icon="undo"></span></button>
+      <button class="hbtn iconOnly" id="redoBtn" title="Redo (Ctrl+Y)"><span class="islot" data-icon="redo"></span></button>
+      <button class="hbtn iconOnly" id="backpackBtn" title="Backpack"><span class="islot" data-icon="backpack"></span></button>
+      <button class="hbtn" id="langToggle"><span class="islot" id="langIcon" data-icon="flagFr"></span><span id="langLabel">FR</span></button>
+      <button class="hbtn" id="themeToggle"><span class="islot" id="themeIcon" data-icon="sun"></span><span id="themeLabel">Clair</span></button>
+      <button class="hbtn danger" id="clearBtn"><span class="islot" data-icon="trash"></span><span data-i18n="clear">Tout effacer</span></button>
     </div>
   </header>
   <div id="app">
@@ -246,8 +262,8 @@
           <button class="iconBtn" id="zoomIn" title="Zoom in">+</button>
           <button class="iconBtn" id="resetView" title="Reset view">⌂</button>
         </div>
-        <button class="hbtn" id="cleanUpBtn" title="Clean up blocks">🧹 <span data-i18n="cleanUp">Ranger</span></button>
-        <button class="hbtn" id="fnsBtn" title="Make a Block">🧩 <span data-i18n="makeBlock">Créer un bloc</span></button>
+        <button class="hbtn" id="cleanUpBtn" title="Clean up blocks"><span class="islot" data-icon="cleanup"></span><span data-i18n="cleanUp">Ranger</span></button>
+        <button class="hbtn" id="fnsBtn" title="Make a Block"><span class="islot" data-icon="puzzle"></span><span data-i18n="makeBlock">Créer un bloc</span></button>
         <span class="hint" id="hint"><span class="kbd">Wheel</span> pan · <span class="kbd">Ctrl+Wheel</span> zoom · <span class="kbd">Right-click</span> menu</span>
         <button class="hintClose" id="hintClose" title="Hide help">×</button>
       </div>
@@ -259,8 +275,8 @@
         <div class="label"><span class="badge">JS</span><span data-i18n="codeLabel">Code généré</span></div>
         <div style="display:flex;gap:6px;align-items:center">
           <span class="codeStat" id="codeStat">0 / 32768</span>
-          <button class="hbtn" id="wrapBtn">↩</button>
-          <button class="hbtn" id="copyBtn">📋</button>
+          <button class="hbtn iconOnly" id="wrapBtn" title="Wrap lines"><span class="islot" id="wrapIcon" data-icon="wrap"></span></button>
+          <button class="hbtn iconOnly" id="copyBtn" title="Copy code"><span class="islot" data-icon="copy"></span></button>
         </div>
       </div>
       <pre id="code"></pre>
@@ -274,32 +290,279 @@
    ============================================================ */
 'use strict';
 
+/* ============================================================
+   Custom SVG icon set — hand-drawn on a 24x24 grid, 1.7 stroke,
+   stroke="currentColor". Replaces every emoji in the UI.
+   ============================================================ */
+const ICONS={
+/* ui / actions */
+plus:'<path d="M12 5v14M5 12h14"/>',
+minus:'<path d="M5 12h14"/>',
+close:'<path d="M6 6l12 12M18 6L6 18"/>',
+check:'<path d="M4.5 12.5l5 5L19.5 7"/>',
+undo:'<path d="M4 9h10a5 5 0 010 10H8"/><path d="M7.5 5.5L4 9l3.5 3.5"/>',
+redo:'<path d="M20 9H10a5 5 0 000 10h6"/><path d="M16.5 5.5L20 9l-3.5 3.5"/>',
+save:'<path d="M5 4h11l3 3v13H5z"/><path d="M8.5 4v5h6.5V4"/><rect x="8" y="13" width="8" height="6" rx="1"/>',
+load:'<path d="M4 12a8 8 0 108-8"/><path d="M4 5v5h5"/>',
+export:'<path d="M12 16V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M5 15v4h14v-4"/>',
+import:'<path d="M12 4v12"/><path d="M7.5 11.5L12 16l4.5-4.5"/><path d="M5 15v4h14v-4"/>',
+copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 5.5A1.5 1.5 0 0013.5 4H5.5A1.5 1.5 0 004 5.5v8A1.5 1.5 0 005.5 15"/>',
+trash:'<path d="M4 7h16"/><path d="M9.5 7V4.8h5V7"/><path d="M6.5 7l1 12.5h9L17.5 7"/><path d="M10 11v5M14 11v5"/>',
+search:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>',
+templates:'<rect x="4" y="5" width="12" height="14" rx="2"/><path d="M19 8v11H9"/>',
+newDoc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M12 11v6M9 14h6"/>',
+cleanup:'<path d="M14 4l6 6"/><path d="M17 7l-8.5 8.5a3 3 0 004.2 4.2L21 11"/><path d="M6.5 14.5l3 3"/><path d="M4 20h5"/><path d="M5.5 18.5l3-3"/>',
+backpack:'<path d="M6 10a3 3 0 013-3h6a3 3 0 013 3v9a1 1 0 01-1 1H7a1 1 0 01-1-1z"/><path d="M9.5 7V5a2.5 2.5 0 015 0v2"/><path d="M9 13h6"/>',
+puzzle:'<path d="M10 4.5a2 2 0 013.6 1.1V7H16a1 1 0 011 1v2.4h1.4a2 2 0 010 3.6H17V17a1 1 0 01-1 1h-2.4v1.4a2 2 0 01-3.6 0V18H8a1 1 0 01-1-1v-2.4H5.6a2 2 0 010-3.6H7V8a1 1 0 011-1h2.4z"/>',
+help:'<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 014.9.6c0 1.7-2.5 2-2.5 3.6"/><path d="M12 16.8v.2"/>',
+info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 11v6"/><path d="M12 7.8v.2"/>',
+warning:'<path d="M12 4.5L21 19.5H3z"/><path d="M12 10v4.5"/><path d="M12 17.2v.2"/>',
+closeAll:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9l6 6M15 9l-6 6"/>',
+/* files / data */
+file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+folder:'<path d="M4 7a1 1 0 011-1h4l2 2.5h7a1 1 0 011 1V18a1 1 0 01-1 1H5a1 1 0 01-1-1z"/>',
+archive:'<rect x="4" y="4" width="16" height="5" rx="1.5"/><path d="M5.5 9v10h13V9"/><path d="M10 13h4"/>',
+list:'<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4.5 6.5h.2M4.5 12h.2M4.5 17.5h.2"/>',
+brackets:'<path d="M9 4.5H6.5A1.5 1.5 0 005 6v3.5L3.5 12 5 14.5V18a1.5 1.5 0 001.5 1.5H9"/><path d="M15 4.5h2.5A1.5 1.5 0 0120 6v3.5L21.5 12 20 14.5V18a1.5 1.5 0 01-1.5 1.5H15"/>',
+braces:'<path d="M10 4.5H8.5A2 2 0 006.5 6.5V9a2 2 0 01-2 2 2 2 0 012 2v2.5a2 2 0 002 2H10"/><path d="M14 4.5h1.5a2 2 0 012 2V9a2 2 0 002 2 2 2 0 00-2 2v2.5a2 2 0 01-2 2H14"/>',
+database:'<ellipse cx="12" cy="6.5" rx="7" ry="2.8"/><path d="M5 6.5v11c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-11"/><path d="M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/>',
+grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+layout:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M9 9.5V20"/>',
+terminal:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10l2.5 2.5L7 15"/><path d="M12.5 15.5h4"/>',
+power:'<path d="M12 4v7"/><path d="M6.5 7.5a7.5 7.5 0 1011 0"/>',
+/* theme */
+sun:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/>',
+moon:'<path d="M20 14.5A8.5 8.5 0 019.5 4 8.5 8.5 0 1020 14.5z"/>',
+/* media */
+play:'<path d="M8 5.5l11 6.5-11 6.5z"/>',
+pause:'<path d="M8.5 5.5v13M15.5 5.5v13"/>',
+stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+record:'<circle cx="12" cy="12" r="6"/>',
+volume:'<path d="M4 10v4h3l4 3.5v-11L7 10z"/><path d="M15 9.5a4 4 0 010 5"/><path d="M17.5 7a7 7 0 010 10"/>',
+volumeOff:'<path d="M4 10v4h3l4 3.5v-11L7 10z"/><path d="M15 10l5 5M20 10l-5 5"/>',
+mic:'<rect x="9" y="3.5" width="6" height="10" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0013 0"/><path d="M12 18v3M9 21h6"/>',
+music:'<path d="M9 17V6.5l10-2V15"/><ellipse cx="6.5" cy="17" rx="2.5" ry="2"/><ellipse cx="16.5" cy="15" rx="2.5" ry="2"/>',
+radio:'<circle cx="12" cy="12" r="2.2"/><path d="M8.2 8.2a5.4 5.4 0 000 7.6M15.8 8.2a5.4 5.4 0 010 7.6"/><path d="M5.5 5.5a9.2 9.2 0 000 13M18.5 5.5a9.2 9.2 0 010 13"/>',
+bell:'<path d="M7 16.5V11a5 5 0 0110 0v5.5l1.5 2.5h-13z"/><path d="M10 19.5a2 2 0 004 0"/>',
+bellOff:'<path d="M7 16.5V11a5 5 0 018-4"/><path d="M17 11.5v5l1.5 2.5h-11"/><path d="M4 4l16 16"/>',
+megaphone:'<path d="M4 10.5v3l10 5V5.5z"/><path d="M14 8.5l5-2.5v12l-5-2.5"/><path d="M6.5 14v4.5h3V16"/>',
+speaker:'<rect x="6" y="3.5" width="12" height="17" rx="2.5"/><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15.5" r="3"/>',
+pauseCircle:'<circle cx="12" cy="12" r="8.5"/><path d="M10 9v6M14 9v6"/>',
+/* charts / stats */
+chart:'<path d="M4 4v16h16"/><rect x="7" y="12" width="3" height="5" rx="1"/><rect x="12" y="8" width="3" height="9" rx="1"/><rect x="17" y="10" width="3" height="7" rx="1"/>',
+chartUp:'<path d="M4 17l5-5 4 3.5L20 8"/><path d="M15.5 8H20v4.5"/>',
+chartDown:'<path d="M4 8l5 5 4-3.5L20 17"/><path d="M15.5 17H20v-4.5"/>',
+gauge:'<path d="M4 17a8.5 8.5 0 1116 0"/><path d="M12 17l4-5"/><circle cx="12" cy="17" r="1.2"/>',
+target:'<circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="3.5"/><circle cx="12" cy="12" r=".9"/>',
+crosshair:'<circle cx="12" cy="12" r="5.5"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/>',
+checkCircle:'<circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.2l2.6 2.6 5-5.2"/>',
+xCircle:'<circle cx="12" cy="12" r="8.5"/><path d="M9 9l6 6M15 9l-6 6"/>',
+ban:'<circle cx="12" cy="12" r="8.5"/><path d="M6 18L18 6"/>',
+flame:'<path d="M12 3.5c3 3.2 5.5 5.6 5.5 9a5.5 5.5 0 01-11 0c0-2 .8-3.4 2.2-5 .3 1.6 1 2.5 2 2.6-.3-2.4.2-4.4 1.3-6.6z"/>',
+heart:'<path d="M12 20s-7.5-4.6-7.5-9.2A4.3 4.3 0 0112 8.2a4.3 4.3 0 017.5 2.6C19.5 15.4 12 20 12 20z"/>',
+pulse:'<path d="M3 12h4l2.5-6 4 12 2.5-6H21"/>',
+hourglass:'<path d="M7 3.5h10M7 20.5h10"/><path d="M7 3.5c0 4 5 5.5 5 8.5s-5 4.5-5 8.5"/><path d="M17 3.5c0 4-5 5.5-5 8.5s5 4.5 5 8.5"/>',
+clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+stopwatch:'<circle cx="12" cy="13.5" r="6.5"/><path d="M12 10.5v3l2 1.5"/><path d="M9.5 3h5M12 3v3.5"/>',
+refresh:'<path d="M20 12a8 8 0 11-2.3-5.6"/><path d="M20 4.5V10h-5.5"/>',
+loop:'<path d="M7 8.5h9a3.5 3.5 0 010 7H8"/><path d="M9.5 6L7 8.5 9.5 11"/><path d="M14.5 13.5L17 16l-2.5 2.5"/>',
+sync:'<path d="M4 9a7 7 0 0111.5-3L18 8"/><path d="M18 4.5V8h-3.5"/><path d="M20 15a7 7 0 01-11.5 3L6 16"/><path d="M6 19.5V16h3.5"/>',
+filter:'<path d="M4 5.5h16l-6 7v6l-4 2v-8z"/>',
+sort:'<path d="M7 4.5v15M4 16.5l3 3 3-3"/><path d="M17 19.5v-15M14 7.5l3-3 3 3"/>',
+layers:'<path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/>',
+tag:'<path d="M4 11V5a1 1 0 011-1h6l9 9-7 7z"/><circle cx="8.5" cy="8.5" r="1.3"/>',
+bookmark:'<path d="M6.5 4h11v16L12 16l-5.5 4z"/>',
+star:'<path d="M12 4l2.4 5.2 5.6.7-4.1 3.9 1.1 5.6L12 16.7l-5 2.7 1.1-5.6L4 9.9l5.6-.7z"/>',
+sparkle:'<path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 16l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/>',
+/* arrows */
+arrowUp:'<path d="M12 19V5"/><path d="M6.5 10.5L12 5l5.5 5.5"/>',
+arrowDown:'<path d="M12 5v14"/><path d="M6.5 13.5L12 19l5.5-5.5"/>',
+arrowLeft:'<path d="M19 12H5"/><path d="M10.5 6.5L5 12l5.5 5.5"/>',
+arrowRight:'<path d="M5 12h14"/><path d="M13.5 6.5L19 12l-5.5 5.5"/>',
+caretRight:'<path d="M9.5 6l6 6-6 6"/>',
+caretDown:'<path d="M6 9.5l6 6 6-6"/>',
+enter:'<path d="M19 5v6a3 3 0 01-3 3H6"/><path d="M9.5 10.5L6 14l3.5 3.5"/>',
+external:'<path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/>',
+/* blocks / code */
+block:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M9.5 9.5V20"/>',
+blocks:'<rect x="4" y="4" width="7.5" height="7.5" rx="1.5"/><rect x="12.5" y="4" width="7.5" height="7.5" rx="1.5"/><rect x="4" y="12.5" width="7.5" height="7.5" rx="1.5"/><rect x="12.5" y="12.5" width="7.5" height="7.5" rx="1.5"/>',
+code:'<path d="M8.5 8L4.5 12l4 4"/><path d="M15.5 8l4 4-4 4"/><path d="M13.5 5.5l-3 13"/>',
+terminal2:'<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M7 10l2.5 2.5L7 15"/><path d="M12.5 15.5h4"/>',
+webhook:'<circle cx="8" cy="8" r="3"/><circle cx="16" cy="16" r="3"/><path d="M10.5 9.5l3 4.5"/><path d="M5 16.5h6M13 8h6"/>',
+function:'<path d="M9 5.5c-2 0-2.5 1.2-2.5 3v1.2c0 1.4-.6 2.3-2 2.3 1.4 0 2 .9 2 2.3v1.2c0 1.8.5 3 2.5 3"/><path d="M13.5 9.5h5M13.5 14.5h5"/>',
+compare:'<path d="M12 4v16"/><path d="M7 8H4v8h3"/><path d="M17 8h3v8h-3"/>',
+logic:'<path d="M6 5.5h7.5a5 5 0 010 10H6z"/><path d="M9 9.5h2M9 13.5h2"/><path d="M18.5 8.5v7"/>',
+branch:'<circle cx="7" cy="6" r="2.2"/><circle cx="7" cy="18" r="2.2"/><circle cx="17" cy="12" r="2.2"/><path d="M7 8.2v7.6"/><path d="M9.2 6h3.3a2.3 2.3 0 012.3 2.3v1.5"/>',
+merge:'<circle cx="7" cy="6" r="2.2"/><circle cx="7" cy="18" r="2.2"/><circle cx="17" cy="12" r="2.2"/><path d="M7 8.2v7.6"/><path d="M9.2 6.6C13 7 15 9 15.3 11"/>',
+/* people / entities */
+person:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/>',
+people:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2"/><path d="M15.5 6.3a3 3 0 010 5.6"/><path d="M17 13.9c2.1.5 3.5 2.3 3.5 5.1"/>',
+idCard:'<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.8 15.5c.4-1.3 1.5-2 2.7-2s2.3.7 2.7 2"/><path d="M14 10h4M14 13.5h4"/>',
+mask:'<path d="M4 7c2.5-1.5 5-2 8-2s5.5.5 8 2v5c0 4-3.5 7-8 7s-8-3-8-7z"/><path d="M8.5 11h2M13.5 11h2"/><path d="M10 15.5c1.2.8 2.8.8 4 0"/>',
+crown:'<path d="M4 17h16"/><path d="M4.5 7l3.5 3.5L12 5l4 5.5L19.5 7 18 15H6z"/>',
+key:'<circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5L19 4"/><path d="M16 7l2.5 2.5M18.5 4.5L21 7"/>',
+shield:'<path d="M12 3.5l7 2.5v6c0 4.2-3 7.1-7 8.5-4-1.4-7-4.3-7-8.5V6z"/>',
+lock:'<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/><path d="M12 14v2.5"/>',
+walk:'<circle cx="13" cy="5" r="2"/><path d="M12 8l-2 5 2.5 2 .5 5"/><path d="M10 13l-3 2-1 4"/><path d="M14.5 11l2.5 1.5 2 4"/>',
+run:'<circle cx="14" cy="5" r="2"/><path d="M13 8l-3 4 3 2 .5 5"/><path d="M13.5 10.5l3 1 2.5 3"/><path d="M10 12l-3 1.5L5 17"/>',
+sit:'<circle cx="12" cy="5.5" r="2"/><path d="M12 8v5h4l3 5"/><path d="M12 13H8l-2 5"/>',
+float:'<circle cx="12" cy="5.5" r="2"/><path d="M12 8v6"/><path d="M8 11l4 2 4-2"/><path d="M9 17l3 2 3-2"/>',
+animal:'<path d="M5 9l2.5-4 2 3h5l2-3L19 9"/><path d="M5 9c0 5 3 9 7 9s7-4 7-9"/><path d="M9.5 12.5h.2M14.5 12.5h.2"/><path d="M12 15.5v1.5"/>',
+skull:'<path d="M12 3.5c4 0 7 2.6 7 6.2 0 2.2-1 3.5-2.3 4.3v2.5H9.3V18C8 17.2 5 15.9 5 9.7 5 6.1 8 3.5 12 3.5z"/><path d="M9.5 10h.2M14.5 10h.2"/><path d="M11 13.5h2"/><path d="M10 19.5v1.5M14 19.5v1.5"/>',
+ghost:'<path d="M6 19V10a6 6 0 0112 0v9l-3-2-3 2-3-2z"/><path d="M9.5 10h.2M14.5 10h.2"/>',
+bot:'<rect x="4.5" y="8" width="15" height="11" rx="3"/><path d="M12 4.5V8"/><circle cx="12" cy="4" r="1.2"/><path d="M9.5 12.5h.2M14.5 12.5h.2"/><path d="M9.5 16h5"/>',
+eye:'<path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+eyeOff:'<path d="M4 4l16 16"/><path d="M9.5 9.7A2.8 2.8 0 0012 14.8"/><path d="M6.2 6.6C4 8.3 2.5 12 2.5 12S6 17.5 12 17.5c1.8 0 3.4-.5 4.8-1.2"/><path d="M9.8 6.9A9 9 0 0112 6.5c6 0 9.5 5.5 9.5 5.5a16 16 0 01-2.6 3.2"/>',
+/* world / space */
+pin:'<path d="M12 21s6.5-6 6.5-11a6.5 6.5 0 10-13 0C5.5 15 12 21 12 21z"/><circle cx="12" cy="10" r="2.5"/>',
+cube:'<path d="M12 3.5l8 4.2v8.6l-8 4.2-8-4.2V7.7z"/><path d="M4 7.7l8 4.3 8-4.3"/><path d="M12 12v8.5"/>',
+sphere:'<circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="8.5" ry="3.4"/><path d="M12 3.5v17"/>',
+globe:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.6 2.3 4 5.2 4 8.5s-1.4 6.2-4 8.5c-2.6-2.3-4-5.2-4-8.5s1.4-6.2 4-8.5z"/>',
+compass:'<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5.2-5.2 2 2-5.2z"/>',
+map:'<path d="M9 4.5L3.5 6.5v13l5.5-2 6 2 5.5-2v-13l-5.5 2z"/><path d="M9 4.5v13M15 6.5v13"/>',
+route:'<circle cx="6" cy="6.5" r="2.2"/><circle cx="18" cy="17.5" r="2.2"/><path d="M6 8.7v4.3a3 3 0 003 3h5.5a2.2 2.2 0 012.2 1.3"/>',
+terrain:'<path d="M3 19l5.5-9 3.5 5 2.5-3.5L21 19z"/><path d="M7.5 12.5l1.5-2 1.5 2"/>',
+tree:'<path d="M12 3.5l4.5 6h-2.5l3.5 5H12h-5.5l3.5-5H7.5z"/><path d="M12 14.5V20"/>',
+water:'<path d="M12 3.5c3 4 5 6.4 5 9a5 5 0 01-10 0c0-2.6 2-5 5-9z"/><path d="M9.5 13.5a2.5 2.5 0 002.5 2.5"/>',
+wind:'<path d="M3 8.5h9.5a2.5 2.5 0 10-2.5-2.5"/><path d="M3 12.5h13a2.5 2.5 0 11-2.5 2.5"/><path d="M3 16.5h5.5"/>',
+lightning:'<path d="M13.5 3L6 13.5h5L10.5 21 18 10.5h-5z"/>',
+snow:'<path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9"/>',
+meteor:'<circle cx="15.5" cy="15.5" r="4"/><path d="M12 12L4 4"/><path d="M9.5 13.5L5 9"/><path d="M13.5 9.5L9 5"/>',
+planet:'<circle cx="12" cy="12" r="5.5"/><ellipse cx="12" cy="12" rx="10" ry="3.6" transform="rotate(-20 12 12)"/>',
+/* builds / crafting */
+hammer:'<path d="M6.5 13.5L13 20a1.4 1.4 0 002 0l1-1a1.4 1.4 0 000-2l-6.5-6.5"/><path d="M9 8l3-3 7 7-3 3z"/><path d="M9 8L6 5"/>',
+wrench:'<path d="M15.2 3.3a4.6 4.6 0 00-4.9 7.3l-6.4 6.4a1.6 1.6 0 002.3 2.3l6.4-6.4a4.6 4.6 0 007.3-4.9l-2.6 2.6-2.2-2.2z"/>',
+axe:'<path d="M14 4l6 6-2 2-6-6z"/><path d="M12 6L4 20l2 1 8-14"/>',
+pickaxe:'<path d="M4 20L16 8"/><path d="M9 5c4 0 8 3 10 7-3-2-6-2.5-9-1.5"/><path d="M15 3.5c3 1 5.5 3.5 6.5 6.5-1.5-1-2.5-1.5-4-1.8"/>',
+shovel:'<path d="M12 3v11"/><path d="M8 6h8"/><path d="M7.5 14h9l-1.5 6h-6z"/>',
+anvil:'<path d="M4 9h10c0 2 1.5 3 4 3l-1.5 3H6z"/><path d="M8 15v3h8v-3"/><path d="M6 21h12"/>',
+furnace:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8"/><path d="M9 16.5c0-1.5 1.3-2 1.3-3.5 1.2.5 1.7 1.3 1.7 2.2 1-.8 2-.4 2.3 1.3"/>',
+chest:'<rect x="3.5" y="7" width="17" height="12" rx="2"/><path d="M3.5 11.5h17"/><rect x="10" y="11" width="4" height="4" rx="1"/>',
+bottle:'<path d="M9.5 3h5v3l2 3v10a2 2 0 01-2 2h-5a2 2 0 01-2-2V9l2-3z"/><path d="M7.5 14h9"/>',
+flask:'<path d="M9 3.5h6"/><path d="M10 3.5v5L5.5 17a2.5 2.5 0 002.3 3.5h8.4a2.5 2.5 0 002.3-3.5L14 8.5v-5"/><path d="M7.5 14h9"/>',
+gem:'<path d="M7 4h10l4 5.5L12 20 3 9.5z"/><path d="M3 9.5h18"/><path d="M8.5 4L7 9.5 12 20l5-10.5L15.5 4"/>',
+coin:'<circle cx="12" cy="12" r="8"/><path d="M12 7.5v9"/><path d="M14.5 9.5a3 3 0 00-5 2c0 2.6 5 1.4 5 4a3 3 0 01-5 0"/>',
+coins:'<ellipse cx="9" cy="8" rx="5.5" ry="2.6"/><path d="M3.5 8v4c0 1.4 2.5 2.6 5.5 2.6s5.5-1.2 5.5-2.6V8"/><ellipse cx="15" cy="15" rx="5.5" ry="2.6"/><path d="M9.5 15v3.4c0 1.4 2.5 2.6 5.5 2.6s5.5-1.2 5.5-2.6V15"/>',
+cart:'<path d="M3 5h2.5l2 10h10"/><path d="M6.5 8H20l-1.5 5.5H7.5"/><circle cx="9" cy="19" r="1.8"/><circle cx="17" cy="19" r="1.8"/>',
+bag:'<path d="M5 8h14l-1.5 12h-11z"/><path d="M9 8V6a3 3 0 016 0v2"/>',
+box:'<rect x="4" y="7" width="16" height="12" rx="2"/><path d="M4 11h16"/><path d="M9.5 7V4.5h5V7"/>',
+package:'<path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/><path d="M8 5l8 4"/>',
+scroll:'<path d="M6 4h11a2 2 0 012 2v12a2 2 0 01-2 2H6"/><path d="M6 4a2 2 0 00-2 2v1.5h3"/><path d="M4 20a2 2 0 002-2V7.5"/><path d="M9 9h6M9 12.5h6M9 16h4"/>',
+book:'<path d="M4 5.5A1.5 1.5 0 015.5 4H11v16H5.5A1.5 1.5 0 014 18.5z"/><path d="M20 5.5A1.5 1.5 0 0018.5 4H13v16h5.5A1.5 1.5 0 0020 18.5z"/>',
+note:'<path d="M6 3.5h9l4 4v13H6z"/><path d="M15 3.5v4h4"/><path d="M9 12h7M9 16h5"/>',
+clipboard:'<rect x="5" y="5" width="14" height="15" rx="2"/><path d="M9 5V3.5h6V5"/><path d="M9 10h6M9 14h6"/>',
+rules:'<path d="M8 4H6a1.5 1.5 0 00-1.5 1.5V19A1.5 1.5 0 006 20.5h2"/><path d="M16 4h2a1.5 1.5 0 011.5 1.5V19A1.5 1.5 0 0118 20.5h-2"/><path d="M9.5 9h5M9.5 13h5"/>',
+/* editor / canvas */
+cursor:'<path d="M6 3.5l12 8.5-5.5 1.2L9 19z"/>',
+hand:'<path d="M9 11V6a1.5 1.5 0 013 0v4.5"/><path d="M12 10.5V5a1.5 1.5 0 013 0v5.5"/><path d="M15 11V7a1.5 1.5 0 013 0v8a5 5 0 01-5 5h-1.5a4 4 0 01-3.2-1.6L5 14a1.6 1.6 0 012.3-2.2L9 13.5"/>',
+zoomIn:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><path d="M8 10.5h5M10.5 8v5"/>',
+zoomOut:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><path d="M8 10.5h5"/>',
+home:'<path d="M4 11l8-6.5 8 6.5"/><path d="M6.5 10v10h11V10"/>',
+maximize:'<path d="M9 4H4v5"/><path d="M15 4h5v5"/><path d="M20 15v5h-5"/><path d="M9 20H4v-5"/>',
+grip:'<path d="M8 8h.2M16 8h.2M8 12h.2M16 12h.2M8 16h.2M16 16h.2"/>',
+stack:'<rect x="4" y="4.5" width="16" height="4" rx="1.5"/><rect x="4" y="10" width="16" height="4" rx="1.5"/><rect x="4" y="15.5" width="16" height="4" rx="1.5"/>',
+hat:'<path d="M3 18.5h18l-1.5-3H4.5z"/><path d="M7.5 15.5V9.5a4.5 4.5 0 019 0v6"/>',
+repeat2:'<path d="M4 12a8 8 0 0113.5-5.8L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 01-13.5 5.8L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
+
+message:'<path d="M4 6.5A2.5 2.5 0 016.5 4h11A2.5 2.5 0 0120 6.5v7A2.5 2.5 0 0117.5 16H10l-4.5 3.5V16H6.5A2.5 2.5 0 014 13.5z"/>',
+mail:'<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5l8 5.5 8-5.5"/>',
+swords:'<path d="M4 4l9 9-2 2-9-9z"/><path d="M15 15l5 5-2 2-5-5z"/><path d="M20 4l-9 9 2 2 9-9z"/><path d="M6 18l-2 2 2 2 2-2z"/>',
+settings:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 7.8l1.9 1.1M17.2 15.1l1.9 1.1M4.9 16.2l1.9-1.1M17.2 8.9l1.9-1.1"/>',
+sliders:'<path d="M4 8h9M17 8h3"/><path d="M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2"/><circle cx="9" cy="16" r="2"/>',
+wrap:'<path d="M4 6h16"/><path d="M4 12h9"/><path d="M17 12a3 3 0 013 3v3"/><path d="M17 18h3v-3"/><path d="M4 18h6"/>',
+nowrap:'<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><path d="M18 9l3 3-3 3"/>',
+car:'<path d="M4 16v-3l2-5h12l2 5v3"/><path d="M3 16h18"/><circle cx="7.5" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/><path d="M6 13h12"/>',
+plug:'<path d="M9 3v5M15 3v5"/><path d="M6.5 8h11v3.5a5.5 5.5 0 01-11 0z"/><path d="M12 17v4"/>',
+shuffle:'<path d="M3 7h4l10 10h4"/><path d="M17 3l4 4-4 4"/><path d="M3 17h4l3-3"/><path d="M17 3h4v4"/>',
+bug:'<rect x="7.5" y="7" width="9" height="11" rx="4.5"/><path d="M12 3.5v3.5"/><path d="M7.5 11H4M20 11h-3.5M7.5 15.5H4.5M19.5 15.5H16.5"/><path d="M9 5.5l1.5 1.5M15 5.5l-1.5 1.5"/>',
+feather:'<path d="M19.5 4.5c-6 0-11 4-11 9.5L6 20"/><path d="M8.5 14h6"/><path d="M11 10.5h5"/><path d="M19.5 4.5l-9 9"/>',
+broadcast:'<circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 000 7M15.5 8.5a5 5 0 010 7"/><path d="M5.5 5.5a9 9 0 000 13M18.5 5.5a9 9 0 010 13"/>',
+gamepad:'<rect x="2.5" y="7.5" width="19" height="9" rx="4.5"/><path d="M7 10.5v3M5.5 12h3"/><circle cx="16" cy="11" r=".9"/><circle cx="18" cy="13.5" r=".9"/>',
+camera:'<rect x="3" y="7" width="12.5" height="10" rx="2.5"/><path d="M15.5 11l5.5-2.5v7L15.5 13z"/>',
+frame:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 15l4.5-4 3.5 3 3-2.5L20 15"/><circle cx="9" cy="8.5" r="1.3"/>',
+bulb:'<path d="M9 17h6"/><path d="M10 20h4"/><path d="M12 3.5a5.5 5.5 0 013 10.1V17H9v-3.4a5.5 5.5 0 013-10.1z"/>',
+ruler:'<path d="M3.5 15.5L15.5 3.5l5 5-12 12z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2"/>',
+crane:'<path d="M4 21h16"/><path d="M7 21V5h12"/><path d="M7 5l6 4"/><path d="M16 9v5"/><rect x="13.5" y="14" width="5" height="4" rx="1"/>',
+pencil:'<path d="M4 20l1-4.5L16.5 4a2.1 2.1 0 013 3L8 18.5z"/><path d="M14.5 6l3.5 3.5"/>',
+bandage:'<rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-40 12 12)"/><path d="M10 10h.2M12 12h.2M14 14h.2"/>',
+banknote:'<rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/>',
+lifebuoy:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M6 18l3-3M18 18l-3-3M6 6l3 3M18 6l-3 3"/>',
+skip:'<path d="M6 5.5l9 6.5-9 6.5z"/><path d="M18 5.5v13"/>',
+phone:'<path d="M7.5 3.5h3l1.5 4-2 1.5a10 10 0 005 5l1.5-2 4 1.5v3a2 2 0 01-2.2 2A16.5 16.5 0 015.5 5.7a2 2 0 012-2.2z"/>',
+dice:'<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.1"/><circle cx="15" cy="9" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="9" cy="15" r="1.1"/><circle cx="15" cy="15" r="1.1"/>',
+clover:'<circle cx="9" cy="9" r="3.2"/><circle cx="15" cy="9" r="3.2"/><circle cx="9" cy="15" r="3.2"/><circle cx="15" cy="15" r="3.2"/>',
+ballot:'<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10L10.5 4h5L18 10"/><path d="M11 6.5h3"/>',
+traffic:'<rect x="7.5" y="3" width="9" height="18" rx="4.5"/><circle cx="12" cy="8" r="1.6"/><circle cx="12" cy="13" r="1.6"/><circle cx="12" cy="17" r=".6"/>',
+scissors:'<circle cx="6.5" cy="7" r="2.5"/><circle cx="6.5" cy="17" r="2.5"/><path d="M8.5 8.5L20 18M8.5 15.5L20 6"/>',
+monitor:'<rect x="3" y="4.5" width="18" height="12" rx="2.5"/><path d="M9 20h6M12 16.5V20"/>',
+calculator:'<rect x="5" y="3" width="14" height="18" rx="2.5"/><rect x="8" y="6" width="8" height="3.5" rx="1"/><path d="M8.5 13h.2M12 13h.2M15.5 13h.2M8.5 17h.2M12 17h.2M15.5 17h.2"/>',
+bow:'<path d="M5 5l14 14"/><path d="M19 5a10 10 0 010 14"/><path d="M5 19a10 10 0 010-14"/><path d="M14 19l5-5"/>',
+leg:'<path d="M9 3h6v7l1.5 8H9.5L8 10z"/><path d="M8.5 18h8"/>',
+rocket:'<path d="M12 3.5c3 1.5 4.5 4.5 4.5 8L12 16l-4.5-4.5c0-3.5 1.5-6.5 4.5-8z"/><circle cx="12" cy="9" r="1.8"/><path d="M8 13l-2.5 4 4-1M16 13l2.5 4-4-1"/><path d="M12 16v4"/>',
+link:'<path d="M10 13.5a3.5 3.5 0 005 0l2.5-2.5a3.5 3.5 0 00-5-5L11 7.5"/><path d="M14 10.5a3.5 3.5 0 00-5 0L6.5 13a3.5 3.5 0 005 5L13 16.5"/>',
+door:'<path d="M5 20.5V4.5a1 1 0 011-1h9a1 1 0 011 1v16"/><path d="M3.5 20.5h17"/><path d="M13 12h.2"/>',
+store:'<path d="M4 9.5V19h16V9.5"/><path d="M3 9.5l2-5.5h14l2 5.5a3 3 0 01-5.5 1.5 3 3 0 01-5.5 0A3 3 0 013 9.5z"/><path d="M9.5 19v-5h5v5"/>',
+brain:'<path d="M12 5.5a3 3 0 00-5.5 1.6A3 3 0 004 10a3 3 0 001.5 2.6A3 3 0 008 18a3 3 0 004 1.5z"/><path d="M12 5.5a3 3 0 015.5 1.6A3 3 0 0120 10a3 3 0 01-1.5 2.6A3 3 0 0116 18a3 3 0 01-4 1.5z"/><path d="M12 5.5v14"/>',
+shirt:'<path d="M8.5 4L4 6.5l1.5 5 2.5-1V20h8V10.5l2.5 1 1.5-5L15.5 4a3.5 3.5 0 01-7 0z"/>',
+burst:'<path d="M12 3.5l2 5 4-3-1.5 5 5 1.5-4.5 2.5 3 4-5-1-1 5-2.5-4.5-3.5 3 1-5-4.5-2 5-2-2.5-4.5z"/>',
+broom:'<path d="M19 4l-7 7"/><path d="M12 11l-7 7"/><path d="M5 18l-1.5 1.5L6 22h5l3-3-2-2z"/>',
+dagger:'<path d="M12 3l2.5 9.5h-5z"/><path d="M7.5 12.5h9"/><path d="M12 12.5V19"/><path d="M10 19h4"/>',
+firecracker:'<rect x="9" y="9" width="6" height="11" rx="2"/><path d="M12 9V6"/><path d="M12 6l3-2M12 6l-3-2M12 6V3"/>',
+footprints:'<ellipse cx="8" cy="8" rx="2" ry="3.2"/><ellipse cx="8" cy="16.5" rx="2" ry="2.4"/><ellipse cx="16" cy="12.5" rx="2" ry="3.2"/><ellipse cx="16" cy="20" rx="2" ry="1.6"/>',
+wizard:'<path d="M4 20l8-15 8 15z"/><path d="M8 13h8"/><circle cx="12" cy="9.5" r="1.2"/>',
+dotGreen:'<circle cx="12" cy="12" r="4.2" style="fill:#22c55e;stroke:#22c55e"/>',
+dotRed:'<circle cx="12" cy="12" r="4.2" style="fill:#ef4444;stroke:#ef4444"/>',
+drop:'<path d="M12 3.5c3 4 5 6.4 5 9a5 5 0 01-10 0c0-2.6 2-5 5-9z"/>',
+party:'<path d="M4 20l4-11 7 7z"/><path d="M14 5l1 2M18.5 6.5l-1.5 1.5M19 11l-2 .5M11 4.5l.5 2"/>',
+film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14"/><path d="M3 12h18"/>',
+clapper:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3.5 9l1.5-4 15 2-1 2z"/><path d="M8 5.5l1 3M13 6l1 3"/>',
+kneel:'<circle cx="12" cy="5" r="2"/><path d="M12 7.5V12l4 1.5"/><path d="M12 12H8l-2 4h6l3 3"/>',
+plane:'<path d="M3 13l18-8-6 16-3-6z"/><path d="M18 5l-6 10"/>',
+orb:'<circle cx="12" cy="12" r="7"/><path d="M5.5 9.5c4 1 9 1 13-1M5 14c4-1 9-1 13 1"/>',
+trophy:'<path d="M8 4h8v5a4 4 0 01-8 0z"/><path d="M8 5.5H5A3 3 0 008 11M16 5.5h3A3 3 0 0116 11"/><path d="M12 13v4M9 20h6M10 17h4"/>',
+receipt:'<path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+bank:'<path d="M3 9.5L12 4l9 5.5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20.5h18"/>',
+ticket:'<path d="M3 9V6h18v3a3 3 0 000 6v3H3v-3a3 3 0 000-6z"/><path d="M12 6v2M12 11v2M12 16v2"/>',
+extinguisher:'<rect x="7" y="8" width="8" height="13" rx="2.5"/><path d="M11 8V5h4"/><path d="M15 5h3"/><path d="M9 12h4"/>',
+boomerang:'<path d="M5 19c-1-7 3-13 10-14 2 5-1 11-6 13"/><path d="M5 19l4-1"/>',
+keyboard:'<rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6 10h.2M9 10h.2M12 10h.2M15 10h.2M18 10h.2M7.5 14h9"/>',
+
+/* flags */
+flagFr:'<path d="M5 4h14v16H5z"/><path d="M5 4v16"/><path d="M10.5 4.5v15"/><path d="M5 4h5.5v16H5z" fill="currentColor" stroke="none" opacity=".9"/><path d="M15.5 4H19v16h-3.5z" fill="currentColor" stroke="none" opacity=".35"/>',
+flagUk:'<path d="M5 4h14v16H5z"/><path d="M5 12h14M12 4v16"/><path d="M5 4l14 16M19 4L5 20" stroke-width="1.2"/>'
+};
+function icon(name,size,cls){
+  if(!ICONS[name])console.warn('icon: unknown name',name);
+  const body=ICONS[name]||ICONS.cube;
+  return '<svg class="svgIco'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" width="'+(size||16)+'" height="'+(size||16)+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
+}
+
 /* ---------- Categories ---------- */
 const cats=[
- {id:'variables',name:'VAR',short:'Var',icon:'📦',label:'Variables',color:'#fbbf24'},
- {id:'lists',name:'LIST',short:'List',icon:'📋',label:'Lists',color:'#22c55e'},
- {id:'logic',name:'LOG',short:'If',icon:'❓',label:'Logic',color:'#06b6d4'},
- {id:'events',name:'FN',short:'Func',icon:'⚡',label:'Functions',color:'#a78bfa'},
- {id:'search',name:'SRC',short:'Search',icon:'🔎',label:'Search blocks',color:'#64748b'},
- {id:'api_message',name:'MSG+',short:'Msg+',icon:'💬',label:'API Messages & UI',color:'#00d4ff'},
- {id:'api_sound',name:'SND',short:'Snd',icon:'🔊',label:'API Sound & Music',color:'#38bdf8'},
- {id:'api_player',name:'PLY',short:'Ply',icon:'🙂',label:'API Players',color:'#60a5fa'},
- {id:'api_blocks',name:'BLK',short:'Blk',icon:'🧱',label:'API Blocks & World',color:'#a3e635'},
- {id:'api_inventory',name:'INV',short:'Inv',icon:'🎒',label:'API Inventory & Chests',color:'#facc15'},
- {id:'api_items',name:'ITEM',short:'Item',icon:'💎',label:'API Items & Drops',color:'#fb923c'},
- {id:'api_combat',name:'FIG',short:'Fight',icon:'⚔️',label:'API Health, Effects & Combat',color:'#ef4444'},
- {id:'api_entities',name:'ENT',short:'Ent',icon:'🧍',label:'API Entities & Movement',color:'#f97316'},
- {id:'api_mobs',name:'MOB',short:'Mob',icon:'🐺',label:'API Mobs',color:'#c084fc'},
- {id:'api_mesh',name:'MSH',short:'Mesh',icon:'🧊',label:'API Mesh & Throwables',color:'#818cf8'},
- {id:'api_vehicles',name:'VEH',short:'Veh',icon:'🚗',label:'API Vehicles',color:'#f472b6'},
- {id:'api_shop',name:'SHP',short:'Shop',icon:'🛒',label:'API Shop & Currency',color:'#22c55e'},
- {id:'api_db',name:'DB',short:'DB',icon:'🗄️',label:'API Database',color:'#94a3b8'},
- {id:'api_client',name:'OPT',short:'Opt',icon:'⚙️',label:'API Client Options',color:'#14b8a6'},
- {id:'api_settings',name:'SET',short:'Set',icon:'🎛️',label:'API Entity Settings',color:'#e879f9'},
- {id:'api_qte',name:'QTE',short:'QTE',icon:'🎯',label:'API QTE',color:'#f43f5e'},
- {id:'api_fx',name:'FX',short:'FX',icon:'✨',label:'API Particles & Skins',color:'#d946ef'},
- {id:'plugins',name:'PLUG',short:'Plug',icon:'🔌',label:'Plugins',color:'#2dd4bf'},
- {id:'debug',name:'DBG',short:'Bug',icon:'🐞',label:'Debug',color:'#22c55e'}
+ {id:'variables',name:'VAR',short:'Var',icon:'package',label:'Variables',color:'#fbbf24'},
+ {id:'lists',name:'LIST',short:'List',icon:'list',label:'Lists',color:'#22c55e'},
+ {id:'logic',name:'LOG',short:'If',icon:'help',label:'Logic',color:'#06b6d4'},
+ {id:'events',name:'FN',short:'Func',icon:'lightning',label:'Functions',color:'#a78bfa'},
+ {id:'search',name:'SRC',short:'Search',icon:'search',label:'Search blocks',color:'#64748b'},
+ {id:'api_message',name:'MSG+',short:'Msg+',icon:'message',label:'API Messages & UI',color:'#00d4ff'},
+ {id:'api_sound',name:'SND',short:'Snd',icon:'speaker',label:'API Sound & Music',color:'#38bdf8'},
+ {id:'api_player',name:'PLY',short:'Ply',icon:'person',label:'API Players',color:'#60a5fa'},
+ {id:'api_blocks',name:'BLK',short:'Blk',icon:'block',label:'API Blocks & World',color:'#a3e635'},
+ {id:'api_inventory',name:'INV',short:'Inv',icon:'backpack',label:'API Inventory & Chests',color:'#facc15'},
+ {id:'api_items',name:'ITEM',short:'Item',icon:'gem',label:'API Items & Drops',color:'#fb923c'},
+ {id:'api_combat',name:'FIG',short:'Fight',icon:'swords',label:'API Health, Effects & Combat',color:'#ef4444'},
+ {id:'api_entities',name:'ENT',short:'Ent',icon:'person',label:'API Entities & Movement',color:'#f97316'},
+ {id:'api_mobs',name:'MOB',short:'Mob',icon:'animal',label:'API Mobs',color:'#c084fc'},
+ {id:'api_mesh',name:'MSH',short:'Mesh',icon:'cube',label:'API Mesh & Throwables',color:'#818cf8'},
+ {id:'api_vehicles',name:'VEH',short:'Veh',icon:'car',label:'API Vehicles',color:'#f472b6'},
+ {id:'api_shop',name:'SHP',short:'Shop',icon:'cart',label:'API Shop & Currency',color:'#22c55e'},
+ {id:'api_db',name:'DB',short:'DB',icon:'database',label:'API Database',color:'#94a3b8'},
+ {id:'api_client',name:'OPT',short:'Opt',icon:'settings',label:'API Client Options',color:'#14b8a6'},
+ {id:'api_settings',name:'SET',short:'Set',icon:'sliders',label:'API Entity Settings',color:'#e879f9'},
+ {id:'api_qte',name:'QTE',short:'QTE',icon:'target',label:'API QTE',color:'#f43f5e'},
+ {id:'api_fx',name:'FX',short:'FX',icon:'sparkle',label:'API Particles & Skins',color:'#d946ef'},
+ {id:'plugins',name:'PLUG',short:'Plug',icon:'plug',label:'Plugins',color:'#2dd4bf'},
+ {id:'debug',name:'DBG',short:'Bug',icon:'bug',label:'Debug',color:'#22c55e'}
 ];
 
 /* ---------- The 84 callbacks (verified) ---------- */
@@ -488,83 +751,83 @@ function apiGen(name){return (b,ctx,ind)=>ind+apiExpr(name)(b)+';'}
 /* ---------- Built-in block definitions ---------- */
 const defs={
  /* ===== Variables ===== */
- assign:{cat:'variables',icon:'📝',label:'Variable',desc:'Create / edit a variable',params:['','','var'],inline:b=>[['varkind',2],['input',0],['pun','='],['input',1]],
+ assign:{cat:'variables',icon:'pencil',label:'Variable',desc:'Create / edit a variable',params:['','','var'],inline:b=>[['varkind',2],['input',0],['pun','='],['input',1]],
    gen:(b,ctx,ind)=>varLine(b,ctx,ind,fmt(b.params[1]))},
- objectValue:{cat:'variables',icon:'🧩',valueOnly:true,valueKind:'object',snippet:'{ key: value }',label:'Object',desc:'Object value you can drop into a slot',params:[]},
- listValue:{cat:'variables',icon:'📚',valueOnly:true,valueKind:'list',snippet:'[item1, item2]',label:'List',desc:'List value you can drop into a slot',params:[]},
- thisPosValue:{cat:'variables',icon:'📍',valueOnly:true,snippet:'thisPos',label:'thisPos',desc:'[x, y, z] of the code block or board that ran',params:[]},
- playerIdValue:{cat:'variables',icon:'🆔',valueOnly:true,snippet:'playerId',label:'playerId',desc:'Player ID of the running code (same as myId)',params:[]},
- myIdValue:{cat:'variables',icon:'👤',valueOnly:true,snippet:'myId',label:'myId',desc:'ID of the player running the code, or null',params:[]},
- ownerDbIdValue:{cat:'variables',icon:'🗝️',valueOnly:true,snippet:'api.ownerDbId',label:'api.ownerDbId',desc:"Database ID of the world's owner, or null",params:[]},
- objectVar:{cat:'variables',icon:'🧩',hidden:true,params:['','key: value','var'],inline:b=>[['varkind',2],['input',0],['pun','= {'],['input',1],['pun','}']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,objLiteral(b.params[1]))},
- listVar:{cat:'variables',icon:'📚',hidden:true,params:['','item1, item2','var'],inline:b=>[['varkind',2],['input',0],['pun','= ['],['callargs',1],['pun',']']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,'['+parseCallArgs(b.params[1]).map(fmt).join(', ')+']')},
+ objectValue:{cat:'variables',icon:'puzzle',valueOnly:true,valueKind:'object',snippet:'{ key: value }',label:'Object',desc:'Object value you can drop into a slot',params:[]},
+ listValue:{cat:'variables',icon:'templates',valueOnly:true,valueKind:'list',snippet:'[item1, item2]',label:'List',desc:'List value you can drop into a slot',params:[]},
+ thisPosValue:{cat:'variables',icon:'pin',valueOnly:true,snippet:'thisPos',label:'thisPos',desc:'[x, y, z] of the code block or board that ran',params:[]},
+ playerIdValue:{cat:'variables',icon:'idCard',valueOnly:true,snippet:'playerId',label:'playerId',desc:'Player ID of the running code (same as myId)',params:[]},
+ myIdValue:{cat:'variables',icon:'person',valueOnly:true,snippet:'myId',label:'myId',desc:'ID of the player running the code, or null',params:[]},
+ ownerDbIdValue:{cat:'variables',icon:'key',valueOnly:true,snippet:'api.ownerDbId',label:'api.ownerDbId',desc:"Database ID of the world's owner, or null",params:[]},
+ objectVar:{cat:'variables',icon:'puzzle',hidden:true,params:['','key: value','var'],inline:b=>[['varkind',2],['input',0],['pun','= {'],['input',1],['pun','}']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,objLiteral(b.params[1]))},
+ listVar:{cat:'variables',icon:'templates',hidden:true,params:['','item1, item2','var'],inline:b=>[['varkind',2],['input',0],['pun','= ['],['callargs',1],['pun',']']],gen:(b,ctx,ind)=>varLine(b,ctx,ind,'['+parseCallArgs(b.params[1]).map(fmt).join(', ')+']')},
 
  /* ===== Lists ===== */
- listAdd:{cat:'lists',icon:'➕',label:'Add to list',desc:'Push a value onto a list',params:['myList','"value"'],inline:b=>[['input',0],['pun','.push('],['input',1],['pun',')']],expr:b=>String(b.params[0]||'myList').trim()+'.push('+fmt(b.params[1])+')'},
- listRemove:{cat:'lists',icon:'➖',label:'Remove from list',desc:'Remove the item at an index',params:['myList','0'],inline:b=>[['input',0],['pun','.splice('],['input',1],['pun',', 1)']],expr:b=>String(b.params[0]||'myList').trim()+'.splice('+fmt(b.params[1])+', 1)'},
- listClear:{cat:'lists',icon:'🗑️',label:'Clear list',desc:'Remove every item from a list',params:['myList'],inline:b=>[['input',0],['pun','.length = 0']],expr:b=>String(b.params[0]||'myList').trim()+'.length = 0'},
- listLength:{cat:'lists',icon:'📏',label:'Length of list',desc:'Number of items in a list',params:['myList'],inline:b=>[['input',0],['pun','.length']],expr:b=>String(b.params[0]||'myList').trim()+'.length'},
- listGet:{cat:'lists',icon:'🎯',label:'Item of list',desc:'Item at an index (0-based)',params:['myList','0'],inline:b=>[['input',0],['pun','['],['input',1],['pun',']']],expr:b=>String(b.params[0]||'myList').trim()+'['+fmt(b.params[1])+']'},
- listJoin:{cat:'lists',icon:'🔗',label:'Join list',desc:'Join all items into one string',params:['myList','", "'],inline:b=>[['input',0],['pun','.join('],['input',1],['pun',')']],expr:b=>String(b.params[0]||'myList').trim()+'.join('+fmt(b.params[1])+')'},
+ listAdd:{cat:'lists',icon:'plus',label:'Add to list',desc:'Push a value onto a list',params:['myList','"value"'],inline:b=>[['input',0],['pun','.push('],['input',1],['pun',')']],expr:b=>String(b.params[0]||'myList').trim()+'.push('+fmt(b.params[1])+')'},
+ listRemove:{cat:'lists',icon:'minus',label:'Remove from list',desc:'Remove the item at an index',params:['myList','0'],inline:b=>[['input',0],['pun','.splice('],['input',1],['pun',', 1)']],expr:b=>String(b.params[0]||'myList').trim()+'.splice('+fmt(b.params[1])+', 1)'},
+ listClear:{cat:'lists',icon:'trash',label:'Clear list',desc:'Remove every item from a list',params:['myList'],inline:b=>[['input',0],['pun','.length = 0']],expr:b=>String(b.params[0]||'myList').trim()+'.length = 0'},
+ listLength:{cat:'lists',icon:'ruler',label:'Length of list',desc:'Number of items in a list',params:['myList'],inline:b=>[['input',0],['pun','.length']],expr:b=>String(b.params[0]||'myList').trim()+'.length'},
+ listGet:{cat:'lists',icon:'target',label:'Item of list',desc:'Item at an index (0-based)',params:['myList','0'],inline:b=>[['input',0],['pun','['],['input',1],['pun',']']],expr:b=>String(b.params[0]||'myList').trim()+'['+fmt(b.params[1])+']'},
+ listJoin:{cat:'lists',icon:'link',label:'Join list',desc:'Join all items into one string',params:['myList','", "'],inline:b=>[['input',0],['pun','.join('],['input',1],['pun',')']],expr:b=>String(b.params[0]||'myList').trim()+'.join('+fmt(b.params[1])+')'},
 
  /* ===== Logic ===== */
- if:{cat:'logic',icon:'❓',label:'If',desc:'Run the blocks inside when the condition is true',container:true,params:['true'],inline:b=>[['kw','if'],['pun','('],['input',0],['pun',')']],
+ if:{cat:'logic',icon:'help',label:'If',desc:'Run the blocks inside when the condition is true',container:true,params:['true'],inline:b=>[['kw','if'],['pun','('],['input',0],['pun',')']],
    gen:(b,ctx,ind)=>ind+'if ('+fmt(b.params[0]||'true')+') {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'}'},
- ifElse:{cat:'logic',icon:'↩️',label:'If / else',desc:'Run one of two bodies of blocks',container:true,twoBodies:true,params:['true'],inline:b=>[['kw','if'],['pun','('],['input',0],['pun',')']],
+ ifElse:{cat:'logic',icon:'undo',label:'If / else',desc:'Run one of two bodies of blocks',container:true,twoBodies:true,params:['true'],inline:b=>[['kw','if'],['pun','('],['input',0],['pun',')']],
    gen:(b,ctx,ind)=>ind+'if ('+fmt(b.params[0]||'true')+') {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'} else {\n'+genList(b.children2,ctx,ind+'  ')+'\n'+ind+'}'},
- repeat:{cat:'logic',icon:'🔁',label:'Repeat',desc:'Repeat the blocks inside N times',container:true,params:['10'],inline:b=>[['kw','for'],['pun','('],['kw','let'],['pun',' _i = 0; _i < '],['input',0],['pun','; _i++)']],
+ repeat:{cat:'logic',icon:'loop',label:'Repeat',desc:'Repeat the blocks inside N times',container:true,params:['10'],inline:b=>[['kw','for'],['pun','('],['kw','let'],['pun',' _i = 0; _i < '],['input',0],['pun','; _i++)']],
    gen:(b,ctx,ind)=>{const c2=new Set(ctx);c2._loop=(ctx._loop||0)+1;return ind+'for (let _i = 0; _i < '+fmt(b.params[0]||'10')+'; _i++) {\n'+genList(b.children,c2,ind+'  ')+'\n'+ind+'}'}},
- whileLoop:{cat:'logic',icon:'🔄',label:'While',desc:'Repeat the blocks inside while the condition is true',container:true,params:['true'],inline:b=>[['kw','while'],['pun','('],['input',0],['pun',')']],
+ whileLoop:{cat:'logic',icon:'refresh',label:'While',desc:'Repeat the blocks inside while the condition is true',container:true,params:['true'],inline:b=>[['kw','while'],['pun','('],['input',0],['pun',')']],
    gen:(b,ctx,ind)=>{const c2=new Set(ctx);c2._loop=(ctx._loop||0)+1;return ind+'while ('+fmt(b.params[0]||'true')+') {\n'+genList(b.children,c2,ind+'  ')+'\n'+ind+'}'}},
- for:{cat:'logic',icon:'🔂',label:'For',desc:'Classic for loop with a raw header',container:true,params:['let i = 0; i < 10; i++'],inline:b=>[['kw','for'],['pun','('],['input',0],['pun',')']],
+ for:{cat:'logic',icon:'repeat2',label:'For',desc:'Classic for loop with a raw header',container:true,params:['let i = 0; i < 10; i++'],inline:b=>[['kw','for'],['pun','('],['input',0],['pun',')']],
    gen:(b,ctx,ind)=>{const c2=new Set(ctx);c2._loop=(ctx._loop||0)+1;return ind+'for ('+(b.params[0]||'let i = 0; i < 10; i++')+') {\n'+genList(b.children,c2,ind+'  ')+'\n'+ind+'}'}},
- forOf:{cat:'logic',icon:'🔃',label:'For each',desc:'Loop over every item of an array',container:true,params:['item','array'],inline:b=>[['kw','for'],['pun','('],['kw','const'],['input',0],['kw','of'],['input',1],['pun',')']],
+ forOf:{cat:'logic',icon:'sync',label:'For each',desc:'Loop over every item of an array',container:true,params:['item','array'],inline:b=>[['kw','for'],['pun','('],['kw','const'],['input',0],['kw','of'],['input',1],['pun',')']],
    gen:(b,ctx,ind)=>{const v=String(b.params[0]||'item').trim()||'item';const local=new Set([...ctx,v]);local._loop=(ctx._loop||0)+1;return ind+'for (const '+v+' of '+fmt(b.params[1]||'[]')+') {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'}'}},
- forIn:{cat:'logic',icon:'🔀',label:'For key in',desc:'Loop over every key of an object',container:true,params:['key','object'],inline:b=>[['kw','for'],['pun','('],['kw','const'],['input',0],['kw','in'],['input',1],['pun',')']],
+ forIn:{cat:'logic',icon:'shuffle',label:'For key in',desc:'Loop over every key of an object',container:true,params:['key','object'],inline:b=>[['kw','for'],['pun','('],['kw','const'],['input',0],['kw','in'],['input',1],['pun',')']],
    gen:(b,ctx,ind)=>{const k=String(b.params[0]||'key').trim()||'key';const local=new Set([...ctx,k]);local._loop=(ctx._loop||0)+1;return ind+'for (const '+k+' in '+fmt(b.params[1]||'{}')+') {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'}'}},
- wait:{cat:'logic',icon:'⏳',label:'Wait',desc:'Run the blocks inside after a delay (@plugins/helpers setTimeout)',container:true,params:['1000'],plugin:'helpers',inline:b=>[['fn','setTimeout'],['pun','('],['input',0],['pun',' ms)']],
+ wait:{cat:'logic',icon:'hourglass',label:'Wait',desc:'Run the blocks inside after a delay (@plugins/helpers setTimeout)',container:true,params:['1000'],plugin:'helpers',inline:b=>[['fn','setTimeout'],['pun','('],['input',0],['pun',' ms)']],
    gen:(b,ctx,ind)=>ind+'setTimeout(() => {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'}, '+fmt(b.params[0]||'1000')+');'},
- every:{cat:'logic',icon:'⏱️',label:'Every',desc:'Run the blocks inside repeatedly (@plugins/helpers setInterval)',container:true,params:['1000'],plugin:'helpers',inline:b=>[['fn','setInterval'],['pun','('],['input',0],['pun',' ms)']],
+ every:{cat:'logic',icon:'stopwatch',label:'Every',desc:'Run the blocks inside repeatedly (@plugins/helpers setInterval)',container:true,params:['1000'],plugin:'helpers',inline:b=>[['fn','setInterval'],['pun','('],['input',0],['pun',' ms)']],
    gen:(b,ctx,ind)=>{const id='_every'+(b.id||'').replace(/\W/g,'');return ind+'const '+id+' = setInterval(() => {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'}, '+fmt(b.params[0]||'1000')+');'}},
- tryCatch:{cat:'logic',icon:'🛟',label:'Try / catch',desc:'Catch errors thrown by the blocks inside',container:true,twoBodies:true,params:['err'],inline:b=>[['kw','try']],
+ tryCatch:{cat:'logic',icon:'lifebuoy',label:'Try / catch',desc:'Catch errors thrown by the blocks inside',container:true,twoBodies:true,params:['err'],inline:b=>[['kw','try']],
    gen:(b,ctx,ind)=>{const e=String(b.params[0]||'err').trim()||'err';const local=new Set([...ctx,e]);return ind+'try {\n'+genList(b.children,ctx,ind+'  ')+'\n'+ind+'} catch ('+e+') {\n'+genList(b.children2,local,ind+'  ')+'\n'+ind+'}'}},
- breakLoop:{cat:'logic',icon:'⛔',label:'Break',desc:'Exit the current loop',params:[],inline:()=>[['kw','break']],
+ breakLoop:{cat:'logic',icon:'ban',label:'Break',desc:'Exit the current loop',params:[],inline:()=>[['kw','break']],
    gen:(b,ctx,ind)=>ctx&&ctx._loop?ind+'break;':ind+'// break (only works inside a loop)'},
- continueLoop:{cat:'logic',icon:'⏭️',label:'Continue',desc:'Skip to the next loop iteration',params:[],inline:()=>[['kw','continue']],
+ continueLoop:{cat:'logic',icon:'skip',label:'Continue',desc:'Skip to the next loop iteration',params:[],inline:()=>[['kw','continue']],
    gen:(b,ctx,ind)=>ctx&&ctx._loop?ind+'continue;':ind+'// continue (only works inside a loop)'},
 
  /* ===== Functions & events ===== */
- callback:{cat:'events',icon:'⚡',label:'Hat block',hat:true,container:true,params:['tick'],inline:b=>[['prop',b.params[0]||'tick'],['pun','= ('],['args',1],['pun',')']],
+ callback:{cat:'events',icon:'lightning',label:'Hat block',hat:true,container:true,params:['tick'],inline:b=>[['prop',b.params[0]||'tick'],['pun','= ('],['args',1],['pun',')']],
    gen:(b,ctx,ind)=>{const name=String(b.params[0]||'tick').trim();const ps=fnParams(name);const local=new Set([...ctx,...ps]);return ind+name+' = ('+ps.join(', ')+') => {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'};'}},
- func:{cat:'events',icon:'🧩',label:'Make a Block',hat:true,container:true,params:['myFunction',''],inline:b=>[['kw','function'],['fn',b.params[0]||'myFunction'],['pun','('],['args',1],['pun',')']],
+ func:{cat:'events',icon:'puzzle',label:'Make a Block',hat:true,container:true,params:['myFunction',''],inline:b=>[['kw','function'],['fn',b.params[0]||'myFunction'],['pun','('],['args',1],['pun',')']],
    gen:(b,ctx,ind)=>{const name=cleanFnName(b.params[0]||'myFunction');const ps=parseArgs(b.params[1]);const local=new Set([...ctx,...ps]);return ind+'function '+name+'('+ps.join(', ')+') {\n'+genList(b.children,local,ind+'  ')+'\n'+ind+'}'}},
- call:{cat:'events',icon:'📞',label:'Call',desc:'Call a function you made',params:['myFunction',''],inline:b=>[['fn',b.params[0]||'myFunction'],['pun','('],['callargs',1],['pun',')']],
+ call:{cat:'events',icon:'phone',label:'Call',desc:'Call a function you made',params:['myFunction',''],inline:b=>[['fn',b.params[0]||'myFunction'],['pun','('],['callargs',1],['pun',')']],
    expr:b=>cleanFnName(b.params[0]||'myFunction')+'('+parseCallArgs(b.params[1]).map(fmt).join(', ')+')'},
- return:{cat:'events',icon:'↩️',label:'Return',desc:'Return a value from a function',params:[''],
+ return:{cat:'events',icon:'undo',label:'Return',desc:'Return a value from a function',params:[''],
    inline:b=>[['kw','return'],['input',0]],expr:b=>'return '+fmt(b.params[0]||'null')},
- comment:{cat:'events',icon:'💬',label:'Comment',desc:'A JavaScript comment',params:['note'],inline:b=>[['cmt','// '],['input',0]],
+ comment:{cat:'events',icon:'message',label:'Comment',desc:'A JavaScript comment',params:['note'],inline:b=>[['cmt','// '],['input',0]],
    gen:(b,ctx,ind)=>ind+'// '+String(b.params[0]||'').replace(/\n/g,' ')},
 
  /* ===== Debug ===== */
- log:{cat:'debug',icon:'📤',label:'Log',desc:'api.log — prints in chat',params:['"Hello"'],inline:b=>[['prop','api'],['pun','.'],['fn','log'],['pun','('],['input',0],['pun',')']],expr:b=>'api.log('+fmt(b.params[0])+')'},
- logTime:{cat:'debug',icon:'⏱️',label:'Log time',desc:'Log a timestamped message',params:['"checkpoint"'],inline:b=>[['fn','debugLog'],['pun','('],['input',0],['pun',')']],expr:b=>'debugLog('+fmt(b.params[0])+')',plugin:'debug'},
+ log:{cat:'debug',icon:'export',label:'Log',desc:'api.log — prints in chat',params:['"Hello"'],inline:b=>[['prop','api'],['pun','.'],['fn','log'],['pun','('],['input',0],['pun',')']],expr:b=>'api.log('+fmt(b.params[0])+')'},
+ logTime:{cat:'debug',icon:'stopwatch',label:'Log time',desc:'Log a timestamped message',params:['"checkpoint"'],inline:b=>[['fn','debugLog'],['pun','('],['input',0],['pun',')']],expr:b=>'debugLog('+fmt(b.params[0])+')',plugin:'debug'},
 
  /* ===== Plugins (sugar) ===== */
- importHelpers:{cat:'plugins',icon:'🔌',label:'Import helpers',desc:'import { setTimeout, setInterval, ... } from "@plugins/helpers"',params:['setTimeout, setInterval'],plugin:'helpers',hidden:true,
+ importHelpers:{cat:'plugins',icon:'plug',label:'Import helpers',desc:'import { setTimeout, setInterval, ... } from "@plugins/helpers"',params:['setTimeout, setInterval'],plugin:'helpers',hidden:true,
    inline:b=>[['kw','import'],['pun','{ '],['input',0],['pun',' } from "@plugins/helpers"']],
    gen:(b,ctx,ind)=>ind+'import { '+String(b.params[0]||'setTimeout')+' } from "@plugins/helpers";'},
- pSetTimeout:{cat:'plugins',icon:'⏳',label:'setTimeout',desc:'helpers.setTimeout(fn, ms, playerId?)',params:['() => {}','1000'],plugin:'helpers',inline:b=>[['fn','setTimeout'],['pun','('],['input',0],['pun',', '],['input',1],['pun',')']],expr:b=>'setTimeout('+fmt(b.params[0])+', '+fmt(b.params[1])+')'},
- pSetInterval:{cat:'plugins',icon:'⏱️',label:'setInterval',desc:'helpers.setInterval(fn, ms, playerId?)',params:['() => {}','1000'],plugin:'helpers',inline:b=>[['fn','setInterval'],['pun','('],['input',0],['pun',', '],['input',1],['pun',')']],expr:b=>'setInterval('+fmt(b.params[0])+', '+fmt(b.params[1])+')'},
- pClearTimeout:{cat:'plugins',icon:'🛑',label:'clearTimeout',desc:'Cancel a timer started with setTimeout',params:['timerId'],plugin:'helpers',inline:b=>[['fn','clearTimeout'],['pun','('],['input',0],['pun',')']],expr:b=>'clearTimeout('+fmt(b.params[0])+')'},
- pClearInterval:{cat:'plugins',icon:'🛑',label:'clearInterval',desc:'Cancel a timer started with setInterval',params:['timerId'],plugin:'helpers',inline:b=>[['fn','clearInterval'],['pun','('],['input',0],['pun',')']],expr:b=>'clearInterval('+fmt(b.params[0])+')'},
- pForceLoadChunk:{cat:'plugins',icon:'📦',label:'forceLoadChunk',desc:'Load a chunk before touching its blocks',params:['0','0','0'],plugin:'helpers',inline:b=>[['fn','forceLoadChunk'],['pun','('],['input',0],['pun',', '],['input',1],['pun',', '],['input',2],['pun',')']],expr:b=>'forceLoadChunk('+b.params.map(fmt).join(', ')+')'},
- pRandomInt:{cat:'plugins',icon:'🎲',label:'randomInt',desc:'Random integer in [min, max)',params:['0','10'],plugin:'helpers',inline:b=>[['fn','randomInt'],['pun','('],['input',0],['pun',', '],['input',1],['pun',')']],expr:b=>'randomInt('+b.params.map(fmt).join(', ')+')'},
- pShuffleArray:{cat:'plugins',icon:'🔀',label:'shuffleArray',desc:'Shuffle an array in place',params:['myArray'],plugin:'helpers',inline:b=>[['fn','shuffleArray'],['pun','('],['input',0],['pun',')']],expr:b=>'shuffleArray('+fmt(b.params[0])+')'},
- pGetRandomItem:{cat:'plugins',icon:'🍀',label:'getRandomItem',desc:'Pick a random element of an array',params:['myArray'],plugin:'helpers',inline:b=>[['fn','getRandomItem'],['pun','('],['input',0],['pun',')']],expr:b=>'getRandomItem('+fmt(b.params[0])+')'},
- pDebugLog:{cat:'plugins',icon:'🐞',label:'debugLog',desc:'Log with the debug plugin',params:['"msg"'],plugin:'debug',inline:b=>[['fn','debugLog'],['pun','('],['input',0],['pun',')']],expr:b=>'debugLog('+fmt(b.params[0])+')'},
- pSayDialogue:{cat:'plugins',icon:'🗨️',label:'sayDialogue',desc:'Show a dialogue line to a player',params:['playerId','"Hello!"','3000'],plugin:'dialogue',inline:b=>[['fn','sayDialogue'],['pun','('],['input',0],['pun',', '],['input',1],['pun',', '],['input',2],['pun',')']],expr:b=>'sayDialogue('+b.params.map(fmt).join(', ')+')'},
- pClearDialogue:{cat:'plugins',icon:'🚫',label:'clearDialogue',desc:'Hide the current dialogue line',params:['playerId'],plugin:'dialogue',inline:b=>[['fn','clearDialogue'],['pun','('],['input',0],['pun',')']],expr:b=>'clearDialogue('+fmt(b.params[0])+')'},
- pCreateGame:{cat:'plugins',icon:'🎮',label:'createGame',desc:'Start a session-based game (teams, maps, resets)',params:['{ maps: ["Arena"] }'],plugin:'sessionBasedGame',inline:b=>[['fn','createGame'],['pun','('],['input',0],['pun',')']],expr:b=>'createGame('+fmt(b.params[0])+')'}
+ pSetTimeout:{cat:'plugins',icon:'hourglass',label:'setTimeout',desc:'helpers.setTimeout(fn, ms, playerId?)',params:['() => {}','1000'],plugin:'helpers',inline:b=>[['fn','setTimeout'],['pun','('],['input',0],['pun',', '],['input',1],['pun',')']],expr:b=>'setTimeout('+fmt(b.params[0])+', '+fmt(b.params[1])+')'},
+ pSetInterval:{cat:'plugins',icon:'stopwatch',label:'setInterval',desc:'helpers.setInterval(fn, ms, playerId?)',params:['() => {}','1000'],plugin:'helpers',inline:b=>[['fn','setInterval'],['pun','('],['input',0],['pun',', '],['input',1],['pun',')']],expr:b=>'setInterval('+fmt(b.params[0])+', '+fmt(b.params[1])+')'},
+ pClearTimeout:{cat:'plugins',icon:'stop',label:'clearTimeout',desc:'Cancel a timer started with setTimeout',params:['timerId'],plugin:'helpers',inline:b=>[['fn','clearTimeout'],['pun','('],['input',0],['pun',')']],expr:b=>'clearTimeout('+fmt(b.params[0])+')'},
+ pClearInterval:{cat:'plugins',icon:'stop',label:'clearInterval',desc:'Cancel a timer started with setInterval',params:['timerId'],plugin:'helpers',inline:b=>[['fn','clearInterval'],['pun','('],['input',0],['pun',')']],expr:b=>'clearInterval('+fmt(b.params[0])+')'},
+ pForceLoadChunk:{cat:'plugins',icon:'package',label:'forceLoadChunk',desc:'Load a chunk before touching its blocks',params:['0','0','0'],plugin:'helpers',inline:b=>[['fn','forceLoadChunk'],['pun','('],['input',0],['pun',', '],['input',1],['pun',', '],['input',2],['pun',')']],expr:b=>'forceLoadChunk('+b.params.map(fmt).join(', ')+')'},
+ pRandomInt:{cat:'plugins',icon:'dice',label:'randomInt',desc:'Random integer in [min, max)',params:['0','10'],plugin:'helpers',inline:b=>[['fn','randomInt'],['pun','('],['input',0],['pun',', '],['input',1],['pun',')']],expr:b=>'randomInt('+b.params.map(fmt).join(', ')+')'},
+ pShuffleArray:{cat:'plugins',icon:'shuffle',label:'shuffleArray',desc:'Shuffle an array in place',params:['myArray'],plugin:'helpers',inline:b=>[['fn','shuffleArray'],['pun','('],['input',0],['pun',')']],expr:b=>'shuffleArray('+fmt(b.params[0])+')'},
+ pGetRandomItem:{cat:'plugins',icon:'clover',label:'getRandomItem',desc:'Pick a random element of an array',params:['myArray'],plugin:'helpers',inline:b=>[['fn','getRandomItem'],['pun','('],['input',0],['pun',')']],expr:b=>'getRandomItem('+fmt(b.params[0])+')'},
+ pDebugLog:{cat:'plugins',icon:'bug',label:'debugLog',desc:'Log with the debug plugin',params:['"msg"'],plugin:'debug',inline:b=>[['fn','debugLog'],['pun','('],['input',0],['pun',')']],expr:b=>'debugLog('+fmt(b.params[0])+')'},
+ pSayDialogue:{cat:'plugins',icon:'message',label:'sayDialogue',desc:'Show a dialogue line to a player',params:['playerId','"Hello!"','3000'],plugin:'dialogue',inline:b=>[['fn','sayDialogue'],['pun','('],['input',0],['pun',', '],['input',1],['pun',', '],['input',2],['pun',')']],expr:b=>'sayDialogue('+b.params.map(fmt).join(', ')+')'},
+ pClearDialogue:{cat:'plugins',icon:'ban',label:'clearDialogue',desc:'Hide the current dialogue line',params:['playerId'],plugin:'dialogue',inline:b=>[['fn','clearDialogue'],['pun','('],['input',0],['pun',')']],expr:b=>'clearDialogue('+fmt(b.params[0])+')'},
+ pCreateGame:{cat:'plugins',icon:'gamepad',label:'createGame',desc:'Start a session-based game (teams, maps, resets)',params:['{ maps: ["Arena"] }'],plugin:'sessionBasedGame',inline:b=>[['fn','createGame'],['pun','('],['input',0],['pun',')']],expr:b=>'createGame('+fmt(b.params[0])+')'}
 };
 
 /* ---------- API registry ---------- */
@@ -574,128 +837,128 @@ function M(cat,icon,name,params=[],returns=''){API_METHODS.push({cat,icon,name,p
 
 /* ---------- New verified methods (docs Nov 2026) ---------- */
 // Messages / UI
-M(A.msg,'❓','addUiRequest',[pp('playerId','playerId'),pp('parameters','{ type: "standard", title: "Join?" }'),pp('timeoutAfterMs','5000')],'UiRequestId');
-M(A.msg,'🗳️','addUiRequestPopup',[pp('playerId','playerId'),pp('requestText','"Do you want to join the game?"')],'UiRequestId | null');
-M(A.msg,'🚮','deleteUiRequest',[pp('playerId','playerId'),pp('id','uiRequestId')]);
-M(A.msg,'🔼','queueMiddleTextUpper',[pp('playerId','playerId'),pp('text','"GO!"'),pp('duration','2000')],'QueuedCommandId');
-M(A.msg,'🔽','queueMiddleTextLower',[pp('playerId','playerId'),pp('text','"get ready"'),pp('duration','2000')],'QueuedCommandId');
-M(A.msg,'➕','queueCrosshairText',[pp('playerId','playerId'),pp('text','"+"'),pp('duration','500')],'QueuedCommandId');
-M(A.msg,'🚦','getQueuedStatus',[pp('id','queuedCommandId')],'"NOT_IN_QUEUE" | "WAITING_TO_RUN" | "CURRENTLY_RUNNING"');
-M(A.msg,'✂️','removeFromQueue',[pp('id','queuedCommandId')]);
-M(A.msg,'🎯','sendHitmarker',[pp('playerId','playerId'),pp('isCrit','false'),pp('directionVector','null')]);
-M(A.msg,'🛒','sendOverShopInfo',[pp('playerId','playerId'),pp('info','"Nice buy!"')]);
-M(A.msg,'🧭','setDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"'),pp('position','[0, 0, 0]'),pp('text','"Objective"'),pp('showDistance','true'),pp('style','null')]);
-M(A.msg,'🧹','clearDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"')]);
-M(A.msg,'📊','setMiddleScreenBar',[pp('playerId','playerId'),pp('duration','5000'),pp('colour','"#22c55e"'),pp('text','"Loading"')]);
-M(A.msg,'🖥️','removeMiddleScreenBar',[pp('playerId','playerId')]);
+M(A.msg,'help','addUiRequest',[pp('playerId','playerId'),pp('parameters','{ type: "standard", title: "Join?" }'),pp('timeoutAfterMs','5000')],'UiRequestId');
+M(A.msg,'ballot','addUiRequestPopup',[pp('playerId','playerId'),pp('requestText','"Do you want to join the game?"')],'UiRequestId | null');
+M(A.msg,'trash','deleteUiRequest',[pp('playerId','playerId'),pp('id','uiRequestId')]);
+M(A.msg,'arrowUp','queueMiddleTextUpper',[pp('playerId','playerId'),pp('text','"GO!"'),pp('duration','2000')],'QueuedCommandId');
+M(A.msg,'arrowDown','queueMiddleTextLower',[pp('playerId','playerId'),pp('text','"get ready"'),pp('duration','2000')],'QueuedCommandId');
+M(A.msg,'plus','queueCrosshairText',[pp('playerId','playerId'),pp('text','"+"'),pp('duration','500')],'QueuedCommandId');
+M(A.msg,'traffic','getQueuedStatus',[pp('id','queuedCommandId')],'"NOT_IN_QUEUE" | "WAITING_TO_RUN" | "CURRENTLY_RUNNING"');
+M(A.msg,'scissors','removeFromQueue',[pp('id','queuedCommandId')]);
+M(A.msg,'target','sendHitmarker',[pp('playerId','playerId'),pp('isCrit','false'),pp('directionVector','null')]);
+M(A.msg,'cart','sendOverShopInfo',[pp('playerId','playerId'),pp('info','"Nice buy!"')]);
+M(A.msg,'compass','setDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"'),pp('position','[0, 0, 0]'),pp('text','"Objective"'),pp('showDistance','true'),pp('style','null')]);
+M(A.msg,'broom','clearDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"')]);
+M(A.msg,'chart','setMiddleScreenBar',[pp('playerId','playerId'),pp('duration','5000'),pp('colour','"#22c55e"'),pp('text','"Loading"')]);
+M(A.msg,'monitor','removeMiddleScreenBar',[pp('playerId','playerId')]);
 
 // Sound / audio entities / music
-M(A.sound,'🎵','playMusic',[pp('playerId','playerId'),pp('music','"Adigold - A Place To Be Free"','music')]);
-M(A.sound,'🔇','stopMusic',[pp('playerId','playerId')]);
-M(A.sound,'📻','attemptCreateAudioEntity',[pp('x','x'),pp('y','y'),pp('z','z'),pp('soundName','"waterfall"'),pp('volume','1'),pp('options','{ refDistance: 3, maxHearDist: 30, rate: 1 }')],'EntityId | null');
-M(A.sound,'📡','updateAudioEntity',[pp('eId','audioEId'),pp('opts','{ volume: 0.5 }')]);
-M(A.sound,'🔕','deleteAudioEntity',[pp('eId','audioEId')]);
+M(A.sound,'music','playMusic',[pp('playerId','playerId'),pp('music','"Adigold - A Place To Be Free"','music')]);
+M(A.sound,'volumeOff','stopMusic',[pp('playerId','playerId')]);
+M(A.sound,'radio','attemptCreateAudioEntity',[pp('x','x'),pp('y','y'),pp('z','z'),pp('soundName','"waterfall"'),pp('volume','1'),pp('options','{ refDistance: 3, maxHearDist: 30, rate: 1 }')],'EntityId | null');
+M(A.sound,'broadcast','updateAudioEntity',[pp('eId','audioEId'),pp('opts','{ volume: 0.5 }')]);
+M(A.sound,'bellOff','deleteAudioEntity',[pp('eId','audioEId')]);
 
 // Player
-M(A.player,'🎮','getPlayerGamemode',[pp('playerId','playerId')],'WorldGamemode');
-M(A.player,'🎮','setPlayerGamemode',[pp('playerId','playerId'),pp('gamemode','"creative"','gamemode')]);
-M(A.player,'🏃','getPlayerPhysicsState',[pp('playerId','playerId')],'PlayerPhysicsState');
-M(A.player,'🏃','setPlayerPhysicsState',[pp('playerId','playerId'),pp('physicsState','{ type: "BOAT", tier: null }','physicsType'),pp('positionOffset','[0, 0, 0]')]);
-M(A.player,'🧘','setPlayerPose',[pp('playerId','playerId'),pp('pose','"sitting"','pose'),pp('poseOffset','[0, 0, 0]')]);
-M(A.player,'🎥','shakePlayerCamera',[pp('playerId','playerId'),pp('intensity','0.5'),pp('durationMs','400')]);
-M(A.player,'🎬','setGameCamera',[pp('playerId','playerId'),pp('gameCamera','{ type: "follow" }')]);
-M(A.player,'🖼️','isUsingCustomGameTexturePack',[pp('playerId','playerId')],'boolean');
-M(A.player,'💡','isNearInterrupt',[pp('playerId','playerId')],'boolean');
-M(A.player,'📈','registerAnalyticsEvent',[pp('playerId','playerId'),pp('eventType','"death"'),pp('eventValue','"lava"'),pp('gameCategoryId','null'),pp('gameStartTimeMs','gameStartTimeMs'),pp('position','null'),pp('numericValue','null')]);
-M(A.player,'🗺️','registerAnalyticsPlayerPosition',[pp('playerId','playerId'),pp('gameCategoryId','null'),pp('gameStartTimeMs','gameStartTimeMs'),pp('position','null')]);
-M(A.player,'🏷️','getPlayerCosmetic',[pp('playerId','playerId'),pp('cosmeticType','"hat"','cosmeticType')],'CosmeticName');
-M(A.player,'🎭','getVariation',[],'string');
-M(A.player,'🔀','matchmakeToVariation',[pp('variationName','"default"')]);
+M(A.player,'gamepad','getPlayerGamemode',[pp('playerId','playerId')],'WorldGamemode');
+M(A.player,'gamepad','setPlayerGamemode',[pp('playerId','playerId'),pp('gamemode','"creative"','gamemode')]);
+M(A.player,'run','getPlayerPhysicsState',[pp('playerId','playerId')],'PlayerPhysicsState');
+M(A.player,'run','setPlayerPhysicsState',[pp('playerId','playerId'),pp('physicsState','{ type: "BOAT", tier: null }','physicsType'),pp('positionOffset','[0, 0, 0]')]);
+M(A.player,'sit','setPlayerPose',[pp('playerId','playerId'),pp('pose','"sitting"','pose'),pp('poseOffset','[0, 0, 0]')]);
+M(A.player,'camera','shakePlayerCamera',[pp('playerId','playerId'),pp('intensity','0.5'),pp('durationMs','400')]);
+M(A.player,'clapper','setGameCamera',[pp('playerId','playerId'),pp('gameCamera','{ type: "follow" }')]);
+M(A.player,'frame','isUsingCustomGameTexturePack',[pp('playerId','playerId')],'boolean');
+M(A.player,'bulb','isNearInterrupt',[pp('playerId','playerId')],'boolean');
+M(A.player,'chartUp','registerAnalyticsEvent',[pp('playerId','playerId'),pp('eventType','"death"'),pp('eventValue','"lava"'),pp('gameCategoryId','null'),pp('gameStartTimeMs','gameStartTimeMs'),pp('position','null'),pp('numericValue','null')]);
+M(A.player,'map','registerAnalyticsPlayerPosition',[pp('playerId','playerId'),pp('gameCategoryId','null'),pp('gameStartTimeMs','gameStartTimeMs'),pp('position','null')]);
+M(A.player,'tag','getPlayerCosmetic',[pp('playerId','playerId'),pp('cosmeticType','"hat"','cosmeticType')],'CosmeticName');
+M(A.player,'mask','getVariation',[],'string');
+M(A.player,'shuffle','matchmakeToVariation',[pp('variationName','"default"')]);
 
 // Blocks / world / schematics
-M(A.blocks,'📐','getSchematicDimensions',[pp('schematicPath','"schematics/arena.bloxdschem"')],'[x, y, z]');
-M(A.blocks,'🏗️','setChunkAsSchematic',[pp('schematicPath','"schematics/arena.bloxdschem"'),pp('chunkPos','[0, 0, 0]')]);
-M(A.blocks,'🧱','setBlockWalls',[pp('pos1','[0, 0, 0]'),pp('pos2','[10, 5, 10]'),pp('blockName','"Stone"'),pp('hasFloor','true'),pp('hasCeiling','false')]);
-M(A.blocks,'🟦','setBlockRect',[pp('pos1','[0, 0, 0]'),pp('pos2','[10, 5, 10]'),pp('blockName','"Stone"')]);
-M(A.blocks,'⚡','setOptimisations',[pp('enabled','false')]);
-M(A.blocks,'🧊','getBlockSolidity',[pp('x','x'),pp('y','y'),pp('z','z')],'boolean');
+M(A.blocks,'ruler','getSchematicDimensions',[pp('schematicPath','"schematics/arena.bloxdschem"')],'[x, y, z]');
+M(A.blocks,'crane','setChunkAsSchematic',[pp('schematicPath','"schematics/arena.bloxdschem"'),pp('chunkPos','[0, 0, 0]')]);
+M(A.blocks,'block','setBlockWalls',[pp('pos1','[0, 0, 0]'),pp('pos2','[10, 5, 10]'),pp('blockName','"Stone"'),pp('hasFloor','true'),pp('hasCeiling','false')]);
+M(A.blocks,'block','setBlockRect',[pp('pos1','[0, 0, 0]'),pp('pos2','[10, 5, 10]'),pp('blockName','"Stone"')]);
+M(A.blocks,'lightning','setOptimisations',[pp('enabled','false')]);
+M(A.blocks,'cube','getBlockSolidity',[pp('x','x'),pp('y','y'),pp('z','z')],'boolean');
 
 // Items / inventory
-M(A.items,'🧮','getItemAmount',[pp('itemId','itemEId')],'number');
-M(A.items,'🗑️','deleteEntity',[pp('eId','entityId')],'boolean');
-M(A.inv,'🧪','createEnchantmentAttributesForItem',[pp('itemName','"Iron Sword"'),pp('enchantmentLevel','1')],'EnchantmentAttributes');
-M(A.inv,'📖','getCraftingRecipesForPlayer',[pp('playerId','playerId')],'Record<string, RecipesForItem>');
-M(A.inv,'✏️','editItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Iron Sword"'),pp('recipesForItem','[]')]);
-M(A.inv,'🗑️','removeItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','null')]);
-M(A.inv,'↩️','resetItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','null')]);
-M(A.inv,'🧱','getMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0')],'{ name, amount } | null');
-M(A.inv,'🧱','setMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('metadata','{}')]);
+M(A.items,'calculator','getItemAmount',[pp('itemId','itemEId')],'number');
+M(A.items,'trash','deleteEntity',[pp('eId','entityId')],'boolean');
+M(A.inv,'flask','createEnchantmentAttributesForItem',[pp('itemName','"Iron Sword"'),pp('enchantmentLevel','1')],'EnchantmentAttributes');
+M(A.inv,'book','getCraftingRecipesForPlayer',[pp('playerId','playerId')],'Record<string, RecipesForItem>');
+M(A.inv,'pencil','editItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Iron Sword"'),pp('recipesForItem','[]')]);
+M(A.inv,'trash','removeItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','null')]);
+M(A.inv,'undo','resetItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','null')]);
+M(A.inv,'block','getMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0')],'{ name, amount } | null');
+M(A.inv,'block','setMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('metadata','{}')]);
 
 // Combat / lifeforms
-M(A.combat,'📏','getLifeformScale',[pp('lifeformId','playerId')],'number');
-M(A.combat,'📏','setLifeformScale',[pp('lifeformId','playerId'),pp('scale','1.5')]);
-M(A.combat,'🩹','setShieldAmount',[pp('lifeformId','playerId'),pp('newShieldAmount','10')]);
-M(A.combat,'🎬','animateEntity',[pp('entityId','entityId'),pp('animation','"head_wave"'),pp('initialTimeFraction','0'),pp('animationSpeed','1')]);
-M(A.combat,'🧿','addFollowingEntityToPlayer',[pp('playerId','playerId'),pp('eId','entityId'),pp('offset','[0, 1, 0]'),pp('followsPlayerRotation','false')]);
-M(A.combat,'🔗','removeFollowingEntityFromPlayer',[pp('playerId','entityId'),pp('entityEId','entityId')]);
+M(A.combat,'ruler','getLifeformScale',[pp('lifeformId','playerId')],'number');
+M(A.combat,'ruler','setLifeformScale',[pp('lifeformId','playerId'),pp('scale','1.5')]);
+M(A.combat,'bandage','setShieldAmount',[pp('lifeformId','playerId'),pp('newShieldAmount','10')]);
+M(A.combat,'clapper','animateEntity',[pp('entityId','entityId'),pp('animation','"head_wave"'),pp('initialTimeFraction','0'),pp('animationSpeed','1')]);
+M(A.combat,'pin','addFollowingEntityToPlayer',[pp('playerId','playerId'),pp('eId','entityId'),pp('offset','[0, 1, 0]'),pp('followsPlayerRotation','false')]);
+M(A.combat,'link','removeFollowingEntityFromPlayer',[pp('playerId','entityId'),pp('entityEId','entityId')]);
 
 // Vehicles
-M(A.veh,'🚗','attemptSpawnVehicle',[pp('vehicleType','"Boat"','vehicleType'),pp('x','x'),pp('y','y'),pp('z','z'),pp('opts','{ spawnerId: playerId }')],'EntityId | null');
-M(A.veh,'🗑️','despawnVehicle',[pp('vehicleId','vehicleEId')]);
-M(A.veh,'🪑','setPlayerVehicle',[pp('playerId','playerId'),pp('vehicleEId','vehicleEId'),pp('seatIndex','0')]);
-M(A.veh,'🚪','exitPlayerVehicle',[pp('playerId','playerId')]);
-M(A.veh,'💺','getVehicleSeats',[pp('vehicleEId','vehicleEId')],'VehicleSeat[]');
-M(A.veh,'🎛️','getVehicleSetting',[pp('vehicleEId','vehicleEId'),pp('setting','"JumpPower"'),pp('returnDefaultIfNotOverridden','true')]);
-M(A.veh,'🎛️','setVehicleSetting',[pp('vehicleEId','vehicleEId'),pp('setting','"JumpPower"'),pp('value','1')]);
+M(A.veh,'car','attemptSpawnVehicle',[pp('vehicleType','"Boat"','vehicleType'),pp('x','x'),pp('y','y'),pp('z','z'),pp('opts','{ spawnerId: playerId }')],'EntityId | null');
+M(A.veh,'trash','despawnVehicle',[pp('vehicleId','vehicleEId')]);
+M(A.veh,'sit','setPlayerVehicle',[pp('playerId','playerId'),pp('vehicleEId','vehicleEId'),pp('seatIndex','0')]);
+M(A.veh,'door','exitPlayerVehicle',[pp('playerId','playerId')]);
+M(A.veh,'sit','getVehicleSeats',[pp('vehicleEId','vehicleEId')],'VehicleSeat[]');
+M(A.veh,'sliders','getVehicleSetting',[pp('vehicleEId','vehicleEId'),pp('setting','"JumpPower"'),pp('returnDefaultIfNotOverridden','true')]);
+M(A.veh,'sliders','setVehicleSetting',[pp('vehicleEId','vehicleEId'),pp('setting','"JumpPower"'),pp('value','1')]);
 
 // Shop / currency
-M(A.shop,'💵','setCurrency',[pp('playerId','playerId'),pp('currencyId','"coins"'),pp('displayName','"Coins"'),pp('colour','"#fbbf24"')]);
-M(A.shop,'🧾','getCurrencyAmount',[pp('playerId','playerId'),pp('currencyId','"coins"')],'number | null');
-M(A.shop,'🧾','setCurrencyAmount',[pp('playerId','playerId'),pp('currencyId','"coins"'),pp('amount','100'),pp('subtext','""')]);
-M(A.shop,'➕','giveCurrencyAmount',[pp('playerId','playerId'),pp('currencyId','"coins"'),pp('amount','10')]);
-M(A.shop,'🗑️','deleteCurrency',[pp('playerId','playerId'),pp('currencyId','"coins"')]);
-M(A.shop,'🏪','showShopTutorial',[pp('playerId','playerId')]);
+M(A.shop,'banknote','setCurrency',[pp('playerId','playerId'),pp('currencyId','"coins"'),pp('displayName','"Coins"'),pp('colour','"#fbbf24"')]);
+M(A.shop,'receipt','getCurrencyAmount',[pp('playerId','playerId'),pp('currencyId','"coins"')],'number | null');
+M(A.shop,'receipt','setCurrencyAmount',[pp('playerId','playerId'),pp('currencyId','"coins"'),pp('amount','100'),pp('subtext','""')]);
+M(A.shop,'plus','giveCurrencyAmount',[pp('playerId','playerId'),pp('currencyId','"coins"'),pp('amount','10')]);
+M(A.shop,'trash','deleteCurrency',[pp('playerId','playerId'),pp('currencyId','"coins"')]);
+M(A.shop,'store','showShopTutorial',[pp('playerId','playerId')]);
 
 // Entity settings
-M(A.settings,'📉','setPlayerOpacity',[pp('playerId','entityId'),pp('opacity','0.5')]);
-M(A.settings,'📉','setPlayerOpacityForOnePlayer',[pp('playerIdWhoViewsOpacityPlayer','playerId'),pp('playerIdOfOpacityPlayer','entityId'),pp('opacity','0.5')]);
-M(A.settings,'📐','scalePlayerMeshNodes',[pp('playerId','entityId'),pp('nodeScales','{ TorsoNode: [1, 1, 1] }')]);
-M(A.settings,'🎛️','getOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
-M(A.settings,'♻️','setOtherEntitySettingToDefault',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
+M(A.settings,'chartDown','setPlayerOpacity',[pp('playerId','entityId'),pp('opacity','0.5')]);
+M(A.settings,'chartDown','setPlayerOpacityForOnePlayer',[pp('playerIdWhoViewsOpacityPlayer','playerId'),pp('playerIdOfOpacityPlayer','entityId'),pp('opacity','0.5')]);
+M(A.settings,'ruler','scalePlayerMeshNodes',[pp('playerId','entityId'),pp('nodeScales','{ TorsoNode: [1, 1, 1] }')]);
+M(A.settings,'sliders','getOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
+M(A.settings,'refresh','setOtherEntitySettingToDefault',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
 
 // Mobs
-M(A.mobs,'🧠','getMobAiState',[pp('mobId','mobId')],'{ state, params }');
-M(A.mobs,'⚙️','getMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('returnDefaultIfNotOverridden','true')]);
-M(A.mobs,'🎚️','setDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting'),pp('value','20')]);
-M(A.mobs,'🎚️','getDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting')]);
-M(A.mobs,'🗝️','getMobDbId',[pp('mobId','mobId')],'PlayerDbId | null');
-M(A.mobs,'🐺','getNumMobs',[],'number');
+M(A.mobs,'brain','getMobAiState',[pp('mobId','mobId')],'{ state, params }');
+M(A.mobs,'settings','getMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('returnDefaultIfNotOverridden','true')]);
+M(A.mobs,'sliders','setDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting'),pp('value','20')]);
+M(A.mobs,'sliders','getDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting')]);
+M(A.mobs,'key','getMobDbId',[pp('mobId','mobId')],'PlayerDbId | null');
+M(A.mobs,'animal','getNumMobs',[],'number');
 
 // Mesh
-M(A.mesh,'🧊','deleteMeshEntity',[pp('eId','entityId')],'boolean');
-M(A.mesh,'🧊','updateMeshEntity',[pp('eId','entityId'),pp('type','"Box"','meshType'),pp('opts','{}')]);
-M(A.mesh,'🧊','updateEntityNodeMeshAttachment',[pp('eId','entityId'),pp('node','"TorsoNode"','entityNode'),pp('type','"Box"','meshType'),pp('opts','{}'),pp('offset','[0, 0, 0]'),pp('rotation','[0, 0, 0]')]);
-M(A.msg,'✉️','sendMessage',[pp('playerId','playerId'),pp('message','"Bienvenue !"'),pp('style','{ color: "cyan" }')]);M(A.msg,'📣','broadcastMessage',[pp('message','"Annonce"'),pp('style','{ color: "yellow" }')]);M(A.msg,'🔔','sendTopRightHelper',[pp('playerId','playerId'),pp('icon','"fa-solid fa-bolt"'),pp('text','"Objectif"'),pp('opts','{ duration: 3000 }')]);M(A.msg,'🪽','sendFlyingMiddleMessage',[pp('playerId','playerId'),pp('message','"Go !"'),pp('distanceFromAction','0'),pp('lifetimeMs','2000')]);M(A.msg,'📊','initiateMiddleScreenBar',[pp('playerId','playerId'),pp('duration','5000'),pp('chargeExpiresAutomatically','true'),pp('horizontalBarRemOffset','0')]);M(A.msg,'📊','progressBarUpdate',[pp('playerId','playerId'),pp('toFraction','1'),pp('toDuration','1000')]);M(A.msg,'📊','removeMiddleScreenBar',[pp('playerId','playerId')]);M(A.msg,'🏹','setDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"'),pp('position','[0, 10, 0]'),pp('text','"Ici"'),pp('showDistance','true'),pp('style','{}')]);M(A.msg,'🏹','clearDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"')]);M(A.msg,'💀','addCustomKillfeedMessage',[pp('killer','"Killer"'),pp('victim','"Victim"'),pp('withItem','"Sword"')]);
-M(A.sound,'🔊','playSound',[pp('playerId','playerId'),pp('soundName','"pickUp"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null')]);M(A.sound,'📢','broadcastSound',[pp('soundName','"game_start_countdown_final"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null'),pp('exceptPlayerId','null')]);M(A.sound,'🔮','playClientPredictedSound',[pp('soundName','"pickUp"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null'),pp('predictedBy','playerId')]);
-['getPlayerIds','getNumPlayers','getLobbyName','getLobbyType','isPublicLobby','now'].forEach(n=>M(A.player,'ℹ️',n,[]));
-M(A.player,'🔎','getPlayerId',[pp('playerName','"Alex"')]);M(A.player,'🔎','getPlayerIdFromDbId',[pp('dbId','dbId')]);M(A.player,'🆔','getPlayerDbId',[pp('playerId','playerId')]);M(A.player,'✅','playerIsInGame',[pp('playerId','playerId')]);M(A.player,'✅','playerIsLoggedIn',[pp('playerId','playerId')]);M(A.player,'📱','isMobile',[pp('playerId','playerId')]);M(A.player,'🧎','isPlayerCrouching',[pp('playerId','playerId')]);M(A.player,'🎯','getPlayerTargetInfo',[pp('playerId','playerId')]);M(A.player,'🧭','getPlayerFacingInfo',[pp('playerId','playerId')]);M(A.player,'🎉','getPlayerPartyWhenJoined',[pp('playerId','playerId')]);M(A.player,'🦵','getPlayerPhysicsState',[pp('playerId','playerId')]);M(A.player,'🦵','setPlayerPhysicsState',[pp('playerId','playerId'),pp('physicsState','{}'),pp('positionOffset','[0, 0, 0]')]);M(A.player,'📷','setCameraDirection',[pp('playerId','playerId'),pp('direction','[0, 0, 1]')]);M(A.player,'🔎','setCameraZoom',[pp('playerId','playerId'),pp('zoom','1')]);M(A.player,'🫥','setPlayerOpacity',[pp('playerId','playerId'),pp('opacity','0.5')]);M(A.player,'🫥','setPlayerOpacityForOnePlayer',[pp('playerIdWhoViewsOpacityPlayer','viewerId'),pp('playerIdOfOpacityPlayer','playerId'),pp('opacity','0.5')]);M(A.player,'🎭','setPlayerPose',[pp('playerId','playerId'),pp('pose','"standing"','pose'),pp('poseOffset','null')]);M(A.player,'👕','changePlayerIntoSkin',[pp('playerId','playerId'),pp('cosmeticType','"skin"','cosmeticType'),pp('cosmeticName','"skin_0_0"')]);M(A.player,'👕','removeAppliedSkin',[pp('playerId','playerId')]);M(A.player,'👕','getPlayerCosmetic',[pp('playerId','playerId'),pp('cosmeticType','"skin"','cosmeticType')]);M(A.player,'📏','scalePlayerMeshNodes',[pp('playerId','playerId'),pp('nodeScales','{}')]);M(A.player,'🔄','forceRespawn',[pp('playerId','playerId'),pp('respawnPos','[0, 10, 0]')]);M(A.player,'🚪','kickPlayer',[pp('playerId','playerId'),pp('reason','"Raison"')]);M(A.player,'🎮','matchmakePlayer',[pp('playerId','playerId'),pp('game','"worlds"'),pp('lobbyName','"lobby"')]);M(A.player,'👥','setMaxPlayers',[pp('softMaxPlayers','20'),pp('maxPlayers','40')]);
-['getEmptyChunk'].forEach(n=>M(A.blocks,'🧩',n,[]));M(A.blocks,'🧱','getBlock',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','setBlock',[pp('x','x'),pp('y','y'),pp('z','z'),pp('blockName','"Air"')]);M(A.blocks,'🧱','getBlockId',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','blockIdToBlockName',[pp('blockId','blockId')]);M(A.blocks,'🧱','blockNameToBlockId',[pp('blockName','"Grass Block"'),pp('allowInvalidBlock','false')]);M(A.blocks,'🧱','getBlockData',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','setBlockData',[pp('x','x'),pp('y','y'),pp('z','z'),pp('data','{}')]);M(A.blocks,'🧱','getBlockSolidity',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🧱','getMetaInfo',[pp('blockName','"Grass Block"')]);M(A.blocks,'🧍','getBlockCoordinatesPlayerStandingOn',[pp('playerId','playerId')]);M(A.blocks,'🧍','getBlockTypesPlayerStandingOn',[pp('playerId','playerId')]);M(A.blocks,'⬛','setBlockRect',[pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('blockName','"Stone"')]);M(A.blocks,'🧱','setBlockWalls',[pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('blockName','"Stone"'),pp('hasFloor','true'),pp('hasCeiling','true')]);M(A.blocks,'📋','copyChunk',[pp('fromPos','[0, 0, 0]'),pp('toPos','[32, 0, 0]')]);M(A.blocks,'🌍','getChunk',[pp('pos','[0, 0, 0]')]);M(A.blocks,'🌍','blockCoordToChunkId',[pp('pos','[0, 0, 0]')]);M(A.blocks,'🌍','chunkIdToBotLeftCoord',[pp('chunkId','chunkId')]);M(A.blocks,'🌍','isBlockInLoadedChunk',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🌍','raycastForBlock',[pp('fromPos','[0, 10, 0]'),pp('dirVec','[0, -1, 0]')]);M(A.blocks,'🌍','isInsideRect',[pp('coordsToCheck','[0, 0, 0]'),pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('addOneToMax','true')]);M(A.blocks,'✋','attemptWorldChangeBlock',[pp('initiatorDbId','dbId'),pp('x','x'),pp('y','y'),pp('z','z'),pp('blockName','"Air"'),pp('extraInfo','{}')]);M(A.blocks,'✅','setCanChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'✅','setCanChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'✅','setCanChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'🚫','setCantChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'🚫','setCantChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'🚫','setCantChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'↩️','resetCanChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'↩️','resetCanChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'↩️','resetCanChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'🚶','setWalkThroughRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]'),pp('updateType','1')]);M(A.blocks,'🚶','setWalkThroughType',[pp('playerId','playerId'),pp('blockName','"Glass"'),pp('disable','true')]);
-['clearInventory','inventoryIsFull','getInventoryFreeSlotCount','getHeldItem','getSelectedInventorySlotI','getMoonstoneChestItems'].forEach(n=>M(A.inv,'🎒',n,[pp('playerId','playerId')]));M(A.inv,'🎒','setSelectedInventorySlotI',[pp('playerId','playerId'),pp('newI','0')]);M(A.inv,'🎒','getItemSlot',[pp('playerId','playerId'),pp('itemSlotIndex','0')]);M(A.inv,'🎒','setItemSlot',[pp('playerId','playerId'),pp('itemSlotIndex','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('attributes','{}'),pp('tellClient','true')]);M(A.inv,'💎','giveItem',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('attributes','{}')]);M(A.inv,'🔎','findItem',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'🔢','getInventoryItemAmount',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'✅','hasItem',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'➖','removeItemName',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('amount','1')]);M(A.inv,'📊','getItemStat',[pp('lifeformId','playerId'),pp('itemName','"Sword"'),pp('stat','"damage"')]);M(A.inv,'📊','setItemStat',[pp('playerId','playerId'),pp('itemName','"Sword"'),pp('stat','"damage"'),pp('value','10')]);M(A.inv,'🧾','getInitialItemMetadata',[pp('itemName','"Dirt"')]);M(A.inv,'🔨','editItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('recipesForItem','[]')]);M(A.inv,'🔨','removeItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'🔨','resetItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'🌙','getMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0')]);M(A.inv,'🌙','setMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('metadata','{}')]);M(A.inv,'📦','openChestForPlayer',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.inv,'📦','closeChestForPlayer',[pp('playerId','playerId')]);M(A.inv,'📦','canOpenStandardChest',[pp('playerId','playerId'),pp('chestX','x'),pp('chestY','y'),pp('chestZ','z')]);M(A.inv,'📦','getStandardChestItems',[pp('chestPos','[x, y, z]')]);M(A.inv,'📦','getStandardChestItemSlot',[pp('chestPos','[x, y, z]'),pp('idx','0')]);M(A.inv,'📦','setStandardChestItemSlot',[pp('chestPos','[x, y, z]'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('playerId','playerId'),pp('attributes','{}')]);M(A.inv,'📦','giveStandardChestItem',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('playerId','playerId'),pp('attributes','{}')]);M(A.inv,'📦','removeItemNameFromStandardChest',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"'),pp('amount','1'),pp('playerId','playerId')]);M(A.inv,'📦','findStandardChestItem',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"')]);M(A.inv,'📦','getStandardChestItemAmount',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"')]);M(A.inv,'📦','getStandardChestFreeSlotCount',[pp('chestPos','[x, y, z]')]);
-M(A.items,'💧','createItemDrop',[pp('x','x'),pp('y','y'),pp('z','z'),pp('itemName','"Dirt"'),pp('amount','1'),pp('mergeItems','true'),pp('attributes','{}'),pp('timeTillDespawn','30000'),pp('dropperId','playerId'),pp('options','{}')]);M(A.items,'🗑️','deleteItemDrop',[pp('itemId','itemId')]);M(A.items,'🧹','deleteAllItems',[]);M(A.items,'🏷️','getItemDropName',[pp('itemEId','itemEId')]);M(A.items,'👣','getItemIDsOverlappingWithPlayer',[pp('playerId','playerId')]);M(A.items,'✋','setCantPickUpItem',[pp('playerId','playerId'),pp('itemId','itemId')]);M(A.items,'↩️','resetCanPickUpItem',[pp('playerId','playerId'),pp('itemId','itemId')]);M(A.items,'🔢','setItemAmount',[pp('itemId','itemId'),pp('newAmount','1')]);
-['isAlive','getHealth','getShieldAmount','getEffects'].forEach(n=>M(A.combat,'❤️',n,[pp('lifeformId','playerId')]));M(A.combat,'❤️','setHealth',[pp('entityId','playerId'),pp('newHealth','100'),pp('whoDidDamage','null'),pp('increaseMaxHealthIfNeeded','true')]);M(A.combat,'❤️','applyHealthChange',[pp('lifeformId','playerId'),pp('changeAmount','-10'),pp('whoDidDamage','null'),pp('broadcastLifeformHurt','true')]);M(A.combat,'🛡️','setShieldAmount',[pp('lifeformId','playerId'),pp('newShieldAmount','50')]);M(A.combat,'☠️','killLifeform',[pp('lifeformId','playerId'),pp('whoKilled','null')]);M(A.combat,'✨','applyEffect',[pp('lifeformId','playerId'),pp('effectName','"Speed"'),pp('duration','5000'),pp('customEffectInfo','{}')]);M(A.combat,'✨','removeEffect',[pp('lifeformId','playerId'),pp('name','"Speed"')]);M(A.combat,'✨','hasEffect',[pp('lifeformId','playerId'),pp('name','"Speed"'),pp('atOrAboveLevel','1')]);M(A.combat,'✨','getEffectLevel',[pp('lifeformId','playerId'),pp('name','"Speed"')]);M(A.combat,'⚔️','applyMeleeHit',[pp('hittingEId','playerId'),pp('hitEId','targetId'),pp('dirFacing','[0, 0, 1]'),pp('bodyPartHit','"Torso"'),pp('overrides','{}')]);M(A.combat,'⚔️','attemptApplyDamage',[pp('opts','{ eId: playerId, hitEId: targetId, attemptedDmgAmt: 10, withItem: "Diamond Sword", damageCause: null }')]);M(A.combat,'💥','calcExplosionForce',[pp('eId','playerId'),pp('explosionType','"default"'),pp('knockbackFactor','1'),pp('explosionRadius','5'),pp('explosionPos','[0, 0, 0]'),pp('ignoreProjectiles','true')]);M(A.combat,'🎯','sendHitmarker',[pp('playerId','playerId'),pp('isCrit','false'),pp('directionVector','[0, 0, 1]')]);M(A.combat,'🛬','preventFallDamageNextGrounding',[pp('playerId','playerId')]);M(A.combat,'🔥','getCurrentKillstreak',[pp('playerId','playerId')]);M(A.combat,'🔥','clearKillstreak',[pp('playerId','playerId')]);M(A.combat,'💫','getAuraInfo',[pp('playerId','playerId')]);M(A.combat,'💫','applyAuraChange',[pp('playerId','playerId'),pp('auraDiff','1')]);M(A.combat,'💫','setAuraLevel',[pp('playerId','playerId'),pp('level','1')]);M(A.combat,'💫','setTotalAura',[pp('playerId','playerId'),pp('totalAura','100')]);
-M(A.ent,'✅','checkValid',[pp('entityId','playerId')]);M(A.ent,'📍','getPosition',[pp('entityId','playerId')]);M(A.ent,'📍','setPosition',[pp('entityId','playerId'),pp('x','0'),pp('y','10'),pp('z','0')]);M(A.ent,'🚀','getVelocity',[pp('eId','playerId')]);M(A.ent,'🚀','setVelocity',[pp('eId','playerId'),pp('x','0'),pp('y','10'),pp('z','0')]);M(A.ent,'💥','applyImpulse',[pp('eId','playerId'),pp('xImpulse','5'),pp('yImpulse','5'),pp('zImpulse','5')]);M(A.ent,'🧭','getEntityHeading',[pp('entityId','playerId')]);M(A.ent,'🧭','setEntityHeading',[pp('entityId','playerId'),pp('newHeading','0')]);M(A.ent,'🔄','getEntityRotation',[pp('entityId','playerId')]);M(A.ent,'🔄','setEntityRotation',[pp('entityId','playerId'),pp('xRotation','0'),pp('yRotation','0'),pp('zRotation','0')]);M(A.ent,'🏷️','getEntityName',[pp('entityId','playerId')]);M(A.ent,'🏷️','getEntityType',[pp('entityId','playerId')]);M(A.ent,'📦','getEntitiesInRect',[pp('minCoords','[0, 0, 0]'),pp('maxCoords','[10, 10, 10]')]);M(A.ent,'📐','getUnitCoordinatesLifeformWithin',[pp('lifeformId','playerId')]);M(A.ent,'🔗','addFollowingEntityToPlayer',[pp('playerId','playerId'),pp('eId','entityId'),pp('offset','[0, 2, 0]'),pp('followsPlayerRotation','true')]);M(A.ent,'🔗','removeFollowingEntityFromPlayer',[pp('playerId','playerId'),pp('entityEId','entityId')]);M(A.ent,'🎞️','animateEntity',[pp('entityId','entityId'),pp('animationSchema','{}'),pp('initialTimeFraction','0'),pp('animationSpeed','1')]);
-M(A.mobs,'🐺','attemptSpawnMob',[pp('mobType','"Pig"','mobType'),pp('x','x'),pp('y','y'),pp('z','z'),pp('opts','{}')]);M(A.mobs,'🐺','despawnMob',[pp('mobId','mobId')]);M(A.mobs,'🐺','getMobIds',[]);M(A.mobs,'🐺','getNumMobs',[]);M(A.mobs,'🐺','getMobDbId',[pp('mobId','mobId')]);M(A.mobs,'🐺','createMobHerd',[]);M(A.mobs,'⚙️','getDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting')]);M(A.mobs,'⚙️','setDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting'),pp('value','100')]);M(A.mobs,'⚙️','getMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('returnDefaultIfNotOverridden','true')]);M(A.mobs,'⚙️','setMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('value','100')]);M(A.mobs,'🧠','getMobAiState',[pp('mobId','mobId')]);M(A.mobs,'🧠','setMobAiState',[pp('mobId','mobId'),pp('state','"idle"','mobAiState'),pp('params','{}'),pp('opts','{}')]);M(A.mobs,'🕊️','passifyHostility',[pp('mobId','mobId'),pp('targetLifeformId','playerId')]);M(A.mobs,'🐺','onPlayerAttemptSpawnMob',[pp('playerId','playerId'),pp('mobType','"Pig"','mobType'),pp('x','x'),pp('y','y'),pp('z','z')]);
-M(A.mesh,'🧊','attemptCreateMeshEntity',[pp('type','"Box"','meshType'),pp('opts','{}'),pp('name','"mesh"'),pp('physicsOptions','{}'),pp('initiatorId','playerId')]);M(A.mesh,'🧊','updateMeshEntity',[pp('eId','entityId'),pp('type','"Box"','meshType'),pp('opts','{}')]);M(A.mesh,'🗑️','deleteMeshEntity',[pp('eId','entityId')]);M(A.mesh,'🪃','attemptCreateThrowable',[pp('throwerEId','playerId'),pp('itemName','"Snowball"'),pp('position','[0, 10, 0]'),pp('direction','[0, 0, 1]'),pp('velocityMult','1'),pp('damageMult','1'),pp('gravityMult','1'),pp('attributes','{}')]);M(A.mesh,'🗑️','deleteThrowable',[pp('eId','entityId')]);M(A.mesh,'🧍','updateEntityNodeMeshAttachment',[pp('eId','entityId'),pp('node','"HeadMesh"','entityNode'),pp('type','"Box"','meshType'),pp('opts','{}'),pp('offset','[0, 0, 0]'),pp('rotation','[0, 0, 0]')]);M(A.mesh,'💨','updateMeshParticleSystems',[pp('updates','[]')]);
-['configureShopCategory','deleteShopItem'].forEach(n=>M(A.shop,'🛒',n,[pp('categoryKey','"main"'),pp(n==='deleteShopItem'?'itemKey':'config',n==='deleteShopItem'?'"item1"':'{}')]));M(A.shop,'🛒','configureShopCategoryForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('config','{}')]);M(A.shop,'🛒','createShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('item','{}')]);M(A.shop,'🛒','createShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('item','{}')]);M(A.shop,'🛒','updateShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{}')]);M(A.shop,'🛒','updateShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{}')]);M(A.shop,'🛒','resetShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"')]);M(A.shop,'🛒','openShop',[pp('playerId','playerId'),pp('toggle','true'),pp('forceCategoryKey','"main"'),pp('onlyIfNonEmpty','false')]);M(A.shop,'🛒','showShopTutorial',[pp('playerId','playerId')]);M(A.shop,'🛒','sendOverShopInfo',[pp('playerId','playerId'),pp('info','{}')]);
-M(A.db,'🗄️','getLobbyDbValue',[pp('key','"key"')]);M(A.db,'🗄️','setLobbyDbValue',[pp('key','"key"'),pp('value','"value"')]);M(A.db,'🗑️','deleteLobbyDbValue',[pp('key','"key"')]);M(A.db,'🗑️','deleteAllLobbyDbValues',[]);M(A.db,'🗄️','getPlayerDbValue',[pp('playerId','playerId'),pp('key','"key"')]);M(A.db,'🗄️','setPlayerDbValue',[pp('playerId','playerId'),pp('key','"key"'),pp('value','"value"')]);M(A.db,'🗑️','deletePlayerDbValue',[pp('playerId','playerId'),pp('key','"key"')]);M(A.db,'🗑️','deleteAllPlayerDbValues',[pp('playerId','playerId')]);
-M(A.client,'⚙️','setClientOption',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption'),pp('value','1')]);M(A.client,'⚙️','getClientOption',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption')]);M(A.client,'⚙️','setClientOptions',[pp('playerId','playerId'),pp('optionsObj','{}')]);M(A.client,'⚙️','setClientOptionToDefault',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption')]);M(A.client,'📌','setCallbackValueFallback',[pp('callbackName','"onPlayerChat"'),pp('defaultValue','null')]);
-M(A.settings,'🎛️','setTargetedPlayerSettingForEveryone',[pp('targetedPlayerId','playerId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','entitySettingValue'),pp('includeNewJoiners','true')]);M(A.settings,'🎛️','setEveryoneSettingForPlayer',[pp('playerId','playerId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','entitySettingValue'),pp('includeNewJoiners','true')]);M(A.settings,'🎛️','setOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','entitySettingValue')]);M(A.settings,'🎛️','setOtherEntitySettings',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingsObject','{}')]);M(A.settings,'🎛️','getOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);M(A.settings,'🎛️','setOtherEntitySettingToDefault',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
-M(A.qte,'🎯','addQTE',[pp('playerId','playerId'),pp('qteParameters','{ type: "progressBar" }')]);M(A.qte,'🎯','deleteQTE',[pp('playerId','playerId'),pp('id','qteId')]);M(A.qte,'🎯','hasActiveQTE',[pp('playerId','playerId')]);
-M(A.fx,'✨','playParticleEffect',[pp('opts','{ texture: "glint", pos1: [0, 0, 0], pos2: [0, 1, 0] }'),pp('clientPredictedBy','null')]);M(A.fx,'✨','updateMeshParticleSystems',[pp('updates','[]')]);
+M(A.mesh,'cube','deleteMeshEntity',[pp('eId','entityId')],'boolean');
+M(A.mesh,'cube','updateMeshEntity',[pp('eId','entityId'),pp('type','"Box"','meshType'),pp('opts','{}')]);
+M(A.mesh,'cube','updateEntityNodeMeshAttachment',[pp('eId','entityId'),pp('node','"TorsoNode"','entityNode'),pp('type','"Box"','meshType'),pp('opts','{}'),pp('offset','[0, 0, 0]'),pp('rotation','[0, 0, 0]')]);
+M(A.msg,'mail','sendMessage',[pp('playerId','playerId'),pp('message','"Bienvenue !"'),pp('style','{ color: "cyan" }')]);M(A.msg,'megaphone','broadcastMessage',[pp('message','"Annonce"'),pp('style','{ color: "yellow" }')]);M(A.msg,'bell','sendTopRightHelper',[pp('playerId','playerId'),pp('icon','"fa-solid fa-bolt"'),pp('text','"Objectif"'),pp('opts','{ duration: 3000 }')]);M(A.msg,'feather','sendFlyingMiddleMessage',[pp('playerId','playerId'),pp('message','"Go !"'),pp('distanceFromAction','0'),pp('lifetimeMs','2000')]);M(A.msg,'chart','initiateMiddleScreenBar',[pp('playerId','playerId'),pp('duration','5000'),pp('chargeExpiresAutomatically','true'),pp('horizontalBarRemOffset','0')]);M(A.msg,'chart','progressBarUpdate',[pp('playerId','playerId'),pp('toFraction','1'),pp('toDuration','1000')]);M(A.msg,'chart','removeMiddleScreenBar',[pp('playerId','playerId')]);M(A.msg,'bow','setDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"'),pp('position','[0, 10, 0]'),pp('text','"Ici"'),pp('showDistance','true'),pp('style','{}')]);M(A.msg,'bow','clearDirectionArrow',[pp('playerId','playerId'),pp('id','"arrow1"')]);M(A.msg,'skull','addCustomKillfeedMessage',[pp('killer','"Killer"'),pp('victim','"Victim"'),pp('withItem','"Sword"')]);
+M(A.sound,'speaker','playSound',[pp('playerId','playerId'),pp('soundName','"pickUp"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null')]);M(A.sound,'megaphone','broadcastSound',[pp('soundName','"game_start_countdown_final"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null'),pp('exceptPlayerId','null')]);M(A.sound,'orb','playClientPredictedSound',[pp('soundName','"pickUp"'),pp('volume','1'),pp('rate','1'),pp('posSettings','null'),pp('predictedBy','playerId')]);
+['getPlayerIds','getNumPlayers','getLobbyName','getLobbyType','isPublicLobby','now'].forEach(n=>M(A.player,'info',n,[]));
+M(A.player,'search','getPlayerId',[pp('playerName','"Alex"')]);M(A.player,'search','getPlayerIdFromDbId',[pp('dbId','dbId')]);M(A.player,'idCard','getPlayerDbId',[pp('playerId','playerId')]);M(A.player,'checkCircle','playerIsInGame',[pp('playerId','playerId')]);M(A.player,'checkCircle','playerIsLoggedIn',[pp('playerId','playerId')]);M(A.player,'phone','isMobile',[pp('playerId','playerId')]);M(A.player,'kneel','isPlayerCrouching',[pp('playerId','playerId')]);M(A.player,'target','getPlayerTargetInfo',[pp('playerId','playerId')]);M(A.player,'compass','getPlayerFacingInfo',[pp('playerId','playerId')]);M(A.player,'party','getPlayerPartyWhenJoined',[pp('playerId','playerId')]);M(A.player,'leg','getPlayerPhysicsState',[pp('playerId','playerId')]);M(A.player,'leg','setPlayerPhysicsState',[pp('playerId','playerId'),pp('physicsState','{}'),pp('positionOffset','[0, 0, 0]')]);M(A.player,'camera','setCameraDirection',[pp('playerId','playerId'),pp('direction','[0, 0, 1]')]);M(A.player,'search','setCameraZoom',[pp('playerId','playerId'),pp('zoom','1')]);M(A.player,'eyeOff','setPlayerOpacity',[pp('playerId','playerId'),pp('opacity','0.5')]);M(A.player,'eyeOff','setPlayerOpacityForOnePlayer',[pp('playerIdWhoViewsOpacityPlayer','viewerId'),pp('playerIdOfOpacityPlayer','playerId'),pp('opacity','0.5')]);M(A.player,'mask','setPlayerPose',[pp('playerId','playerId'),pp('pose','"standing"','pose'),pp('poseOffset','null')]);M(A.player,'shirt','changePlayerIntoSkin',[pp('playerId','playerId'),pp('cosmeticType','"skin"','cosmeticType'),pp('cosmeticName','"skin_0_0"')]);M(A.player,'shirt','removeAppliedSkin',[pp('playerId','playerId')]);M(A.player,'shirt','getPlayerCosmetic',[pp('playerId','playerId'),pp('cosmeticType','"skin"','cosmeticType')]);M(A.player,'ruler','scalePlayerMeshNodes',[pp('playerId','playerId'),pp('nodeScales','{}')]);M(A.player,'refresh','forceRespawn',[pp('playerId','playerId'),pp('respawnPos','[0, 10, 0]')]);M(A.player,'door','kickPlayer',[pp('playerId','playerId'),pp('reason','"Raison"')]);M(A.player,'gamepad','matchmakePlayer',[pp('playerId','playerId'),pp('game','"worlds"'),pp('lobbyName','"lobby"')]);M(A.player,'people','setMaxPlayers',[pp('softMaxPlayers','20'),pp('maxPlayers','40')]);
+['getEmptyChunk'].forEach(n=>M(A.blocks,'puzzle',n,[]));M(A.blocks,'block','getBlock',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'block','setBlock',[pp('x','x'),pp('y','y'),pp('z','z'),pp('blockName','"Air"')]);M(A.blocks,'block','getBlockId',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'block','blockIdToBlockName',[pp('blockId','blockId')]);M(A.blocks,'block','blockNameToBlockId',[pp('blockName','"Grass Block"'),pp('allowInvalidBlock','false')]);M(A.blocks,'block','getBlockData',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'block','setBlockData',[pp('x','x'),pp('y','y'),pp('z','z'),pp('data','{}')]);M(A.blocks,'block','getBlockSolidity',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'block','getMetaInfo',[pp('blockName','"Grass Block"')]);M(A.blocks,'person','getBlockCoordinatesPlayerStandingOn',[pp('playerId','playerId')]);M(A.blocks,'person','getBlockTypesPlayerStandingOn',[pp('playerId','playerId')]);M(A.blocks,'block','setBlockRect',[pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('blockName','"Stone"')]);M(A.blocks,'block','setBlockWalls',[pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('blockName','"Stone"'),pp('hasFloor','true'),pp('hasCeiling','true')]);M(A.blocks,'list','copyChunk',[pp('fromPos','[0, 0, 0]'),pp('toPos','[32, 0, 0]')]);M(A.blocks,'globe','getChunk',[pp('pos','[0, 0, 0]')]);M(A.blocks,'globe','blockCoordToChunkId',[pp('pos','[0, 0, 0]')]);M(A.blocks,'globe','chunkIdToBotLeftCoord',[pp('chunkId','chunkId')]);M(A.blocks,'globe','isBlockInLoadedChunk',[pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'globe','raycastForBlock',[pp('fromPos','[0, 10, 0]'),pp('dirVec','[0, -1, 0]')]);M(A.blocks,'globe','isInsideRect',[pp('coordsToCheck','[0, 0, 0]'),pp('pos1','[0, 0, 0]'),pp('pos2','[5, 5, 5]'),pp('addOneToMax','true')]);M(A.blocks,'hand','attemptWorldChangeBlock',[pp('initiatorDbId','dbId'),pp('x','x'),pp('y','y'),pp('z','z'),pp('blockName','"Air"'),pp('extraInfo','{}')]);M(A.blocks,'checkCircle','setCanChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'checkCircle','setCanChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'checkCircle','setCanChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'ban','setCantChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'ban','setCantChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'ban','setCantChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'undo','resetCanChangeBlock',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.blocks,'undo','resetCanChangeBlockRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]')]);M(A.blocks,'undo','resetCanChangeBlockType',[pp('playerId','playerId'),pp('blockName','"Stone"')]);M(A.blocks,'walk','setWalkThroughRect',[pp('playerId','playerId'),pp('pos1','[0,0,0]'),pp('pos2','[5,5,5]'),pp('updateType','1')]);M(A.blocks,'walk','setWalkThroughType',[pp('playerId','playerId'),pp('blockName','"Glass"'),pp('disable','true')]);
+['clearInventory','inventoryIsFull','getInventoryFreeSlotCount','getHeldItem','getSelectedInventorySlotI','getMoonstoneChestItems'].forEach(n=>M(A.inv,'backpack',n,[pp('playerId','playerId')]));M(A.inv,'backpack','setSelectedInventorySlotI',[pp('playerId','playerId'),pp('newI','0')]);M(A.inv,'backpack','getItemSlot',[pp('playerId','playerId'),pp('itemSlotIndex','0')]);M(A.inv,'backpack','setItemSlot',[pp('playerId','playerId'),pp('itemSlotIndex','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('attributes','{}'),pp('tellClient','true')]);M(A.inv,'gem','giveItem',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('attributes','{}')]);M(A.inv,'search','findItem',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'sort','getInventoryItemAmount',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'checkCircle','hasItem',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'minus','removeItemName',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('amount','1')]);M(A.inv,'chart','getItemStat',[pp('lifeformId','playerId'),pp('itemName','"Sword"'),pp('stat','"damage"')]);M(A.inv,'chart','setItemStat',[pp('playerId','playerId'),pp('itemName','"Sword"'),pp('stat','"damage"'),pp('value','10')]);M(A.inv,'receipt','getInitialItemMetadata',[pp('itemName','"Dirt"')]);M(A.inv,'hammer','editItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"'),pp('recipesForItem','[]')]);M(A.inv,'hammer','removeItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'hammer','resetItemCraftingRecipes',[pp('playerId','playerId'),pp('itemName','"Dirt"')]);M(A.inv,'moon','getMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0')]);M(A.inv,'moon','setMoonstoneChestItemSlot',[pp('playerId','playerId'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('metadata','{}')]);M(A.inv,'package','openChestForPlayer',[pp('playerId','playerId'),pp('x','x'),pp('y','y'),pp('z','z')]);M(A.inv,'package','closeChestForPlayer',[pp('playerId','playerId')]);M(A.inv,'package','canOpenStandardChest',[pp('playerId','playerId'),pp('chestX','x'),pp('chestY','y'),pp('chestZ','z')]);M(A.inv,'package','getStandardChestItems',[pp('chestPos','[x, y, z]')]);M(A.inv,'package','getStandardChestItemSlot',[pp('chestPos','[x, y, z]'),pp('idx','0')]);M(A.inv,'package','setStandardChestItemSlot',[pp('chestPos','[x, y, z]'),pp('idx','0'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('playerId','playerId'),pp('attributes','{}')]);M(A.inv,'package','giveStandardChestItem',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"'),pp('itemAmount','1'),pp('playerId','playerId'),pp('attributes','{}')]);M(A.inv,'package','removeItemNameFromStandardChest',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"'),pp('amount','1'),pp('playerId','playerId')]);M(A.inv,'package','findStandardChestItem',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"')]);M(A.inv,'package','getStandardChestItemAmount',[pp('chestPos','[x, y, z]'),pp('itemName','"Dirt"')]);M(A.inv,'package','getStandardChestFreeSlotCount',[pp('chestPos','[x, y, z]')]);
+M(A.items,'drop','createItemDrop',[pp('x','x'),pp('y','y'),pp('z','z'),pp('itemName','"Dirt"'),pp('amount','1'),pp('mergeItems','true'),pp('attributes','{}'),pp('timeTillDespawn','30000'),pp('dropperId','playerId'),pp('options','{}')]);M(A.items,'trash','deleteItemDrop',[pp('itemId','itemId')]);M(A.items,'broom','deleteAllItems',[]);M(A.items,'tag','getItemDropName',[pp('itemEId','itemEId')]);M(A.items,'footprints','getItemIDsOverlappingWithPlayer',[pp('playerId','playerId')]);M(A.items,'hand','setCantPickUpItem',[pp('playerId','playerId'),pp('itemId','itemId')]);M(A.items,'undo','resetCanPickUpItem',[pp('playerId','playerId'),pp('itemId','itemId')]);M(A.items,'sort','setItemAmount',[pp('itemId','itemId'),pp('newAmount','1')]);
+['isAlive','getHealth','getShieldAmount','getEffects'].forEach(n=>M(A.combat,'heart',n,[pp('lifeformId','playerId')]));M(A.combat,'heart','setHealth',[pp('entityId','playerId'),pp('newHealth','100'),pp('whoDidDamage','null'),pp('increaseMaxHealthIfNeeded','true')]);M(A.combat,'heart','applyHealthChange',[pp('lifeformId','playerId'),pp('changeAmount','-10'),pp('whoDidDamage','null'),pp('broadcastLifeformHurt','true')]);M(A.combat,'shield','setShieldAmount',[pp('lifeformId','playerId'),pp('newShieldAmount','50')]);M(A.combat,'skull','killLifeform',[pp('lifeformId','playerId'),pp('whoKilled','null')]);M(A.combat,'sparkle','applyEffect',[pp('lifeformId','playerId'),pp('effectName','"Speed"'),pp('duration','5000'),pp('customEffectInfo','{}')]);M(A.combat,'sparkle','removeEffect',[pp('lifeformId','playerId'),pp('name','"Speed"')]);M(A.combat,'sparkle','hasEffect',[pp('lifeformId','playerId'),pp('name','"Speed"'),pp('atOrAboveLevel','1')]);M(A.combat,'sparkle','getEffectLevel',[pp('lifeformId','playerId'),pp('name','"Speed"')]);M(A.combat,'swords','applyMeleeHit',[pp('hittingEId','playerId'),pp('hitEId','targetId'),pp('dirFacing','[0, 0, 1]'),pp('bodyPartHit','"Torso"'),pp('overrides','{}')]);M(A.combat,'swords','attemptApplyDamage',[pp('opts','{ eId: playerId, hitEId: targetId, attemptedDmgAmt: 10, withItem: "Diamond Sword", damageCause: null }')]);M(A.combat,'burst','calcExplosionForce',[pp('eId','playerId'),pp('explosionType','"default"'),pp('knockbackFactor','1'),pp('explosionRadius','5'),pp('explosionPos','[0, 0, 0]'),pp('ignoreProjectiles','true')]);M(A.combat,'target','sendHitmarker',[pp('playerId','playerId'),pp('isCrit','false'),pp('directionVector','[0, 0, 1]')]);M(A.combat,'plane','preventFallDamageNextGrounding',[pp('playerId','playerId')]);M(A.combat,'flame','getCurrentKillstreak',[pp('playerId','playerId')]);M(A.combat,'flame','clearKillstreak',[pp('playerId','playerId')]);M(A.combat,'sparkle','getAuraInfo',[pp('playerId','playerId')]);M(A.combat,'sparkle','applyAuraChange',[pp('playerId','playerId'),pp('auraDiff','1')]);M(A.combat,'sparkle','setAuraLevel',[pp('playerId','playerId'),pp('level','1')]);M(A.combat,'sparkle','setTotalAura',[pp('playerId','playerId'),pp('totalAura','100')]);
+M(A.ent,'checkCircle','checkValid',[pp('entityId','playerId')]);M(A.ent,'pin','getPosition',[pp('entityId','playerId')]);M(A.ent,'pin','setPosition',[pp('entityId','playerId'),pp('x','0'),pp('y','10'),pp('z','0')]);M(A.ent,'rocket','getVelocity',[pp('eId','playerId')]);M(A.ent,'rocket','setVelocity',[pp('eId','playerId'),pp('x','0'),pp('y','10'),pp('z','0')]);M(A.ent,'burst','applyImpulse',[pp('eId','playerId'),pp('xImpulse','5'),pp('yImpulse','5'),pp('zImpulse','5')]);M(A.ent,'compass','getEntityHeading',[pp('entityId','playerId')]);M(A.ent,'compass','setEntityHeading',[pp('entityId','playerId'),pp('newHeading','0')]);M(A.ent,'refresh','getEntityRotation',[pp('entityId','playerId')]);M(A.ent,'refresh','setEntityRotation',[pp('entityId','playerId'),pp('xRotation','0'),pp('yRotation','0'),pp('zRotation','0')]);M(A.ent,'tag','getEntityName',[pp('entityId','playerId')]);M(A.ent,'tag','getEntityType',[pp('entityId','playerId')]);M(A.ent,'package','getEntitiesInRect',[pp('minCoords','[0, 0, 0]'),pp('maxCoords','[10, 10, 10]')]);M(A.ent,'ruler','getUnitCoordinatesLifeformWithin',[pp('lifeformId','playerId')]);M(A.ent,'link','addFollowingEntityToPlayer',[pp('playerId','playerId'),pp('eId','entityId'),pp('offset','[0, 2, 0]'),pp('followsPlayerRotation','true')]);M(A.ent,'link','removeFollowingEntityFromPlayer',[pp('playerId','playerId'),pp('entityEId','entityId')]);M(A.ent,'film','animateEntity',[pp('entityId','entityId'),pp('animationSchema','{}'),pp('initialTimeFraction','0'),pp('animationSpeed','1')]);
+M(A.mobs,'animal','attemptSpawnMob',[pp('mobType','"Pig"','mobType'),pp('x','x'),pp('y','y'),pp('z','z'),pp('opts','{}')]);M(A.mobs,'animal','despawnMob',[pp('mobId','mobId')]);M(A.mobs,'animal','getMobIds',[]);M(A.mobs,'animal','getNumMobs',[]);M(A.mobs,'animal','getMobDbId',[pp('mobId','mobId')]);M(A.mobs,'animal','createMobHerd',[]);M(A.mobs,'settings','getDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting')]);M(A.mobs,'settings','setDefaultMobSetting',[pp('mobType','"Pig"','mobType'),pp('setting','"maxHealth"','mobSetting'),pp('value','100')]);M(A.mobs,'settings','getMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('returnDefaultIfNotOverridden','true')]);M(A.mobs,'settings','setMobSetting',[pp('mobId','mobId'),pp('setting','"maxHealth"','mobSetting'),pp('value','100')]);M(A.mobs,'brain','getMobAiState',[pp('mobId','mobId')]);M(A.mobs,'brain','setMobAiState',[pp('mobId','mobId'),pp('state','"idle"','mobAiState'),pp('params','{}'),pp('opts','{}')]);M(A.mobs,'feather','passifyHostility',[pp('mobId','mobId'),pp('targetLifeformId','playerId')]);M(A.mobs,'animal','onPlayerAttemptSpawnMob',[pp('playerId','playerId'),pp('mobType','"Pig"','mobType'),pp('x','x'),pp('y','y'),pp('z','z')]);
+M(A.mesh,'cube','attemptCreateMeshEntity',[pp('type','"Box"','meshType'),pp('opts','{}'),pp('name','"mesh"'),pp('physicsOptions','{}'),pp('initiatorId','playerId')]);M(A.mesh,'cube','updateMeshEntity',[pp('eId','entityId'),pp('type','"Box"','meshType'),pp('opts','{}')]);M(A.mesh,'trash','deleteMeshEntity',[pp('eId','entityId')]);M(A.mesh,'boomerang','attemptCreateThrowable',[pp('throwerEId','playerId'),pp('itemName','"Snowball"'),pp('position','[0, 10, 0]'),pp('direction','[0, 0, 1]'),pp('velocityMult','1'),pp('damageMult','1'),pp('gravityMult','1'),pp('attributes','{}')]);M(A.mesh,'trash','deleteThrowable',[pp('eId','entityId')]);M(A.mesh,'person','updateEntityNodeMeshAttachment',[pp('eId','entityId'),pp('node','"HeadMesh"','entityNode'),pp('type','"Box"','meshType'),pp('opts','{}'),pp('offset','[0, 0, 0]'),pp('rotation','[0, 0, 0]')]);M(A.mesh,'wind','updateMeshParticleSystems',[pp('updates','[]')]);
+['configureShopCategory','deleteShopItem'].forEach(n=>M(A.shop,'cart',n,[pp('categoryKey','"main"'),pp(n==='deleteShopItem'?'itemKey':'config',n==='deleteShopItem'?'"item1"':'{}')]));M(A.shop,'cart','configureShopCategoryForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('config','{}')]);M(A.shop,'cart','createShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('item','{}')]);M(A.shop,'cart','createShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('item','{}')]);M(A.shop,'cart','updateShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{}')]);M(A.shop,'cart','updateShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{}')]);M(A.shop,'cart','resetShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"')]);M(A.shop,'cart','openShop',[pp('playerId','playerId'),pp('toggle','true'),pp('forceCategoryKey','"main"'),pp('onlyIfNonEmpty','false')]);M(A.shop,'cart','showShopTutorial',[pp('playerId','playerId')]);M(A.shop,'cart','sendOverShopInfo',[pp('playerId','playerId'),pp('info','{}')]);
+M(A.db,'database','getLobbyDbValue',[pp('key','"key"')]);M(A.db,'database','setLobbyDbValue',[pp('key','"key"'),pp('value','"value"')]);M(A.db,'trash','deleteLobbyDbValue',[pp('key','"key"')]);M(A.db,'trash','deleteAllLobbyDbValues',[]);M(A.db,'database','getPlayerDbValue',[pp('playerId','playerId'),pp('key','"key"')]);M(A.db,'database','setPlayerDbValue',[pp('playerId','playerId'),pp('key','"key"'),pp('value','"value"')]);M(A.db,'trash','deletePlayerDbValue',[pp('playerId','playerId'),pp('key','"key"')]);M(A.db,'trash','deleteAllPlayerDbValues',[pp('playerId','playerId')]);
+M(A.client,'settings','setClientOption',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption'),pp('value','1')]);M(A.client,'settings','getClientOption',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption')]);M(A.client,'settings','setClientOptions',[pp('playerId','playerId'),pp('optionsObj','{}')]);M(A.client,'settings','setClientOptionToDefault',[pp('playerId','playerId'),pp('option','"speedMultiplier"','clientOption')]);M(A.client,'pin','setCallbackValueFallback',[pp('callbackName','"onPlayerChat"'),pp('defaultValue','null')]);
+M(A.settings,'sliders','setTargetedPlayerSettingForEveryone',[pp('targetedPlayerId','playerId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','entitySettingValue'),pp('includeNewJoiners','true')]);M(A.settings,'sliders','setEveryoneSettingForPlayer',[pp('playerId','playerId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','entitySettingValue'),pp('includeNewJoiners','true')]);M(A.settings,'sliders','setOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting'),pp('settingValue','"yellow"','entitySettingValue')]);M(A.settings,'sliders','setOtherEntitySettings',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingsObject','{}')]);M(A.settings,'sliders','getOtherEntitySetting',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);M(A.settings,'sliders','setOtherEntitySettingToDefault',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingName','"nameColour"','entitySetting')]);
+M(A.qte,'target','addQTE',[pp('playerId','playerId'),pp('qteParameters','{ type: "progressBar" }')]);M(A.qte,'target','deleteQTE',[pp('playerId','playerId'),pp('id','qteId')]);M(A.qte,'target','hasActiveQTE',[pp('playerId','playerId')]);
+M(A.fx,'sparkle','playParticleEffect',[pp('opts','{ texture: "glint", pos1: [0, 0, 0], pos2: [0, 1, 0] }'),pp('clientPredictedBy','null')]);M(A.fx,'sparkle','updateMeshParticleSystems',[pp('updates','[]')]);
 /* ---------- Extra verified methods not present in the ported table ---------- */
-M(A.mesh,'🪨','attemptCreateThrowable',[pp('throwerEId','playerId'),pp('itemName','"Dynamite"'),pp('position','[0, 0, 0]'),pp('direction','[0, 1, 0]'),pp('velocityMult','1'),pp('damageMult','1'),pp('gravityMult','1'),pp('attributes','{}')],'EntityId');
-M(A.mesh,'🧨','deleteThrowable',[pp('eId','entityId')],'boolean');
-M(A.player,'🧮','calcExplosionForce',[pp('eId','entityId'),pp('x','x'),pp('y','y'),pp('z','z'),pp('explosionStrength','4')]);
+M(A.mesh,'rock','attemptCreateThrowable',[pp('throwerEId','playerId'),pp('itemName','"Dynamite"'),pp('position','[0, 0, 0]'),pp('direction','[0, 1, 0]'),pp('velocityMult','1'),pp('damageMult','1'),pp('gravityMult','1'),pp('attributes','{}')],'EntityId');
+M(A.mesh,'firecracker','deleteThrowable',[pp('eId','entityId')],'boolean');
+M(A.player,'calculator','calcExplosionForce',[pp('eId','entityId'),pp('x','x'),pp('y','y'),pp('z','z'),pp('explosionStrength','4')]);
 
 /* ---------- Return-value registry ---------- */
 const API_RETURN_NAMES=new Set(['addQTE','addUiRequest','addUiRequestPopup','queueMiddleTextUpper','queueMiddleTextLower','queueCrosshairText','getQueuedStatus','attemptApplyDamage','attemptCreateMeshEntity','attemptCreateThrowable','attemptCreateAudioEntity','attemptSpawnMob','attemptSpawnVehicle','attemptWorldChangeBlock','blockCoordToChunkId','blockIdToBlockName','blockNameToBlockId','calcExplosionForce','createItemDrop','createMobHerd','findItem','findStandardChestItem','getAuraInfo','getBlock','getBlockData','getBlockId','getBlockSolidity','getClientOption','getCraftingRecipesForPlayer','getCurrencyAmount','getCurrentKillstreak','getDefaultMobSetting','getEffectLevel','getEffects','getEntitiesInRect','getEntityHeading','getEntityName','getEntityRotation','getEntityType','getHealth','getHeldItem','getInitialItemMetadata','getInventoryFreeSlotCount','getInventoryItemAmount','getItemAmount','getItemDropName','getItemIDsOverlappingWithPlayer','getItemSlot','getItemStat','getLifeformScale','getLobbyDbValue','getLobbyName','getLobbyType','getMetaInfo','getMobAiState','getMobDbId','getMobIds','getMobSetting','getMoonstoneChestItems','getMoonstoneChestItemSlot','getNumMobs','getNumPlayers','getOtherEntitySetting','getPlayerCosmetic','getPlayerDbId','getPlayerDbValue','getPlayerFacingInfo','getPlayerGamemode','getPlayerId','getPlayerIdFromDbId','getPlayerIds','getPlayerPartyWhenJoined','getPlayerPhysicsState','getPlayerTargetInfo','getPosition','getSchematicDimensions','getSelectedInventorySlotI','getShieldAmount','getStandardChestFreeSlotCount','getStandardChestItemAmount','getStandardChestItems','getStandardChestItemSlot','getUnitCoordinatesLifeformWithin','getVariation','getVehicleSeats','getVehicleSetting','hasActiveQTE','isAlive','isNearInterrupt','isPublicLobby','isUsingCustomGameTexturePack','now','raycastForBlock','createEnchantmentAttributesForItem','deleteEntity','deleteMeshEntity','deleteThrowable','despawnMob','getMobVehicleSeats','matchmakeToVariation','getBlockCoordinatesPlayerStandingOn','getBlockTypesPlayerStandingOn','applyMeleeHit','setCurrencyAmount']);
@@ -705,8 +968,8 @@ function registerApiMethods(methods){
   methods.forEach(m=>{
     if(seen.has(m.name))return;   // first registration wins: no duplicate blocks
     seen.add(m.name);
-    defs[m.name]={cat:m.cat,icon:m.icon||'🔌',label:'api.'+m.name,
-      desc:m.desc||('api.'+m.name+'('+m.params.map(p=>p.name).join(', ')+')'+(m.returns?' → '+m.returns:'')),
+    defs[m.name]={cat:m.cat,icon:m.icon||'plug',label:'api.'+m.name,
+      desc:m.desc||('api.'+m.name+'('+m.params.map(p=>p.name).join(', ')+')'+(m.returns?' -> '+m.returns:'')),
       params:m.params.map(p=>p.default),
       paramNames:m.params.map(p=>p.name),
       choices:m.params.map(p=>p.choice),
@@ -723,37 +986,37 @@ function registerApiValueSnippets(methods){
 }
 
 /* ---------- Additional documented methods (verified) ---------- */
-M(A.player,'🎭','changePlayerIntoSkin',[pp('playerId','playerId'),pp('cosmeticType','"head"','cosmeticType'),pp('cosmeticName','"wizard"')]);
-M(A.player,'🧙','getNpcSkins',[],'string[]');
-M(A.blocks,'🧭','chunkIdToBotLeftCoord',[pp('chunkId','chunkId')],'[number, number, number]');
-M(A.blocks,'📋','copyChunk',[pp('fromPos','[0, 0, 0]'),pp('toPos','[32, 0, 0]')]);
-M(A.inv,'🚪','closeChestForPlayer',[pp('playerId','playerId')]);
-M(A.combat,'🔥','clearKillstreak',[pp('playerId','playerId')]);
-M(A.combat,'🗡️','getCurrentKillstreak',[pp('playerId','playerId')],'number');
-M(A.combat,'💥','getUnitCoordinatesLifeformWithin',[pp('lifeformId','entityId')],'number[][]');
-M(A.shop,'🏷️','configureShopCategory',[pp('categoryKey','"main"'),pp('config','{}')]);
-M(A.shop,'🏷️','configureShopCategoryForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('config','{}')]);
-M(A.shop,'🏪','updateShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{ canBuy: true }')]);
-M(A.shop,'🏪','updateShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{ canBuy: true }')]);
-M(A.settings,'🎚️','setOtherEntitySettings',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingsObject','{}')]);
-M(A.client,'🎛️','getPlayerFacingInfo',[pp('playerId','playerId')],'{ camPos, dir, angleDir, moveHeading }');
-M(A.client,'🎛️','getPlayerTargetInfo',[pp('playerId','playerId')],'{ position, normal, adjacent }');
-M(A.client,'🎥','setCameraDirection',[pp('playerId','playerId'),pp('direction','[0, 0, 1]')]);
-M(A.client,'🔎','setCameraZoom',[pp('playerId','playerId'),pp('zoom','1')]);
-M(A.blocks,'🧱','raycastForBlock',[pp('fromPos','[0, 0, 0]'),pp('dirVec','[0, -1, 0]')],'BlockRaycastResult');
-M(A.blocks,'🏔️','getChunk',[pp('chunkX','0'),pp('chunkY','0'),pp('chunkZ','0')]);
-M(A.ent,'🧍','getEntityHeading',[pp('entityId','entityId')],'number');
-M(A.ent,'🧍','getEntityRotation',[pp('entityId','entityId')],'[number, number, number]');
-M(A.ent,'🏷️','getEntityName',[pp('entityId','entityId')],'string');
-M(A.ent,'🧬','getEntityType',[pp('entityId','entityId')],'EntityType');
-M(A.ent,'🧍','setEntityHeading',[pp('entityId','entityId'),pp('newHeading','0')]);
-M(A.ent,'🧍','setEntityRotation',[pp('entityId','entityId'),pp('xRotation','0'),pp('yRotation','0'),pp('zRotation','0')]);
-M(A.ent,'✅','checkValid',[pp('entityId','entityId')],'boolean');
-M(A.items,'🧾','getItemDropName',[pp('itemEId','itemEId')],'ItemName');
-M(A.items,'🔢','getItemStat',[pp('lifeformId','playerId'),pp('itemName','"Dirt"'),pp('stat','"DirtTtb"')]);
-M(A.items,'🔢','setItemAmount',[pp('itemId','itemEId'),pp('newAmount','1')]);
-M(A.items,'🎯','setCantPickUpItem',[pp('playerId','playerId'),pp('itemId','itemEId')]);
-M(A.inv,'🎯','resetCanPickUpItem',[pp('playerId','playerId'),pp('itemId','itemEId')]);
+M(A.player,'mask','changePlayerIntoSkin',[pp('playerId','playerId'),pp('cosmeticType','"head"','cosmeticType'),pp('cosmeticName','"wizard"')]);
+M(A.player,'wizard','getNpcSkins',[],'string[]');
+M(A.blocks,'compass','chunkIdToBotLeftCoord',[pp('chunkId','chunkId')],'[number, number, number]');
+M(A.blocks,'list','copyChunk',[pp('fromPos','[0, 0, 0]'),pp('toPos','[32, 0, 0]')]);
+M(A.inv,'door','closeChestForPlayer',[pp('playerId','playerId')]);
+M(A.combat,'flame','clearKillstreak',[pp('playerId','playerId')]);
+M(A.combat,'dagger','getCurrentKillstreak',[pp('playerId','playerId')],'number');
+M(A.combat,'burst','getUnitCoordinatesLifeformWithin',[pp('lifeformId','entityId')],'number[][]');
+M(A.shop,'tag','configureShopCategory',[pp('categoryKey','"main"'),pp('config','{}')]);
+M(A.shop,'tag','configureShopCategoryForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('config','{}')]);
+M(A.shop,'store','updateShopItem',[pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{ canBuy: true }')]);
+M(A.shop,'store','updateShopItemForPlayer',[pp('playerId','playerId'),pp('categoryKey','"main"'),pp('itemKey','"item1"'),pp('changes','{ canBuy: true }')]);
+M(A.settings,'sliders','setOtherEntitySettings',[pp('relevantPlayerId','playerId'),pp('targetedEntityId','targetId'),pp('settingsObject','{}')]);
+M(A.client,'sliders','getPlayerFacingInfo',[pp('playerId','playerId')],'{ camPos, dir, angleDir, moveHeading }');
+M(A.client,'sliders','getPlayerTargetInfo',[pp('playerId','playerId')],'{ position, normal, adjacent }');
+M(A.client,'camera','setCameraDirection',[pp('playerId','playerId'),pp('direction','[0, 0, 1]')]);
+M(A.client,'search','setCameraZoom',[pp('playerId','playerId'),pp('zoom','1')]);
+M(A.blocks,'block','raycastForBlock',[pp('fromPos','[0, 0, 0]'),pp('dirVec','[0, -1, 0]')],'BlockRaycastResult');
+M(A.blocks,'terrain','getChunk',[pp('chunkX','0'),pp('chunkY','0'),pp('chunkZ','0')]);
+M(A.ent,'person','getEntityHeading',[pp('entityId','entityId')],'number');
+M(A.ent,'person','getEntityRotation',[pp('entityId','entityId')],'[number, number, number]');
+M(A.ent,'tag','getEntityName',[pp('entityId','entityId')],'string');
+M(A.ent,'branch','getEntityType',[pp('entityId','entityId')],'EntityType');
+M(A.ent,'person','setEntityHeading',[pp('entityId','entityId'),pp('newHeading','0')]);
+M(A.ent,'person','setEntityRotation',[pp('entityId','entityId'),pp('xRotation','0'),pp('yRotation','0'),pp('zRotation','0')]);
+M(A.ent,'checkCircle','checkValid',[pp('entityId','entityId')],'boolean');
+M(A.items,'receipt','getItemDropName',[pp('itemEId','itemEId')],'ItemName');
+M(A.items,'sort','getItemStat',[pp('lifeformId','playerId'),pp('itemName','"Dirt"'),pp('stat','"DirtTtb"')]);
+M(A.items,'sort','setItemAmount',[pp('itemId','itemEId'),pp('newAmount','1')]);
+M(A.items,'target','setCantPickUpItem',[pp('playerId','playerId'),pp('itemId','itemEId')]);
+M(A.inv,'target','resetCanPickUpItem',[pp('playerId','playerId'),pp('itemId','itemEId')]);
 /* ============================================================
    State
    ============================================================ */
@@ -790,8 +1053,8 @@ const I18N={
  fr:{
   title:'Bloxd Blocks Studio — Éditeur visuel JavaScript',tag:'Éditeur visuel JavaScript',
   save:'Sauvegarder',load:'Charger',clear:'Tout effacer',copy:'Copier',wrapOn:'Retour ligne',wrapOff:'Ligne unique',
-  copied:'✓ Copié !',codeLabel:'Code généré',workspace:'Espace de travail',resetView:'Réinitialiser la vue',
-  hideHint:'Masquer l’aide',langBtn:'🇬🇧 EN',themeLight:'☀️ Clair',themeDark:'🌙 Sombre',
+  copied:'Copié !',codeLabel:'Code généré',workspace:'Espace de travail',resetView:'Réinitialiser la vue',
+  hideHint:'Masquer l’aide',langBtn:'EN',themeLight:'Clair',themeDark:'Sombre',
   templates:'Modèles',newProject:'Nouveau',exportBtn:'Exporter',importBtn:'Importer',backpack:'Sac à dos',
   cleanUp:'Ranger',makeBlock:'Créer un bloc',variables:'Variables',makeList:'Créer une liste',
   hint:'<span class="kbd">Molette</span> déplacer · <span class="kbd">Ctrl + molette</span> zoom · <span class="kbd">Clic droit</span> menu',
@@ -851,8 +1114,8 @@ const I18N={
  en:{
   title:'Bloxd Blocks Studio — Visual JavaScript Editor',tag:'Visual JavaScript Editor',
   save:'Save',load:'Load',clear:'Clear all',copy:'Copy',wrapOn:'Wrap lines',wrapOff:'No wrap',
-  copied:'✓ Copied!',codeLabel:'Generated code',workspace:'Workspace',resetView:'Reset view',
-  hideHint:'Hide help',langBtn:'🇫🇷 FR',themeLight:'☀️ Light',themeDark:'🌙 Dark',
+  copied:'Copied!',codeLabel:'Generated code',workspace:'Workspace',resetView:'Reset view',
+  hideHint:'Hide help',langBtn:'FR',themeLight:'Light',themeDark:'Dark',
   templates:'Templates',newProject:'New',exportBtn:'Export',importBtn:'Import',backpack:'Backpack',
   cleanUp:'Clean up',makeBlock:'Make a Block',variables:'Variables',makeList:'Make a List',
   hint:'<span class="kbd">Wheel</span> pan · <span class="kbd">Ctrl + Wheel</span> zoom · <span class="kbd">Right-click</span> menu',
@@ -1228,7 +1491,7 @@ function ctxMenu(items,x,y){
   items.forEach(it=>{
     if(it==='-'){m.append(document.createElement('hr'));return}
     const btn=document.createElement('button');
-    btn.innerHTML='<span>'+it.icon+'</span><span>'+it.label+'</span>'+(it.key?'<span class="cKey">'+it.key+'</span>':'');
+    btn.innerHTML='<span class="cmIco">'+icon(it.icon||'caretRight',14)+'</span><span>'+it.label+'</span>'+(it.key?'<span class="cKey">'+it.key+'</span>':'');
     if(it.danger)btn.className='danger';
     btn.onclick=()=>{m.remove();it.fn()};
     m.append(btn);
@@ -1247,7 +1510,7 @@ function renderTabs(){
   const tabs=$('#tabs');
   tabs.innerHTML=cats.map(c=>{
     const title=i18n('cats.'+c.id,c.label||c.name);
-    return '<button class="tab '+(c.id===active?'active':'')+'" data-cat="'+c.id+'" title="'+title.replace(/"/g,'&quot;')+'" style="--cat:'+c.color+'"><span class="ico">'+c.icon+'</span><span>'+c.short+'</span></button>';
+    return '<button class="tab '+(c.id===active?'active':'')+'" data-cat="'+c.id+'" title="'+title.replace(/"/g,'&quot;')+'" style="--cat:'+c.color+'"><span class="ico">'+icon(c.icon,17)+'</span><span>'+c.short+'</span></button>';
   }).join('');
   tabs.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{active=t.dataset.cat;renderTabs();renderPalette()}});
 }
@@ -1260,7 +1523,7 @@ function toolEl(type,extraClass){
   el.style.setProperty('--cat',c.color);
   el.draggable=true;
   el.dataset.type=type;
-  el.innerHTML='<span class="ico">'+(d.icon||'🔌')+'</span><span style="min-width:0;display:block"><span class="name">'+(d.expr&&!d.container?d.label||type:blockLabel(type,d))+'</span><span class="desc">'+blockDesc(type,d)+'</span></span>';
+  el.innerHTML='<span class="ico">'+icon(d.icon||'plug',17)+'</span><span style="min-width:0;display:block"><span class="name">'+(d.expr&&!d.container?d.label||type:blockLabel(type,d))+'</span><span class="desc">'+blockDesc(type,d)+'</span></span>';
   el.addEventListener('dragstart',e=>{
     e.dataTransfer.setData('application/x-block-type',type);
     e.dataTransfer.effectAllowed='copy';
@@ -1286,15 +1549,15 @@ function renderPalette(){
   if(c.id==='search'){renderSearchPalette(pal);return}
   const title=document.createElement('div');
   title.className='catTitle';
-  title.innerHTML='<span>'+c.icon+'</span>'+i18n('cats.'+c.id,c.label);
+  title.innerHTML='<span class="titleIco">'+icon(c.icon,15)+'</span>'+i18n('cats.'+c.id,c.label);
   pal.append(title);
   if(c.id==='variables'){
     const b1=document.createElement('button');
-    b1.className='specialBtn';b1.textContent='➕ '+tr('variables');
+    b1.className='specialBtn';b1.innerHTML=icon('plus',14)+'<span>'+tr('variables')+'</span>';
     b1.onclick=openVarsModal;
     pal.append(b1);
     const b2=document.createElement('button');
-    b2.className='specialBtn';b2.textContent='📋 '+tr('makeList');
+    b2.className='specialBtn';b2.innerHTML=icon('list',14)+'<span>'+tr('makeList')+'</span>';
     b2.onclick=openListsModal;
     pal.append(b2);
     const lv=document.createElement('div');
@@ -1303,7 +1566,7 @@ function renderPalette(){
   }
   if(c.id==='events'){
     const b2=document.createElement('button');
-    b2.className='specialBtn';b2.textContent='🧩 '+tr('makeBlock');
+    b2.className='specialBtn';b2.innerHTML=icon('puzzle',14)+'<span>'+tr('makeBlock')+'</span>';
     b2.onclick=openFnsModal;
     pal.append(b2);
   }
@@ -1331,7 +1594,7 @@ function renderPalette(){
       el.style.borderLeftColor='#a78bfa';
       el.draggable=true;
       el.dataset.cb=name;
-      el.innerHTML='<span class="ico">⚡</span><span style="min-width:0;display:block"><span class="name">'+name+'</span><span class="desc">'+(params.length?params.join(', '):tr('noArgs'))+'</span></span>';
+      el.innerHTML='<span class="ico">'+icon('lightning',17)+'</span><span style="min-width:0;display:block"><span class="name">'+name+'</span><span class="desc">'+(params.length?params.join(', '):tr('noArgs'))+'</span></span>';
       el.addEventListener('dragstart',e=>{e.dataTransfer.setData('application/x-callback',name);e.dataTransfer.effectAllowed='copy';drag={kind:'callback',type:name}});
       el.addEventListener('dragend',()=>{drag=null;clearDropHints()});
       el.onclick=()=>{pushUndo();addStack([hatCallback(name)]);renderAll()};
@@ -1342,7 +1605,7 @@ function renderPalette(){
 function renderSearchPalette(pal){
   const head=document.createElement('div');
   head.className='catTitle';
-  head.innerHTML='<span>🔎</span>'+i18n('cats.search','Block search');
+  head.innerHTML='<span class="titleIco">'+icon('search',15)+'</span>'+i18n('cats.search','Block search');
   pal.append(head);
   const box=document.createElement('div');
   box.style.cssText='position:sticky;top:0;z-index:3;background:var(--panel);padding:2px 0 8px;border-bottom:1px solid var(--line);margin-bottom:8px';
@@ -1405,7 +1668,7 @@ function renderWorkspace(){
     wrap.style.top=(s.y||20)+'px';
     const bar=document.createElement('div');
     bar.className='stackBar';
-    bar.innerHTML='<span>⠿ stack</span><span style="opacity:.6">'+countBlocks(s.blocks)+'</span>';
+    bar.innerHTML='<span class="grip">'+icon('grip',12)+'</span><span>stack</span><span style="opacity:.6">'+countBlocks(s.blocks)+'</span>';
     bar.title='Drag to move this stack';
     bar.addEventListener('mousedown',e=>startStackDrag(e,s));
     wrap.append(bar);
@@ -1676,7 +1939,7 @@ function valueSlotEl(b,idx,choiceKey){
       renderInline(val,inner);
       chip.append(inner);
       const rm=document.createElement('button');
-      rm.className='valueRemove';rm.textContent='✕';rm.title=tr('delete');
+      rm.className='valueRemove';rm.innerHTML=icon('close',10);rm.title=tr('delete');
       rm.onclick=e=>{e.stopPropagation();pushUndo();b.params[idx]='';renderAll()};
       chip.append(rm);
       chip.draggable=true;
@@ -1812,7 +2075,7 @@ function valueEditor(v,setter){
       inp.onmousedown=e=>e.stopPropagation();
       slot.append(inp);
       const rm=document.createElement('button');
-      rm.className='valueRemove';rm.textContent='✕';
+      rm.className='valueRemove';rm.innerHTML=icon('close',10);
       rm.onclick=e=>{e.stopPropagation();v.items.splice(i,1);setter(v)};
       iw.append(slot,rm);
       el.append(iw);
@@ -1841,7 +2104,7 @@ function valueEditor(v,setter){
       inp.onmousedown=e=>e.stopPropagation();
       slot.append(inp);
       const rm=document.createElement('button');
-      rm.className='valueRemove';rm.textContent='✕';
+      rm.className='valueRemove';rm.innerHTML=icon('close',10);
       rm.onclick=e=>{e.stopPropagation();v.props.splice(i,1);setter(v)};
       iw.append(key,colon,slot,rm);
       el.append(iw);
@@ -1864,8 +2127,8 @@ function valueEditor(v,setter){
 function blockMenu(b,x,y){
   const d=defs[b.type]||{};
   const items=[
-    {icon:'📄',label:tr('ctxDuplicate'),fn:()=>{pushUndo();duplicateBlock(b.id);renderAll()}},
-    {icon:'💬',label:tr('ctxComment'),fn:()=>{
+    {icon:'file',label:tr('ctxDuplicate'),fn:()=>{pushUndo();duplicateBlock(b.id);renderAll()}},
+    {icon:'message',label:tr('ctxComment'),fn:()=>{
       pushUndo();
       const loc=findStackLoc(b.id);
       if(!loc)return;
@@ -1873,17 +2136,17 @@ function blockMenu(b,x,y){
       loc.list.splice(loc.index+1,0,c);
       renderAll();
     }},
-    {icon:'🎒',label:tr('ctxBackpack'),fn:()=>{
+    {icon:'backpack',label:tr('ctxBackpack'),fn:()=>{
       pushUndo();
       backpack.push({id:'bp'+Date.now(),name:(d.label||b.type)+' '+new Date().toLocaleTimeString(),blocks:[clone(b)]});
       saveProject(true);
-      toast('🎒');
+      toast(tr('ctxBackpack'));
     }}
   ];
-  if(d.container)items.push({icon:b.collapsed?'▸':'▾',label:tr('ctxCollapse')+(b.collapsed?' · '+fmtTpl('collapsed',{n:countBlocks(b.children||[])+(b.children2?countBlocks(b.children2):0)}):''),fn:()=>{pushUndo();b.collapsed=!b.collapsed;renderWorkspace()}});
-  items.push({icon:b.disabled?'✅':'🚫',label:tr('ctxDisable'),fn:()=>{pushUndo();b.disabled=!b.disabled;renderWorkspace();renderCode()}});
+  if(d.container)items.push({icon:b.collapsed?'caretRight':'caretDown',label:tr('ctxCollapse')+(b.collapsed?' · '+fmtTpl('collapsed',{n:countBlocks(b.children||[])+(b.children2?countBlocks(b.children2):0)}):''),fn:()=>{pushUndo();b.collapsed=!b.collapsed;renderWorkspace()}});
+  items.push({icon:b.disabled?'checkCircle':'ban',label:tr('ctxDisable'),fn:()=>{pushUndo();b.disabled=!b.disabled;renderWorkspace();renderCode()}});
   items.push('-');
-  items.push({icon:'🗑️',label:tr('ctxDelete'),danger:true,fn:()=>{pushUndo();removeBlock(b.id);renderAll()}});
+  items.push({icon:'trash',label:tr('ctxDelete'),danger:true,fn:()=>{pushUndo();removeBlock(b.id);renderAll()}});
   ctxMenu(items,x,y);
 }
 function findStackLoc(id){
@@ -1964,7 +2227,7 @@ function openVarsModal(){
         const row=document.createElement('div');
         row.className='listRow';
         row.innerHTML='<span class="nm">'+esc(v.name)+'</span><span class="meta">var</span>';
-        const del=document.createElement('button');del.textContent='✕';
+        const del=document.createElement('button');del.innerHTML=icon('close',12);
         del.onclick=()=>{pushUndo();vars.splice(i,1);draw();renderPalette()};
         row.append(del);
         list.append(row);
@@ -1976,7 +2239,7 @@ function openVarsModal(){
     f.innerHTML='<label>'+tr('varName')+'</label>';
     const inp=document.createElement('input');inp.placeholder='score';
     f.append(inp);body.append(f);
-    const add=document.createElement('button');add.className='btnPrimary';add.textContent='＋ '+tr('create');
+    const add=document.createElement('button');add.className='btnPrimary';add.innerHTML=icon('plus',14)+'<span>'+tr('create')+'</span>';
     const doAdd=()=>{
       const name=inp.value.trim();
       if(!isIdentName(name)){toast(tr('invalidName'),true);return}
@@ -2001,7 +2264,7 @@ function openListsModal(){
         const row=document.createElement('div');
         row.className='listRow';
         row.innerHTML='<span class="nm">'+esc(v.name)+'</span><span class="meta">array</span>';
-        const del=document.createElement('button');del.textContent='✕';
+        const del=document.createElement('button');del.innerHTML=icon('close',12);
         del.onclick=()=>{pushUndo();lists.splice(i,1);draw()};
         row.append(del);
         list.append(row);
@@ -2013,7 +2276,7 @@ function openListsModal(){
     f.innerHTML='<label>'+tr('varName')+'</label>';
     const inp=document.createElement('input');inp.placeholder='players';
     f.append(inp);body.append(f);
-    const add=document.createElement('button');add.className='btnPrimary';add.textContent='＋ '+tr('create');
+    const add=document.createElement('button');add.className='btnPrimary';add.innerHTML=icon('plus',14)+'<span>'+tr('create')+'</span>';
     const doAdd=()=>{
       const name=inp.value.trim();
       if(!isIdentName(name)){toast(tr('invalidName'),true);return}
@@ -2038,7 +2301,7 @@ function openFnsModal(){
         const row=document.createElement('div');
         row.className='listRow';
         row.innerHTML='<span class="nm">'+esc(v.name)+'('+esc(v.params||'')+')</span>';
-        const del=document.createElement('button');del.textContent='✕';
+        const del=document.createElement('button');del.innerHTML=icon('close',12);
         del.onclick=()=>{pushUndo();customFns.splice(i,1);draw()};
         row.append(del);
         list.append(row);
@@ -2055,7 +2318,7 @@ function openFnsModal(){
     const inp2=document.createElement('input');inp2.placeholder='playerId, amount';
     f2.append(inp2);
     body.append(f1,f2);
-    const add=document.createElement('button');add.className='btnPrimary';add.textContent='＋ '+tr('create');
+    const add=document.createElement('button');add.className='btnPrimary';add.innerHTML=icon('plus',14)+'<span>'+tr('create')+'</span>';
     add.onclick=()=>{
       const name=inp.value.trim();
       if(!isIdentName(name)){toast(tr('invalidName'),true);return}
@@ -2092,7 +2355,7 @@ function openBackpack(){
         addStack(blocks);
         renderAll();close();
       };
-      const del=document.createElement('button');del.textContent='✕';
+      const del=document.createElement('button');del.innerHTML=icon('close',12);
       del.onclick=()=>{backpack.splice(i,1);saveProject(true);close();openBackpack()};
       row.append(ins,del);
       list.append(row);
@@ -2117,10 +2380,10 @@ const TEMPLATES=[
  ]),
  T('Join / leave feed','Announce joins and leaves to everyone',()=>[
    {id:newid(),type:'callback',params:['onPlayerJoin'],children:[
-     apiB('broadcastMessage',['"🟢 "+api.getEntityName(playerId)+" joined"','{ color: "lime" }'])
+     apiB('broadcastMessage',['"-> "+api.getEntityName(playerId)+" joined"','{ color: "lime" }'])
    ]},
    {id:newid(),type:'callback',params:['onPlayerLeave'],children:[
-     apiB('broadcastMessage',['"🔴 "+api.getEntityName(playerId)+" left"','{ color: "red" }'])
+     apiB('broadcastMessage',['"<- "+api.getEntityName(playerId)+" left"','{ color: "red" }'])
    ]}
  ]),
  T('Scoreboard & HUD','Tick timer with middle-screen text and a countdown',()=>[
@@ -2186,7 +2449,7 @@ function openTemplates(){
           stacks.push(s);
         });
         renderAll();close();
-        toast('✓ '+t.name);
+        toast(t.name);
       };
       grid.append(card);
     });
@@ -2205,7 +2468,7 @@ function openExport(){
     ta.value=JSON.stringify(projectData(),null,2);
     ta.readOnly=true;
     body.append(ta);
-    const dl=document.createElement('button');dl.className='btnPrimary';dl.textContent='⬇ '+tr('download');
+    const dl=document.createElement('button');dl.className='btnPrimary';dl.innerHTML=icon('export',14)+'<span>'+tr('download')+'</span>';
     dl.onclick=()=>{
       const blob=new Blob([ta.value],{type:'application/json'});
       const a=document.createElement('a');
@@ -2222,7 +2485,7 @@ function openImport(){
     const ta=document.createElement('textarea');
     ta.placeholder='{ "stacks": [...], "vars": [...] }';
     body.append(ta);
-    const go=document.createElement('button');go.className='btnPrimary';go.textContent='⬆ '+tr('applyImport');
+    const go=document.createElement('button');go.className='btnPrimary';go.innerHTML=icon('import',14)+'<span>'+tr('applyImport')+'</span>';
     go.onclick=()=>{
       let raw=null;
       try{raw=JSON.parse(ta.value)}catch(e){toast(tr('badJson'),true);return}
@@ -2309,9 +2572,9 @@ function setupWorkspace(){
     const x=Math.round((e.clientX-r.left-view.x)/view.scale);
     const y=Math.round((e.clientY-r.top-view.y)/view.scale);
     ctxMenu([
-      {icon:'⚡',label:'Add hat block here',fn:()=>{pushUndo();stacks.push({id:'s'+Date.now(),x,y,blocks:[hatCallback('tick')]});renderAll()}},
-      {icon:'🧹',label:tr('cleanUp'),fn:cleanUp},
-      {icon:'🔍',label:tr('resetView'),fn:()=>{view={x:0,y:0,scale:1};applyView()}}
+      {icon:'lightning',label:'Add hat block here',fn:()=>{pushUndo();stacks.push({id:'s'+Date.now(),x,y,blocks:[hatCallback('tick')]});renderAll()}},
+      {icon:'broom',label:tr('cleanUp'),fn:cleanUp},
+      {icon:'search',label:tr('resetView'),fn:()=>{view={x:0,y:0,scale:1};applyView()}}
     ],e.clientX,e.clientY);
   });
 }
@@ -2362,20 +2625,26 @@ function applyLangStatic(){
   document.title=tr('title');
   const tag=$('#tagline');if(tag)tag.textContent=tr('tag');
   $$('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;const v=tr(k);if(v!==k)el.textContent=v});
-  $('#langToggle').textContent=tr('langBtn');
+  const ll=$('#langLabel'),li=$('#langIcon');
+  if(ll)ll.textContent=tr('langBtn');
+  if(li)li.innerHTML=icon(lang==='fr'?'flagUk':'flagFr',15);
   $('#hint').innerHTML=tr('hint');
   if(hintHidden)$('#hint').classList.add('hidden');
   const zl=$('#zoomLabel');if(zl&&zl.textContent.endsWith('%'))$('#zoomLabel').textContent=zl.textContent;
 }
 function applyTheme(){
   document.body.classList.toggle('light',theme==='light');
-  $('#themeToggle').textContent=theme==='dark'?tr('themeLight'):tr('themeDark');
+  const lbl=$('#themeLabel'),ic=$('#themeIcon');
+  if(lbl)lbl.textContent=theme==='dark'?tr('themeLight'):tr('themeDark');
+  if(ic)ic.innerHTML=icon(theme==='dark'?'sun':'moon',15);
 }
 function applyCodeWrap(){
   const c=$('#code');
   c.classList.toggle('wrap',codeWrap);
-  $('#wrapBtn').textContent=codeWrap?'→':'↩';
+  const wi=$('#wrapIcon');
+  if(wi)wi.innerHTML=icon(codeWrap?'nowrap':'wrap',15);
   $('#wrapBtn').title=codeWrap?tr('wrapOff'):tr('wrapOn');
+  $('#wrapBtn').classList.toggle('active',codeWrap);
 }
 function wireToolbar(){
   $('#langToggle').onclick=()=>{lang=lang==='fr'?'en':'fr';localStorage.setItem('bloxd-lang',lang);applyLangStatic();applyTheme();applyCodeWrap();renderTabs();renderPalette();renderAll()};
@@ -2396,7 +2665,7 @@ function wireToolbar(){
   $('#saveBtn').onclick=()=>saveProject(false);
   $('#loadBtn').onclick=()=>{
     pushUndo();
-    if(loadProject()){renderAll();toast('↩');}else toast('localStorage: empty',true);
+    if(loadProject()){renderAll();toast(tr('load'));}else toast('localStorage: empty',true);
   };
   $('#clearBtn').onclick=()=>{
     if(!confirm(tr('clearConfirm')))return;
@@ -2449,7 +2718,14 @@ function wireToolbar(){
 /* ============================================================
    Boot
    ============================================================ */
+function paintIconSlots(root){
+  (root||document).querySelectorAll('.islot[data-icon]').forEach(el=>{
+    const n=el.getAttribute('data-icon');
+    el.innerHTML=icon(n,el.classList.contains('big')?18:15);
+  });
+}
 function boot(){
+  paintIconSlots();
   registerApiMethods(API_METHODS);
   registerApiValueSnippets(API_METHODS);
   applyLangStatic();
