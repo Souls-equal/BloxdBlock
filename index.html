@@ -2927,6 +2927,157 @@ function acEnum(kind){
   return [];
 }
 /* all candidates for (block, param index), as {v,label,kind,hint} */
+
+/* ---------- variable typing ----------
+   We do not have declared types, so we infer from how each name is used:
+   numbers, text, booleans, lists, objects, entities, or unknown.
+   Inference scans every assignment / call argument in the project.        */
+const AC_NUMERIC_HINT=/^(x|y|z|i|n|j|k|t|amount|value|count|score|coins|health|level|speed|volume|rate|duration|total|num|number|index|idx|radius|distance|height|width|timer|progress|damage|price|id|ticks|ms|delta|strength|power|hp|mana|xp|exp|coins|points|kills|deaths|wins|losses)$/i;
+/* names that read like text/booleans/collections: never offered for a number slot */
+const AC_NONNUMERIC_HINT=/(name|label|text|message|title|desc|key|word|str|reason|type|kind|colour|color|icon|path|url|prefix|suffix|tag|id)$|^(is|has|can|should|was|did|will|allow|enable|disable|show|hide)/i;
+function acInferTypes(){
+  const T={};
+  const note=(name,kind)=>{name=String(name||'').trim();if(!/^[A-Za-z_$][\w$]*$/.test(name))return;
+    if(!T[name])T[name]={num:0,str:0,bool:0,list:0,obj:0};
+    if(kind&&T[name][kind]!==undefined)T[name][kind]++};
+  const classify=v=>{
+    if(v&&typeof v==='object'){
+      if(v.__value==='list')return 'list';
+      if(v.__value==='object')return 'obj';
+      if(v.type&&defs[v.type]&&defs[v.type].expr)return acReturnKind(v.type);
+      return null;
+    }
+    const raw=String(v??'').trim();
+    if(!raw)return null;
+    if(/^\[/.test(raw))return 'list';
+    if(/^\{/.test(raw))return 'obj';
+    if(/^(true|false)$/.test(raw))return 'bool';
+    if(/^-?\d+(\.\d+)?$/.test(raw))return 'num';
+    if(/^(['"`]).*\1$/s.test(raw))return 'str';
+    if(/^[A-Za-z_$][\w$]*$/.test(raw))return 'ident';
+    return null;
+  };
+  const walk=(list,scope)=>{
+    (list||[]).forEach(b=>{
+      const d=defs[b.type]||{};
+      /* local numeric loop counters */
+      if(b.type==='repeat')note(scope['_i'],'num');
+      if(b.type==='assign'){
+        const names=(String(b.params[0]||'').match(/[A-Za-z_$][\w$]*/g)||[]);
+        const k=classify(b.params[1]);
+        names.forEach(nm=>{if(k)note(nm,k)});
+      }
+      (d.paramNames||[]).forEach((pn,i)=>{
+        const v=b.params[i];
+        if(classify(v)==='ident'){/* the ident inherits nothing new */}
+        if(pn&&/^(x|y|z)$/.test(pn)&&/^[A-Za-z_$][\w$]*$/.test(String(v||'').trim()))note(v,'?');
+      });
+      /* record which names get used in numeric-looking slots */
+      (d.paramNames||[]).forEach((pn,i)=>{
+        const kind=AC_PARAM_KIND[pn]||'';
+        const raw=String(b.params[i]==null?'':b.params[i]).trim();
+        if(!/^[A-Za-z_$][\w$]*$/.test(raw))return;
+        if(kind==='numberValue'||kind==='msNumber'||kind==='unitNumber'||kind==='rateNumber'||
+           kind==='coordX'||kind==='coordY'||kind==='coordZ'||kind==='opacityNumber'||
+           kind==='scaleNumber'||kind==='indexValue'||kind==='levelNumber')note(raw,'num');
+      });
+      walk(b.children,scope);walk(b.children2,scope);
+    });
+  };
+  stacks.forEach(s=>walk(s.blocks,{}));
+  /* variables listed in the sidebar count too, even when never assigned */
+  vars.forEach(v=>{if(!T[v.name])T[v.name]={num:0,str:0,bool:0,list:0,obj:0}});
+  lists.forEach(l=>{note(l.name,'list')});
+  customFns.forEach(f=>{if(!T[f.name])T[f.name]={num:0,str:0,bool:0,list:0,obj:0}});
+  return T;
+}
+/* what a reporter block evaluates to, from its return annotation */
+function acReturnKind(type){
+  const d=defs[type]||{};
+  const r=String(d.returns||'').toLowerCase();
+  if(/^number|boolean\[\]|number\[\]/.test(r))return 'num';
+  if(/^string|'|\"/.test(r))return 'str';
+  if(/^boolean/.test(r))return 'bool';
+  if(/\[\]$/.test(r))return 'list';
+  if(/^\{\}|^object/.test(r))return 'obj';
+  if(/entity|id\b/.test(r))return 'entity';
+  /* fall back to the method-name convention of the API */
+  const n=type;
+  if(/^(getNum|getHealth|getShield|getItem|getCurrency|getInventory|getEffect|getBlockId|getBlockSolidity|calc|getUnit|now$|getLifeformScale)/.test(n))return 'num';
+  if(/^(is|has|can)/.test(n))return 'bool';
+  if(/^(getPlayerIds|getMobIds|getEffects|getEntityIds|getStandardChestItems|getMoonstoneChestItems|getCraftingRecipesForPlayer)/.test(n))return 'list';
+  if(/^(getEntityName|getLobbyName|getLobbyType|getBlockName|getVariation|getItemDropName)/.test(n))return 'str';
+  if(/^(getPosition|getEntityRotation|getBlockCoordinatesPlayerStandingOn|getUnitCoordinates)/.test(n))return 'list';
+  return null;
+}
+/* which families of value a slot accepts */
+function acSlotWants(b,idx){
+  const d=defs[b.type]||{};
+  const pname=(d.paramNames&&d.paramNames[idx])||'';
+  const k=AC_PARAM_KIND[pname];
+  if(!k)return 'any';
+  if(k==='numberValue'||k==='msNumber'||k==='coordX'||k==='coordY'||k==='coordZ'||k==='indexValue'||k==='levelNumber')return 'num';
+  if(k==='unitNumber'||k==='rateNumber'||k==='opacityNumber'||k==='scaleNumber')return 'num';
+  if(k==='stringText'||k==='pathText')return 'str';
+  if(k==='boolValue')return 'bool';
+  if(k==='arrayLiteral')return 'list';
+  if(k==='objectLiteral'||k==='objectKey')return 'obj';
+  if(k==='entityRef')return 'entity';
+  return 'any';
+}
+/* dominant inferred kind of a name */
+function acKindOf(name,types){
+  const t=types[name];
+  if(!t){
+    if(AC_NONNUMERIC_HINT.test(name))return 'str';
+    return AC_NUMERIC_HINT.test(name)?'num':null;
+  }
+  const rank=[['num',t.num],['list',t.list],['obj',t.obj],['str',t.str],['bool',t.bool]];
+  rank.sort((a,b2)=>b2[1]-a[1]);
+  if(rank[0][1]>0)return rank[0][0];
+  if(AC_NONNUMERIC_HINT.test(name))return 'str';
+  return AC_NUMERIC_HINT.test(name)?'num':null;
+}
+/* does a candidate value make sense for a slot family? */
+function acCompatible(item,wants){
+  if(wants==='any')return true;
+  const k=item.kind;
+  if(wants==='num'){
+    if(k==='number')return true;
+    if(k==='variable')return item.vKind==='num'||item.vKind===null;   /* unknown vars still offered, ranked lower */
+    if(k==='template'&&/thisPos\[|getPosition/.test(item.v))return true;
+    if(k==='valueBlock')return AC_RETURN_NUM.test(item.v);
+    return false;
+  }
+  if(wants==='str'){
+    if(k==='enum'||k==='valueBlock')return true;
+    if(k==='variable')return item.vKind==='str'||item.vKind===null;
+    return false;
+  }
+  if(wants==='bool'){
+    if(k==='bool')return true;
+    if(k==='variable')return item.vKind==='bool'||item.vKind===null;
+    if(k==='valueBlock')return /^(is|has|can)/.test(item.v.replace(/^api\./,''));
+    return false;
+  }
+  if(wants==='list'){
+    if(k==='template'||k==='valueBlock')return /\n|\[\]|getPlayerIds|getMobIds|getEffects|getPosition|thisPos/.test(item.v);
+    if(k==='variable')return item.vKind==='list'||item.vKind===null;
+    return false;
+  }
+  if(wants==='obj'){
+    if(k==='template'||k==='objectKey')return true;
+    if(k==='variable')return item.vKind==='obj'||item.vKind===null;
+    return false;
+  }
+  if(wants==='entity'){
+    if(k==='entity'||k==='variable')return true;
+    return false;
+  }
+  return true;
+}
+const AC_RETURN_NUM=/^(getNum|getHealth|getShield|getItem|getCurrency|getInventory|getEffect|getBlockId|getBlockSolidity|calc|getUnit|now|getLifeformScale|getPosition|is|has|can)/;
+
 function acPriority(b,idx){
   const d=defs[b.type]||{};
   const pname=(d.paramNames&&d.paramNames[idx])||'';
@@ -2941,7 +3092,7 @@ function acPriority(b,idx){
 function acCandidates(b,idx){
   const {d,pname,ch}=acContext(b,idx);
   const out=[];
-  const push=(v,kind,hint)=>{if(v!==''&&v!=null)out.push({v:String(v),kind:kind||'value',hint:hint||''})};
+  const push=(v,kind,hint,extra)=>{if(v!==''&&v!=null)out.push(Object.assign({v:String(v),kind:kind||'value',hint:hint||''},extra||{}))};
   /* 0. block-specific vocabularies */
   if(b.type==='callback'&&idx===0){
     eventFns.forEach(f=>push(f[0],'event','event'));
@@ -2987,7 +3138,7 @@ function acCandidates(b,idx){
     return dedupAc(out);
   }
   /* 1. enum given by the block definition */
-  if(ch)acEnum(ch).forEach(v=>push(v,'enum',ch));
+  if(ch)acEnum(ch).forEach(v=>push(v,'enum',ch,{quote:true}));
   /* 2. specialised dynamic cases */
   if(pname==='settingName'||pname==='setting'){
     (pname==='setting'?acEnum('mobSetting'):acEnum('entitySetting')).forEach(v=>push(v,'enum',pname));
@@ -3024,13 +3175,39 @@ function acCandidates(b,idx){
       push('api.getPosition(playerId)['+n+']','template','coordinate');
       ['0','10','32','64'].forEach(v=>push(v,'number',''));
     }
-    else acEnum(kind).forEach(v=>push(v,'enum',kind));
+    else{
+      const qk=AC_QUOTE_KINDS[kind]?'q':null;
+      acEnum(kind).forEach(v=>push(v,'enum',kind,qk?{quote:true}:null));
+    }
   }
-  /* 4. identifiers in scope + declared before */
+  /* 4. project variables first: they are the most useful thing to type,
+        and we know (or guess) their type so numeric slots only show numbers */
+  const wants=acSlotWants(b,idx);
+  const types=acInferTypes();
   const stack=stacks.find(s=>acBlockById(b.id,s.blocks));
   const scope=new Set(acScopeIds(b));
   acDeclaredBefore(b,stack).forEach(n=>scope.add(n));
-  scope.forEach(v=>{if(!AC_JS_KEYWORDS.includes(v))push(v,'variable','scope')});
+  const seenVar=new Set();
+  const pushVar=(name,origin)=>{
+    const n=String(name||'').trim();
+    if(!n||seenVar.has(n)||AC_JS_KEYWORDS.includes(n))return;
+    seenVar.add(n);
+    const k=acKindOf(n,types);
+    out.push({v:n,kind:'variable',hint:k?origin+':'+k:origin,vKind:k});
+  };
+  vars.forEach(v=>pushVar(v.name,'var'));
+  lists.forEach(l=>pushVar(l.name,'list'));
+  scope.forEach(n=>pushVar(n,'scope'));
+  customFns.forEach(f=>pushVar(f.name,'fn'));
+  /* reporter blocks that yield a matching value, only when the slot wants one */
+  if(wants==='num'||wants==='str'||wants==='bool'){
+    Object.keys(defs).forEach(k=>{
+      const dd=defs[k];
+      if(!dd||!dd.valueOnly||!dd.snippet||dd.hidden)return;
+      const rk=dd.valueKind||acReturnKind(k);
+      if(rk===wants||rk===null)push(dd.snippet,'valueBlock',k);
+    });
+  }
   /* 5. free value blocks available in the palette (thisPos, myId, ...) */
   Object.keys(defs).forEach(k=>{
     const dd=defs[k];
@@ -3151,12 +3328,32 @@ function acRender(inp,items,sel){
   const selRow=pop.querySelector('.acItem.sel');
   if(selRow&&selRow.scrollIntoView)selRow.scrollIntoView({block:'nearest'});
 }
+/* a bare word is invalid JS: quote dictionary values on insertion */
+const AC_QUOTE_KINDS={blockName:1,itemName:1,soundName:1,music:1};
+function acNeedsQuotes(it){
+  if(it.quote)return true;
+  if(it.kind==='enum'&&AC_QUOTE_KINDS[it.hint])return true;
+  return false;
+}
+function acQuoteValue(it){
+  const v=String(it.v||'');
+  if(/^(['"`]).*\1$/s.test(v))return v;              /* already a string literal */
+  if(/^-?\d+(\.\d+)?$/.test(v))return v;             /* number */
+  if(/^(true|false|null|undefined)$/.test(v))return v; /* keyword */
+  if(/^[[{()]/.test(v))return v;                       /* template / object / array / call */
+  if(/^[A-Za-z_$][\w$.]*$/.test(v)&&!acNeedsQuotes(it))return v; /* variable, api path, identifier */
+  if(acNeedsQuotes(it))return '"'+v.replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"';
+  return v;                                            /* anything else stays as typed */
+}
 function acAccept(i){
   if(!acState)return;
   const it=acState.items[i];
   if(!it)return;
   const inp=acState.inp;
-  const v=it.v;
+  let v=acQuoteValue(it);
+  /* keep the surrounding quotes if the user is editing an already-quoted string */
+  const cur=String(inp.value||'').trim();
+  if(/^(['"`]).*\1$/s.test(cur)&&!/^(['"`])/.test(v))v=cur[0]+v+cur[0];
   let caret=v.length;
   /* place the caret inside templates: { key:  } -> before the last brace, [..] alike */
   const hole=v.indexOf('  ');
@@ -3201,10 +3398,12 @@ function acUpdate(inp,getBlock,getIdx,commit){
   const caret=inp.selectionStart==null?raw.length:inp.selectionStart;
   const upto=raw.slice(0,caret);
   const text=(upto.match(/[A-Za-z_$.][\w$.:]*$/)||[''])[0];
-  const cands=acCandidates(b,idx),prio=acPriority(b,idx);
+  const cands=acCandidates(b,idx),prio=acPriority(b,idx),wants=acSlotWants(b,idx);
   const items=cands
-    .map(it=>({it,score:acScore(it,text,prio)}))
-    .filter(x=>x.score>=0)
+    .map(it=>({it,score:acScore(it,text,prio)
+        +(it.kind==='variable'?(text?0:1.5):0)
+        +(it.kind==='variable'&&wants!=='any'&&it.vKind!==wants?8:0)}))
+    .filter(x=>x.score>=0&&acCompatible(x.it,wants))
     .sort((a,b2)=>a.score-b2.score||(text?a.it.v.length-b2.it.v.length:0))
     .slice(0,60)
     .map(x=>x.it);
@@ -3214,10 +3413,12 @@ function acUpdate(inp,getBlock,getIdx,commit){
 }
 /* append typed text for tests / programmatic use */
 function acSuggestFor(b,idx,text){
-  const prio=acPriority(b,idx);
+  const prio=acPriority(b,idx),wants=acSlotWants(b,idx);
   return acCandidates(b,idx)
-    .map(it=>({it,score:acScore(it,text||'',prio)}))
-    .filter(x=>x.score>=0)
+    .map(it=>({it,score:acScore(it,text||'',prio)
+        +(it.kind==='variable'?((text||'').length?0:1.5):0)
+        +(it.kind==='variable'&&wants!=='any'&&it.vKind!==wants?8:0)}))
+    .filter(x=>x.score>=0&&acCompatible(x.it,wants))
     .sort((a,b2)=>a.score-b2.score||(text?a.it.v.length-b2.it.v.length:0))
     .map(x=>x.it);
 }
