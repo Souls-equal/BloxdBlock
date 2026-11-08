@@ -224,6 +224,35 @@
     @media(max-width:1020px){header .hbtn span[data-i18n="load"],header .hbtn span[data-i18n="templates"],header .hbtn span[data-i18n="clear"]{display:none}}
     @media(max-width:1050px){#app{--leftW:230px;--codeW:330px}.hint{display:none}}
     @media(max-width:820px){#app{grid-template-columns:1fr}.vResize,aside,#codePanel{display:none}}
+
+    /* ---------- Autocomplete popup ---------- */
+    .acPopup{position:fixed;z-index:9999;display:none;min-width:190px;max-width:min(460px,92vw);overflow:auto;
+      background:var(--panel2);border:1px solid var(--line);border-radius:11px;
+      box-shadow:0 18px 44px rgba(0,0,0,.55);padding:4px;font-family:"JetBrains Mono",Consolas,monospace}
+    body.light .acPopup{background:#fff;border-color:#c8d3ea;box-shadow:0 18px 44px rgba(37,54,90,.22)}
+    .acPopup .acHead{position:sticky;top:0;padding:4px 7px 5px;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+      color:var(--dim);background:inherit;font-family:inherit;font-weight:800}
+    .acItem{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--text);
+      text-align:left;padding:5px 7px;border-radius:7px;cursor:pointer;font:inherit;font-size:11.5px;line-height:1.25}
+    .acItem:hover,.acItem.sel{background:rgba(61,111,255,.18);color:var(--bright)}
+    body.light .acItem:hover,body.light .acItem.sel{background:rgba(61,111,255,.12);color:#111827}
+    .acItem.sel{box-shadow:inset 2px 0 0 var(--blue)}
+    .acVal{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .acKind{flex-shrink:0;font-size:8.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+      padding:2px 5px;border-radius:5px;border:1px solid var(--line);color:var(--dim);max-width:96px;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .acKind.ac-enum{color:#7dd3fc;border-color:rgba(125,211,252,.35)}
+    .acKind.ac-variable{color:#c3e88d;border-color:rgba(195,232,141,.35)}
+    .acKind.ac-function,.acKind.ac-event{color:#ffcb6b;border-color:rgba(255,203,107,.35)}
+    .acKind.ac-entity{color:#f78c6c;border-color:rgba(247,140,108,.35)}
+    .acKind.ac-template,.acKind.ac-objectKey{color:#c792ea;border-color:rgba(199,146,234,.35)}
+    .acKind.ac-valueBlock{color:#89ddff;border-color:rgba(137,221,255,.35)}
+    .acKind.ac-keyword{color:#8b98b8;border-color:rgba(139,152,184,.35)}
+    .acKind.ac-number,.acKind.ac-bool{color:#f2c98a;border-color:rgba(242,201,138,.35)}
+    .acKind.ac-member{color:#a3e635;border-color:rgba(163,230,53,.35)}
+    .acKind.ac-identifier{color:#e0e7f5;border-color:rgba(224,231,245,.3)}
+    @media(max-width:760px){.acPopup{max-width:94vw}}
+
   </style>
 </head>
 <body>
@@ -736,6 +765,12 @@ const API_CHOICES={
  walkingType:choiceList(['walking','running']),
  music:choiceList(['Adigold - A Place To Be Free','Adigold - Butterfly Effect','Adigold - Dreamless Sleep','Adigold - Frozen Pulse','Adigold - Frozen Skies','Adigold - Healing Thoughts','Adigold - Here Forever','Adigold - Just a Little Hope','Adigold - Just Like Heaven','Adigold - Memories Remain','Adigold - North','Adigold - Nowhere','Adigold - Orange Sky','Adigold - Reflections','Adigold - Remember Me','Adigold - Solitude','Adigold - Sunsets','Adigold - Together','Adigold - Warmth','Adigold - Wishful Thinking'])
 };
+/* --- data for autocomplete (bloxd.io/docs block-names, item-names, sounds) --- */
+const BLOCK_LIST=["Dirt","Messy Dirt","Grass Block","Sand","Clay","Gravel","Snow","Maple Log","Pine Log","Plum Log","Cedar Log","Aspen Log","Jungle Log","Maple Wood Planks","Aspen Wood Planks","Plum Wood Planks","Jungle Wood Planks","Pine Wood Planks","Cedar Wood Planks","Barkless Maple Log","Barkless Aspen Log","Barkless Plum Log","Barkless Jungle Log","Barkless Pine Log","Barkless Cedar Log","Stone","Messy Stone","Smooth Stone","Diorite","Smooth Diorite","Andesite","Smooth Andesite","Granite","Smooth Granite","Sandstone","Yellowstone","Coal Ore","Iron Ore","Gold Ore","Lapis Lazuli Ore","Emerald Ore","Diamond Ore","Copper Ore","Voltite Ore","Lunite Ore","Comet Ore","Block of Coal","Block of Iron","Block of Gold","Block of Lapis Lazuli","Block of Emerald","Block of Diamond","Block of Moonstone","Block of Lunite","White Wool","Orange Wool","Magenta Wool","Light Blue Wool","Yellow Wool","Lime Wool","Pink Wool","Gray Wool","Light Gray Wool","Cyan Wool","Purple Wool","Blue Wool","Brown Wool","Green Wool","Red Wool","Black Wool","Baked Clay","White Baked Clay","Orange Baked Clay","Magenta Baked Clay","Light Blue Baked Clay","Yellow Baked Clay","Lime Baked Clay","Pink Baked Clay","Gray Baked Clay","Light Gray Baked Clay","Cyan Baked Clay","Purple Baked Clay","Blue Baked Clay","Brown Baked Clay","Green Baked Clay","Red Baked Clay","Black Baked Clay","Gray Concrete","Light Gray Concrete","Black Concrete","Blue Concrete","Brown Concrete","Cyan Concrete","Light Blue Concrete","Lime Concrete","Magenta Concrete","Orange Concrete","Pink Concrete","Purple Concrete","Red Concrete","White Concrete","Green Concrete","Yellow Concrete","Pine Leaves","Aspen Leaves","Maple Leaves","Jungle Leaves","Plum Leaves","Cedar Leaves","Palm Leaves","Pear Leaves","Cherry Leaves","Mango Leaves","Spectral Leaves","Autumn Maple Leaves","Autumn Aspen Leaves","Fruity Maple Leaves","Watermelon","Glass","Black Glass","Blue Glass","Brown Glass","Cyan Glass","Gray Glass","Light Gray Glass","Green Glass","Light Blue Glass","Lime Glass","Magenta Glass","Orange Glass","Pink Glass","Purple Glass","Red Glass","White Glass","Yellow Glass","Dim Lamp On","Dim Lamp Off","Water","Invisible Solid","Bricks","Stone Bricks","Dark Red Brick","Dark Red Stone","Block of Quartz","Chiseled Block of Quartz","Engraved Stone","Mossy Stone Bricks","Cracked Stone Bricks","Smooth Sandstone","Engraved Sandstone","Ice","Obsidian","Hay Bale","Sponge","Beacon","Golden Decoration","Moonstone Explosive","Bedrock","Cactus","Grass","Dandelion","Poppy","Red Tulip","Pink Tulip","White Tulip","Orange Tulip","Daisy","Bluebell","Forget-me-not","Allium","Azure Bluet","Lily of the Valley","Shadow Rose","Furnace","Workbench","Maple Door","Maple Trapdoor","Aspen Sapling","Maple Sapling","Jungle Sapling","Plum Sapling","Pine Sapling","Cedar Sapling","Chest","Protector","Fat Cactus","Maple Ladder","Vines","Iron Ladder","White Planks","Orange Planks","Magenta Planks","Light Blue Planks","Yellow Planks","Lime Planks","Pink Planks","Gray Planks","Light Gray Planks","Cyan Planks","Purple Planks","Blue Planks","Brown Planks","Green Planks","Red Planks","Black Planks","Artisan Bench","White Ceramic","Orange Ceramic","Magenta Ceramic","Light Blue Ceramic","Yellow Ceramic","Lime Ceramic","Pink Ceramic","Gray Ceramic","Light Gray Ceramic","Cyan Ceramic","Purple Ceramic","Blue Ceramic","Brown Ceramic","Green Ceramic","Red Ceramic","Black Ceramic","Wheat Seeds","Wheat","Tilled Soil","Bread Block","Mossy Messy Stone","White Bed","Orange Bed","Magenta Bed","Light Blue Bed","Yellow Bed","Lime Bed","Pink Bed","Gray Bed","Light Gray Bed","Cyan Bed","Purple Bed","Blue Bed","Brown Bed","Green Bed","Red Bed","Black Bed","Apple Block","Moonstone Ore","Moonstone Chest","Magma","Useless Soil","Marked Sandstone","Red Sandstone","Smooth Red Sandstone","Engraved Red Sandstone","Green Stone","Green Bricks","Dark Green Bricks","Sandstone Bricks","Engraved Diorite","Diorite Bricks","Engraved Andesite","Andesite Bricks","Engraved Granite","Granite Bricks","Ice Bricks","Palm Log","Palm Wood Planks","Palm Sapling","Pine Door","Plum Door","Cedar Door","Aspen Door","Jungle Door","Palm Door","Pine Trapdoor","Plum Trapdoor","Cedar Trapdoor","Aspen Trapdoor","Jungle Trapdoor","Palm Trapdoor","Red Sand","Red Sandstone Bricks","Rocky Dirt","Fallen Maple Leaves","Maple Slab","Pine Slab","Plum Slab","Cedar Slab","Aspen Slab","Jungle Slab","Palm Slab","Dirt Slab","Grass Slab","Messy Stone Slab","Stone Slab","Smooth Stone Slab","Engraved Stone Slab","Stone Bricks Slab","Mossy Stone Slab","Mossy Stone Bricks Slab","Andesite Slab","Diorite Slab","Granite Slab","Sandstone Slab","Bricks Slab","Ice Bricks Slab","Plum Block","Coconut Block","Pear Log","Pear Wood Planks","Pear Sapling","Pear Slab","Pear Block","Compressed Messy Stone","Extra Compressed Messy Stone","Board","Net","Cobweb","Brown Mushroom Block","Red Mushroom Block","Mushroom Stem","Fireball Block","Iceball Block","Watermelon Seeds","Pumpkin Seeds","Pumpkin","Carved Pumpkin","Jack o'Lantern","Melon Seeds","Melon","Iron Watermelon","Potion Table","Pine Ladder","Plum Ladder","Cedar Ladder","Aspen Ladder","Jungle Ladder","Palm Ladder","Pear Ladder","Black Carpet","Blue Carpet","Red Carpet","White Carpet","Bookshelf","Empty Bookshelf","Mailbox","Rice","Cranberries","Red Mushroom","Brown Mushroom","Cotton Seeds","Cotton","Tall Grass","Barkless Palm Log","Barkless Pear Log","Mystery Block","Rocket","Super Rocket","Grenade","Cherry Log","Barkless Cherry Log","Cherry Wood Planks","Cherry Door","Cherry Trapdoor","Cherry Sapling","Cherry Slab","Cherry Ladder","Cherry Block","Bouncy Bomb Block","Obby Rocket","Wood Spikes","Stone Spikes","Iron Spikes","Gold Spikes","Diamond Spikes","Kill Spikes","Corn Block","Corn Seeds","Corn Plant","Loot Chest","Melting Ice","Mushroom","Pumpkin Pie","Nether","Spawn Block","Checkpoint Block","Custom Lobby Block","Goal Block","Finish Block","Drop Location Block","Obby Death Block","Obby Absorb Block","Bone Block","Pig Spawner Block","Cow Spawner Block","Sheep Spawner Block","Cave Golem Spawner Block","Draugr Zombie Spawner Block","Draugr Skeleton Spawner Block","Empty Spawner Block","Frost Golem Spawner Block","Frost Zombie Spawner Block","Frost Skeleton Spawner Block","Snowy Messy Stone","Draugr Knight Spawner Block","Packed Snow","Carved Messy Stone","Spectral Grass","Spectral Log","Spectral Wood Planks","Spectral Door","Spectral Trapdoor","Spectral Sapling","Spectral Slab","Spectral Ladder","Wood Enchanting Table","Stone Enchanting Table","Iron Enchanting Table","Gold Enchanting Table","Diamond Enchanting Table","Pine Grass Block","Pine Grass","Pine Fern","Fallen Pine Cone","Pine Cone Block","Wolf Spawner Block","Bear Spawner Block","Deer Spawner Block","Stag Spawner Block","Bone Antlers","Gold Antlers","Gold Watermelon Stag Spawner Block","Salvaging Table","Chalk","Yellow Chalk","White Chalk","Red Chalk","Blue Chalk","Chalk Bricks","Leaf Bed","Jungle Grass Block","Jungle Tall Grass","Catnip","Mango Log","Mango Wood Planks","Mango Door","Mango Trapdoor","Mango Sapling","Mango Slab","Mango Ladder","Mango Block","Banana Block","Banana Seeds","Dangling Rope","Dangling Vine","Gorilla Spawner Block","Wildcat Spawner Block","Black Portal","Blue Portal","Red Portal","White Portal","Yellow Portal","Leather Block","Horse Spawner Block","Tomato Plant","Carrot Plant","Potato Plant","Strawberry Bush","Sugar Cane Plant","Lettuce Plant","Coffee Plant","Cauliflower Plant","Parsnip Plant","Blueberry Bush","Red Cabbage Plant","Beetroot Plant","Iron Chest","Crate","Carrot Block","Carrot Seeds","Potato Block","Potato Seeds","Beetroot Block","Beetroot Seeds","White Banner","Red Banner","Blue Banner","Green Banner","Black Banner","Draugr Banner","Skull Banner","Rainbow Banner","Spirit Golem Spawner Block","Fertilised Soil","Hollow Crate","Draugr Warper Spawner Block","Radar","Inactive Radar","Active Radar","Lucky Block","Ultra Lucky Block","Gold Trophy","Wood Trophy","Stone Trophy","Iron Trophy","Diamond Trophy","Moonstone Trophy","Weapon Lucky Block","Boiling Pot","Chopping Board","Frying Pan","Kitchen Worktop","Slicing Board","Bin","Vending Machine","Torch","Yellow Torch","Red Torch","Blue Torch","Yellow Neon","White Neon","Red Neon","Blue Neon","Landing Pad","Weak Jump Pad","Jump Pad","Strong Jump Pad","Super Jump Pad","Football","Ghost Chest","Ghost Lucky Block","Glowing Mushroom","Crystal","Slime Trail","Overgrown Grass Block","Smoke Block","Pipe","Auto Miner","Auto Crafter","Rocket Ship","Extractor Pipe","Splitter Pipe","Solar Panel","Wire","Filter Pipe","Merger Pipe","Auto Harvester","Stalker Spawner Block","Slime Spawner Block","Iron Guardian Spawner Block","Gold Guardian Spawner Block","Diamond Guardian Spawner Block","Moonstone Guardian Spawner Block","Dry Grass Block","Dead Bush","Lantern","Lily Pad","Camel Spawner Block","Rare Lucky Block","Super Lucky Block","Building Lucky Block","Armour Lucky Block","Tools Lucky Block","Food Lucky Block","Potion Lucky Block","Block Destroyer TNT","Maple Stairs","Pine Stairs","Plum Stairs","Cedar Stairs","Aspen Stairs","Jungle Stairs","Palm Stairs","Pear Stairs","Cherry Stairs","Spectral Stairs","Mango Stairs","Stone Stairs","Smooth Stone Stairs","Stone Bricks Stairs","Bricks Stairs","Toxic Waste Barrel","Toxic Waste","Ancient Maple Log","Evil Lucky Block","Noticeboard","Standing Noticeboard","Tiki Terror Spawner Block","Maple Fence","Pine Fence","Plum Fence","Cedar Fence","Aspen Fence","Jungle Fence","Palm Fence","Pear Fence","Cherry Fence","Spectral Fence","Mango Fence","Pure Coal Ore","Pure Iron Ore","Pure Gold Ore","Pure Diamond Ore","Pure Moonstone Ore","Maple Fence Gate","Pine Fence Gate","Jungle Fence Gate","Cannon","Crystal Block","Rope Block","Ash","Coal Deposit","Iron Deposit","Stone Deposit","Copper Deposit","Gold Deposit","Homestead Core","Drop Pad","Burner Drill","Crusher","Smelter","Generator","Press","Wire Mill","Conveyor Belt","Splitter","Voltite Deposit","Alloy Kiln","Electric Drill","Assembler","Sorting Gate","Belt Loader","Storage Silo","Charge Vault","Machine Bench","Parts Bench","Tool Bench","Tree Cutter","Volt Engine","Deep Drill","Shatter Mill","Sky Tap","Fast Belt","Charging Pad","Crystal Vat","Starframe","Forge Hopper","Comet Heart","Recycler","Belt Lift","Belt Drop","Crop Harvester","Belt Tunnel","Pure Copper Ore","Pure Voltite Ore","Darkstone","Darkstone Bricks","Engraved Darkstone","Smooth Darkstone","Scorpion Eggs Block","Trading Terminal","Stone Generator","Wheat Helper","Carrot Helper","Melon Helper","Showcase","Code Block","Spawn Block (Red)","Spawn Block (Blue)","Spawn Block (Yellow)","Grenade Launcher","Air","Void","Barrier","Lava","Bed","Door","Trapdoor","Ladder","Stairs","Slab","Fence","Fence Gate","Planks","Log","Leaves","Sapling"];
+const ITEM_LIST=["Wood Pickaxe","Stone Pickaxe","Iron Pickaxe","Gold Pickaxe","Diamond Pickaxe","Moonstone Pickaxe","Golem Pickaxe","Wood Axe","Stone Axe","Iron Axe","Gold Axe","Diamond Axe","Moonstone Axe","Artisan Axe","Wood Spade","Stone Spade","Iron Spade","Gold Spade","Diamond Spade","Wood Sword","Stone Sword","Iron Sword","Gold Sword","Diamond Sword","Knight Sword","Wood Hoe","Stone Hoe","Iron Hoe","Gold Hoe","Diamond Hoe","Flashlight","Mining Helmet","Wood Helmet","Iron Helmet","Gold Helmet","Diamond Helmet","Wood Chestplate","Iron Chestplate","Gold Chestplate","Diamond Chestplate","Fur Chestplate","Wood Leggings","Iron Leggings","Gold Leggings","Diamond Leggings","Wood Boots","Iron Boots","Gold Boots","Diamond Boots","Spiked Boots","Wood Gauntlets","Iron Gauntlets","Gold Gauntlets","Diamond Gauntlets","Military Helmet","Military Chestplate","Military Gauntlets","Military Leggings","Military Boots","White Wood Helmet","White Wood Chestplate","Red Wood Helmet","Blue Wood Helmet","Green Wood Helmet","Black Wood Helmet","Shears","Artisan Shears","Stick","Coal","Raw Iron","Iron Bar","Iron Fragment","Raw Gold","Gold Bar","Gold Fragment","Diamond","Diamond Fragment","Moonstone","Lunite","Moonstone Fragment","Bowl","Bowl of Cranberries","Mushroom Soup","Glowing Soup","Night Vision Soup","Cotton","Gold Crop","Bucket","Water Bucket","Lava Bucket","Boat","Obsidian Boat","Speedboat","Wood Hang Glider","Iron Hang Glider","Gold Hang Glider","Diamond Hang Glider","Hovercraft","Yellow Kart","Red Kart","Blue Kart","Black Kart","Off Roader","Gold Mining Drill","Iron Mining Drill","Diamond Mining Drill","Moonstone Mining Drill","Armored Car","Light Blue Car","Snowball","Snowball Launcher","Pebble","Reinforced Pebble","Bullet","Ball","Reinforced Ball","Frag Grenade","Mining Grenade","Smoke Grenade","Moonstone Orb","Fireball","Bouncy Bomb","RPG","Obby RPG","Super RPG","Iceball","Capitano Grenade","Scatter Pellet","Wood Bow","Stone Bow","Iron Bow","Gold Bow","Diamond Bow","Wood Crossbow","Stone Crossbow","Iron Crossbow","Gold Crossbow","Diamond Crossbow","Wood Crossbow Charged","Diamond Crossbow Charged","Arrow","Compass","Chunk Map","Bread","Bowl of Rice","Apple","Plum","Coconut","Cracked Coconut","Pear","Cherry","Banana","Watermelon Slice","Gold Watermelon Slice","Melon Slice","Gold Melon Slice","Pumpkin Pie","Corn","Cornbread","Chili Pepper","Mango","Carrot","Gold Carrot","Raw Potato","Baked Potato","Beetroot","Raw Porkchop","Cooked Porkchop","Raw Beef","Steak","Raw Mutton","Cooked Mutton","Raw Venison","Cooked Venison","Rotten Flesh","Rotten Brain","Bone","Bone Meal","Leather","Saddle","Spirit Saddle","Fur","Golem Eye","Knight Heart","Teleport Heart","Frost Shard","Molten Cog","Choir Bell","Siege Core","Flywheel","Radiant Spark","Brood Sac","Bandolier","Name Tag","Book","Empty Bottle","Water Bottle","Slowness Potion","Slowness Potion II","Splash Slowness Potion","Poison Potion","Poison Potion II","Splash Poison Potion","Weakness Potion","Weakness Potion II","Instant Damage Potion","Instant Damage Potion II","Milk Potion","Splash Milk Potion","Speed Potion","Speed Potion II","Splash Speed Potion","Defense Potion","Defense Potion II","Splash Defense Potion","Strength Potion","Strength Potion II","Splash Strength Potion","Invisibility Potion","Splash Invisibility Potion","Jump Potion","Jump Potion II","Splash Jump Potion","Knockback Potion","Splash Knockback Potion","Regeneration Potion","Regeneration Potion II","Splash Regeneration Potion","Instant Healing Potion","Instant Healing Potion II","Splash Instant Healing Potion","Haste Potion","Haste Potion II","Splash Haste Potion","Shield Potion","Shield Potion II","Splash Shield Potion","Double Jump Potion","Splash Double Jump Potion","Heat Resistance Potion","Splash Heat Resistance Potion","X-Ray Vision Potion","Splash X-Ray Vision Potion","Mining Yield Potion","Splash Mining Yield Potion","Brain Rot Potion","Splash Brain Rot Potion","Chaos Potion","Teleportation Potion","Ammo","AK-47","M16","MP40","TAR-21","M1911","One Shot Pistol","Double Barrel","AWP","Deagle","Striker-12","VSR","DMR","Minigun","FMR","SKAR","Block-19","Mini Izu","GPMG","Gold Coin","Updraft","Snowdash","Floor Creator","Moonstone Remote Explosive","Moonstone Remote","Ice Bridge","Maple Planks Bridge","Messy Stone Bridge","Yellow Balloon","Red Balloon","Blue Balloon","Yellow Paintball Gun","Red Paintball Gun","Blue Paintball Gun","Yellow Paintball","Red Paintball","Blue Paintball","Yellow Paint Bow","Red Paint Bow","Blue Paint Bow","Pig Spawn Orb","Cow Spawn Orb","Sheep Spawn Orb","Horse Spawn Orb","Camel Spawn Orb","Wolf Spawn Orb","Bear Spawn Orb","Deer Spawn Orb","Stag Spawn Orb","Gorilla Spawn Orb","Frost Golem Spawn Orb","Draugr Zombie Spawn Orb","Draugr Skeleton Spawn Orb","Draugr Knight Spawn Orb","Frost Zombie Spawn Orb","Frost Skeleton Spawn Orb","Magma Golem Spawn Orb","Spirit Golem Spawn Orb","Spirit Wolf Spawn Orb","Spirit Bear Spawn Orb","Spirit Stag Spawn Orb","Spirit Gorilla Spawn Orb","Draugr Warper Spawn Orb","Slime Spawn Orb","Iron Guardian Spawn Orb","Gold Guardian Spawn Orb","Diamond Guardian Spawn Orb","Moonstone Guardian Spawn Orb","NPC Spawn Orb","Tiki Terror Spawn Orb","Crone Spawn Orb","Cactus","Dirt","Grass Block","Stone","Sand","Wood Planks","Glass","Obsidian"];
+const SOUND_LIST=["lavaFlow","crowdAmbience","crowdCheer","refereeWhistle","cryptWhoosh","doorKnock","futureStrangePulse","hauntedHorrorImpact","horrorAccent1","horrorFright","horrorMaleDrone","intensiveRainLoop","metalDoorKnock","ominousBellHit","pulseFromTheDark","suspenseRiser","thunderRain","zapAccent1","zapAccent2","cloth1","cloth2","cloth3","cloth4","glass1","glass2","glass3","grass1","grass2","grass3","grass4","gravel1","gravel2","gravel3","gravel4","pickUp","sand1","sand2","sand3","sand4","snow1","snow2","snow3","snow4","stone1","stone2","stone3","stone4","wood1","wood2","wood3","wood4","caughtFish","reel","game_start_countdown_01","game_start_countdown_02","game_start_countdown_03","game_start_countdown_final","bullet_shell_bounce_general_07","headshot_04","headshot_06","pistol_cock_01","pistol_shot_01","pistol_shot_02","pistol_magazine_load_01","pistol_magazine_unload_01","rifle_cock_01","rifle_shot_01","rifle_shot_02","rifle_magazine_load_01","rifle_magazine_unload_01","semiAuto_cock_01","semiAuto_shot_01","semiAuto_shot_02","semiAuto_magazine_load_01","semiAuto_magazine_unload_01","shotgun_cock_01","shotgun_shot_01","shotgun_shot_02","shotgun_load_bullet_01","submachine_cock_01","submachine_shot_01","submachine_shot_02","submachine_magazine_load_01","submachine_magazine_unload_01","bearRoar1","bearRoar2","bearRoar3","bearRoar4","bearRoar5","catHiss1","catHiss2","catHurt1","catMeow1","catMeow2","catMeow3","catMeow4","catMeow5","cowHurt1","cowMoo1","cowMoo2","cowMoo3","croneAttack1","croneHurt1","croneIdle1","deerGrunt1","deerHurt1","dogBark1","dogBark2","dogBark3","dogGrowl1","dogHurt1","fennecYip1","fennecYip2","golemGrunt1","gorillaIdle1","gorillaRoar1","horseHurt1","horseIdle1","knightGrunt1","pigHurt1","pigOink1","pigOink2","pigOink3","pigOink4","pigOink5","reaverAttack1","reaverGrunt1","sheepBaa1","sheepBaa2","sheepBaa3","sheepHurt1","skeletonRattle1","skeletonRattle2","stagGrunt1","stagHurt1","stalkerAttack1","stalkerIdle1","warperGrunt1","warperPhase1","wraithGrunt1","wraithHurt","ZombieGrunt1","ZombieGrunt2","ZombieGrunt3","ZombieHurt1","ZombieHurt2","bass","bassattack","bd","bigDrumSwish1","bigDrumSwish2","bigDrumSwish3","drumSwish1","drumSwish2","harp_pling","hat","levelup","lowDrum1","lowDrum2","lowDrum3","snare","sonarBeep","trumpetFlare","trumpetNote1","trumpetNote2","trumpetNote3","beep","bow","bucketEmpty1","bucketEmpty2","bucketEmpty3","bucketFill1","bucketFill2","bucketFill3","burp","cannonFire1","cannonFire2","cannonFire3","cashRegister","chestClose","chestOpen","doorClose","doorClose2","doorOpen-bloxd1","doorOpen-bloxd2","drink","eat1","equip_leather1","exp_collect","exp_levelup","fallsmall","fireBurn","firecracker1","firecracker2","firecracker3","firecracker4","hoeTill1","hoeTill2","hoeTill3","hoeTill4","laugh1","laugh2","laugh3","magicAccent1","magicAccent2","magicAccent3","magicAccent4","splash1","successfulBowHit","trapdoorOpen","rpgBeltCloth1","rpgBeltCloth2","rpgBeltHandle1","rpgBeltHandle2","rpgBookClose","rpgBookFlip1","rpgBookFlip2","rpgBookFlip3","rpgBookOpen","rpgBookPlace1","rpgBookPlace2","rpgBookPlace3","rpgChop","rpgCloth1","rpgCloth2","rpgCloth3","rpgCloth4","rpgCreak1","rpgCreak2","rpgCreak3","rpgDoorClose1","rpgDoorClose2","rpgDoorClose3","rpgDoorClose4","rpgDoorOpen1","rpgDoorOpen2","rpgDrawKnife1","rpgDrawKnife2","rpgDrawKnife3","rpgDropLeather","rpgFootstep00","rpgFootstep01","waterfall","splash","explosion","step","hit","hurt","jump","land","click","pop","whoosh","wind","rain","thunder"];
+const MUSIC_LIST=["Adigold - A Place To Be Free","Adigold - Butterfly Effect","Adigold - Dreamless Sleep","Adigold - Frozen Pulse","Adigold - Frozen Skies","Adigold - Healing Thoughts","Adigold - Here Forever","Adigold - Just a Little Hope","Adigold - Just Like Heaven","Adigold - Memories Remain","Adigold - Place To Be","Adigold - The Riverside","Adigold - The Wonder","Adigold - Vetrar (Cut B)","Awkward Comedy Quirky","battle-ship-111902","cdk-Silence-Await","corsairs-studiokolomna-main-version-23542-02-33","ghost-Reverie-small-theme","happy","Heroic-Demise-New","I-am-the-Sea-The-Room-4","Juhani Junkala [Retro Game Music Pack] Ending","Juhani Junkala [Retro Game Music Pack] Level 1","Juhani Junkala [Retro Game Music Pack] Level 2","Juhani Junkala [Retro Game Music Pack] Level 3","Juhani Junkala [Retro Game Music Pack] Title Screen","LonePeakMusic-Highway-1","Mojo Productions - Pirates","Mojo Productions - Sneaky Jazz","Mojo Productions - The Sneaky","Mojo Productions - The Sneaky Jazz","progress","raise-the-sails-152124","ramblinglibrarian-I-Have-Often-T","Slow-Motion-Bensound","snowflake-Ethereal-Space","the-epic-adventure-131399","TownTheme","The Suspense Ambient","Epic1","Epic2","Emotional Epic","Enemy Marked","spooky","Shuffling Crypt","Tower of Doom","Wild Infernos","Molten Rift"];
+
 /* ---------- Helpers used by block definitions ---------- */
 const defOf=t=>defs[t];
 const catOf=id=>cats.find(c=>c.id===id);
@@ -1063,7 +1098,7 @@ const I18N={
   dropHere:'Déposez des blocs ici',duplicate:'Dupliquer',delete:'Supprimer',saved:'Sauvegardé dans ce navigateur.',
   clearConfirm:'Effacer tous les blocs ?',blockSing:'bloc',blockPlur:'blocs',
   codeDrag:'// Glissez des blocs dans l’espace de travail',codeEmpty:'// vide',invalidVar:'// nom de variable invalide',
-  phVar:'nomVariable ou [x, y, z]',phValue:'valeur',phFn:'nomFonction',phArgs:'arg1, arg2',phCallFn:'fonction',phCallArgs:'valeur1, valeur2',
+  phVar:'nomVariable ou [x, y, z]',phValue:'valeur',acOne:'1 suggestion',acMany:'{n} suggestions',phFn:'nomFonction',phArgs:'arg1, arg2',phCallFn:'fonction',phCallArgs:'valeur1, valeur2',
   searchPlaceholder:'Rechercher un bloc… ex: getPlayer',searchHint:'Recherche dans les noms, descriptions et catégories.',
   searchEmpty:'Tapez une recherche pour filtrer les blocs.',searchNoResult:'Aucun bloc trouvé.',
   searchResult:'résultat',searchResults:'résultats',
@@ -1124,7 +1159,7 @@ const I18N={
   dropHere:'Drop blocks here',duplicate:'Duplicate',delete:'Delete',saved:'Saved in this browser.',
   clearConfirm:'Clear all blocks?',blockSing:'block',blockPlur:'blocks',
   codeDrag:'// Drag blocks into the workspace',codeEmpty:'// empty',invalidVar:'// invalid variable name',
-  phVar:'variableName or [x, y, z]',phValue:'value',phFn:'functionName',phArgs:'arg1, arg2',phCallFn:'function',phCallArgs:'value1, value2',
+  phVar:'variableName or [x, y, z]',phValue:'value',acOne:'1 suggestion',acMany:'{n} suggestions',phFn:'functionName',phArgs:'arg1, arg2',phCallFn:'function',phCallArgs:'value1, value2',
   searchPlaceholder:'Search for a block… e.g. getPlayer',searchHint:'Searches names, descriptions and categories.',
   searchEmpty:'Type a search to filter blocks.',searchNoResult:'No block found.',
   searchResult:'result',searchResults:'results',
@@ -1976,6 +2011,7 @@ function valueSlotEl(b,idx,choiceKey){
     inp.oninput=()=>{b.params[idx]=inp.value;inp.size=Math.max(4,Math.min(34,inp.value.length||4));renderCode();updateStats()};
     inp.onchange=()=>{pushUndo();renderAll()};
     inp.onmousedown=e=>e.stopPropagation();
+    acAttach(inp,()=>b,()=>idx,v=>{b.params[idx]=v;inp.size=Math.max(4,Math.min(34,v.length||4));renderCode();updateStats()});
     wrap.append(inp);
   };
   render();
@@ -2037,6 +2073,7 @@ function argsSlotEl(b,idx){
   inp.oninput=()=>{b.params[idx]=inp.value;inp.size=Math.max(8,Math.min(30,inp.value.length||8));renderCode()};
   inp.onchange=()=>pushUndo();
   inp.onmousedown=e=>e.stopPropagation();
+  acAttach(inp,()=>b,()=>idx,v=>{b.params[idx]=v}, {args:true});
   wrap.append(inp);
   return wrap;
 }
@@ -2051,6 +2088,7 @@ function callArgsSlotEl(b,idx){
   inp.oninput=()=>{b.params[idx]=inp.value;inp.size=Math.max(8,Math.min(30,inp.value.length||8));renderCode()};
   inp.onchange=()=>pushUndo();
   inp.onmousedown=e=>e.stopPropagation();
+  acAttach(inp,()=>b,()=>idx,v=>{b.params[idx]=v},{args:true});
   wrap.append(inp);
   return wrap;
 }
@@ -2713,6 +2751,676 @@ function wireToolbar(){
     renderAll();
   });
   window.addEventListener('beforeunload',()=>saveProject(true));
+}
+
+/* ============================================================
+   Autocomplete — contextual suggestions while typing in a slot
+   ============================================================ */
+const AC_JS_KEYWORDS=['true','false','null','undefined','thisPos','playerId','myId','api','Math','JSON','Object','Array','String','Number','parseInt','parseFloat'];
+const AC_METHOD_NAMES=['api.log','api.getPlayerIds','api.getNumPlayers','api.now','api.getPosition','api.getHealth','api.getInventoryItemAmount','api.getHeldItem','api.getBlock','api.setBlock','api.sendMessage','api.broadcastMessage','api.playSound','api.giveItem','api.attemptApplyDamage','api.spawnMob','api.getMobIds','api.getEntityName','api.getLobbyDbValue','api.setLobbyDbValue','api.getPlayerDbValue','api.setPlayerDbValue','api.getCurrencyAmount','api.setCurrencyAmount','api.isAlive'];
+
+/* property dictionary: full dotted paths inside the api object */
+const AC_API_PROPS=(function(){
+  const seen=new Set(), out=[];
+  API_METHODS.forEach(m=>{const p='api.'+m.name;if(!seen.has(p)){seen.add(p);out.push(p)}});
+  ['api.ownerDbId'].forEach(p=>{if(!seen.has(p))out.push(p)});
+  return out.sort();
+})();
+
+/* static enum-ish data for params */
+const AC_DATA={
+  blockName:BLOCK_LIST,
+  itemName:ITEM_LIST,
+  soundName:SOUND_LIST,
+  music:MUSIC_LIST,
+  currencyId:['coins','gems','tokens'],
+  categoryKey:['main','shop','tools','blocks','food','weapons','misc'],
+  itemKey:['item1','item2','item3','item4','item5','item6'],
+  key:['key','name','id','score','coins','level'],
+  stat:['damage','DirtTtb','miningSpeed','durability','attackDamage'],
+  colour:['#22c55e','#3b82f6','#ef4444','#fbbf24','#a78bfa','cyan','red','lime','yellow','orange','white','black'],
+  effectName:EFFECT_NAMES,
+  pose:['standing','sitting','zombie','gliding','driving','sleeping','riding'],
+  cosmeticName:['skin_0_0','wizard','chef','farmer','trader','zombie','general','painter_spencer','piggy_banker','portal_mage','tentacle_girl','tentacle_guy','trader_black','trader_blue','monster_hunter_lorenzo','farmer_gill'],
+  variationName:['default','easy','hard','pvp','parkour'],
+  lobbyName:['lobby','arena','main'],
+  game:['worlds','bloxdhop','peaceful','survival','parkour'],
+  id:['uiRequestId','queuedCommandId','entityId','dbId','playerId','targetId','item1','arrow1'],
+  name:['Speed','mesh','timer','counter','score'],
+  bodyPartHit:['Torso','Head','Legs','Arms'],
+  type:['Box','BloxdBlock','Person','Leaderboard','ParticleEmitter'],
+};
+/* parameter name -> category of suggestion */
+const AC_PARAM_KIND={
+  blockName:'blockName',itemName:'itemName',itemNameOfBlock:'itemName',withItem:'itemName',
+  soundName:'soundName',music:'music',currencyId:'currencyId',categoryKey:'categoryKey',
+  itemKey:'itemKey',key:'key',stat:'stat',colour:'colour',color:'colour',
+  effectName:'effectName',pose:'pose',cosmeticName:'cosmeticName',variationName:'variationName',
+  lobbyName:'lobbyName',game:'game',bodyPartHit:'bodyPartHit',type:'type',
+  dirFacing:'dirVec',direction:'dirVec',dirVec:'dirVec',directionVector:'dirVec',rotation:'dirVec',
+  x:'coordX',y:'coordY',z:'coordZ',pos:'posVec',pos1:'posVec',pos2:'posVec',fromPos:'posVec',toPos:'posVec',chestPos:'posVec',
+  position:'posVec',offset:'offsetVec',respawnPos:'respawnVec',explosionPos:'posVec',
+  coordsToCheck:'coordsVec',minCoords:'minCoords',maxCoords:'maxCoords',chunkPos:'chunkVec',
+  playerId:'entityRef',lifeformId:'entityRef',entityId:'entityRef',eId:'entityRef',
+  mobId:'entityRef',vehicleEId:'entityRef',vehicleId:'entityRef',itemEId:'entityRef',
+  targetedEntityId:'entityRef',targetLifeformId:'entityRef',targetedPlayerId:'entityRef',
+  hitEId:'entityRef',hittingEId:'entityRef',throwerEId:'entityRef',killer:'entityRef',
+  victim:'entityRef',dropperId:'entityRef',initiatorId:'entityRef',initiatorDbId:'entityRef',
+  dbId:'entityRef',relevantPlayerId:'entityRef',predictedBy:'entityRef',clientPredictedBy:'entityRef',
+  exceptPlayerId:'entityRef',whoDidDamage:'entityRef',whoKilled:'entityRef',
+  playerIdOfOpacityPlayer:'entityRef',playerIdWhoViewsOpacityPlayer:'entityRef',
+  playerName:'stringText',message:'stringText',text:'stringText',reason:'stringText',
+  requestText:'stringText',displayName:'stringText',subtext:'stringText',info:'stringText',
+  killerName:'stringText',schematicPath:'pathText',
+  timeoutAfterMs:'msNumber',duration:'msNumber',durationMs:'msNumber',lifetimeMs:'msNumber',
+  timeTillDespawn:'msNumber',atOrAboveLevel:'numberValue',amount:'numberValue',
+  itemAmount:'numberValue',newAmount:'numberValue',value:'numberValue',level:'numberValue',
+  newHealth:'numberValue',newShieldAmount:'numberValue',maxPlayers:'numberValue',
+  softMaxPlayers:'numberValue',idx:'indexValue',newI:'indexValue',itemSlotIndex:'indexValue',
+  seatIndex:'indexValue',volume:'unitNumber',rate:'rateNumber',opacity:'opacityNumber',
+  intensity:'unitNumber',scale:'scaleNumber',zoom:'scaleNumber',explosionStrength:'numberValue',
+  explosionRadius:'numberValue',enchantmentLevel:'levelNumber',addOneToMax:'boolValue',
+  allowInvalidBlock:'boolValue',broadcastLifeformHurt:'boolValue',disable:'boolValue',
+  enabled:'boolValue',hasCeiling:'boolValue',hasFloor:'boolValue',isCrit:'boolValue',
+  mergeItems:'boolValue',returnDefaultIfNotOverridden:'boolValue',showDistance:'boolValue',
+  tellClient:'boolValue',toggle:'boolValue',ignoreProjectiles:'boolValue',
+  includeNewJoiners:'boolValue',increaseMaxHealthIfNeeded:'boolValue',onlyIfNonEmpty:'boolValue',
+  followsPlayerRotation:'boolValue',chargeExpiresAutomatically:'boolValue',
+  opts:'objectLiteral',options:'objectLiteral',config:'objectLiteral',attributes:'objectLiteral',
+  changes:'objectLiteral',metadata:'objectLiteral',parameters:'objectLiteral',params:'objectLiteral',
+  settingsObject:'objectLiteral',extraInfo:'objectLiteral',overrides:'objectLiteral',
+  nodeScales:'objectLiteral',data:'objectLiteral',style:'objectLiteral',physicsOptions:'objectLiteral',
+  item:'objectLiteral',qteParameters:'objectLiteral',animationSchema:'objectLiteral',
+  customEffectInfo:'objectLiteral',updates:'arrayLiteral',recipesForItem:'arrayLiteral',
+  node:'nodeName',setting:'mobSetting',settingName:'entitySetting',settingValue:'entitySettingValue',
+  state:'mobAiState',physicsState:'physicsType',option:'clientOption',cosmeticType:'cosmeticType',
+  mobType:'mobType',vehicleType:'vehicleType',animation:'animationName',eventType:'eventType',
+  eventValue:'eventValue',callbackName:'callbackName',updateType:'updateType',explosionType:'explosionType',
+  respawnPos:'respawnVec'
+};
+/* object literal keys offered per param name */
+const AC_OBJ_KEYS={
+  opts:['spawnerId','volume','rate','playerId','ownerDbId','refDistance','maxHearDist','silent','mergeItems','kind'],
+  options:['refDistance','maxHearDist','rate','playerId','volume'],
+  config:['title','description','icon','order','canBuy','price','currency'],
+  attributes:['damage','durability','attackSpeed','miningSpeed','enchantments','knockback'],
+  changes:['canBuy','price','displayName','icon','amount','available'],
+  metadata:['displayName','lore','customModelData','enchantments'],
+  parameters:['type','title','description','options','timeout','min','max'],
+  physicsOptions:['type','tier','gravityMult','velocityMult','damageMult'],
+  qteParameters:['type','duration','difficulty','label','colour'],
+};
+const AC_ENTITY_REFS=['playerId','entityId','mobId','vehicleEId','itemEId','targetId','audioEId','dbId','null'];
+const AC_ARRAYS={
+  posVec:'[0, 0, 0]',offsetVec:'[0, 1, 0]',respawnVec:'[0, 10, 0]',dirVec:'[0, 0, 1]',
+  coordsVec:'[0, 0, 0]',minCoords:'[0, 0, 0]',maxCoords:'[10, 10, 10]',chunkVec:'[32, 0, 0]'
+};
+
+/* ---------- scope helpers ---------- */
+function acBlockById(id,list){
+  for(const b of list||[]){
+    if(b.id===id)return b;
+    const r=acBlockById(id,b.children)||acBlockById(id,b.children2);
+    if(r)return r;
+  }
+  return null;
+}
+function acAncestors(targetId,list,chain){
+  chain=chain||[];
+  for(const b of list||[]){
+    if(b.id===targetId)return chain;
+    const r=acAncestors(targetId,b.children,chain.concat(b))||acAncestors(targetId,b.children2,chain.concat(b));
+    if(r)return r;
+  }
+  return null;
+}
+/* identifiers visible where block b sits: globals + locals introduced by ancestor hats and loops */
+function acScopeIds(b){
+  const ids=new Set();
+  const add=v=>{const s=String(v||'').trim();if(/^[A-Za-z_$][\w$]*$/.test(s))ids.add(s)};
+  vars.forEach(v=>add(v.name));
+  lists.forEach(l=>add(l.name));
+  customFns.forEach(f=>add(f.name));
+  add('thisPos');add('playerId');add('myId');add('api');
+  const chain=b?acAncestors(b.id,(stacks.find(s=>acBlockById(b.id,s.blocks))||{}).blocks||[]):[];
+  (chain||[]).forEach(a=>{
+    const d=defs[a.type]||{};
+    if(a.type==='callback'){
+      fnParams(String(a.params[0]||'')).forEach(add);
+    }else if(a.type==='func'){
+      parseArgs(a.params[1]).forEach(add);
+    }else if(a.type==='forOf'||a.type==='forIn'){
+      add(a.params[0]);
+    }else if(a.type==='tryCatch'&&a.children2&&a.children2.some(x=>x.id===b.id)){
+      add(a.params[0]);
+    }
+  });
+  return [...ids];
+}
+/* local variables declared before the block, anywhere in the same stack */
+function acDeclaredBefore(b,stack){
+  const out=[];
+  if(!stack)return out;
+  const walk=(list)=>{
+    for(const x of list||[]){
+      if(x.id===b.id)return true;
+      if(x.type==='assign'){const raw=String(x.params[0]||'');const m=raw.match(/[A-Za-z_$][\w$]*/g)||[];m.forEach(n=>out.push(n))}
+      if(walk(x.children))return true;
+      if(walk(x.children2))return true;
+    }
+    return false;
+  };
+  walk(stack.blocks);
+  return out;
+}
+/* ---------- suggestion surface for a slot ---------- */
+function acContext(b,idx){
+  const d=defs[b.type]||{};
+  const pname=(d.paramNames&&d.paramNames[idx])||'';
+  const ch=(d.choices&&d.choices[idx])||null;
+  return {d,pname,ch};
+}
+function acEnum(kind){
+  if(API_CHOICES[kind])return API_CHOICES[kind].map(o=>unq(o.value));
+  if(kind==='entitySettingValue')return [];
+  if(AC_DATA[kind])return AC_DATA[kind].slice();
+  return [];
+}
+/* all candidates for (block, param index), as {v,label,kind,hint} */
+
+/* ---------- variable typing ----------
+   We do not have declared types, so we infer from how each name is used:
+   numbers, text, booleans, lists, objects, entities, or unknown.
+   Inference scans every assignment / call argument in the project.        */
+const AC_NUMERIC_HINT=/^(x|y|z|i|n|j|k|t|amount|value|count|score|coins|health|level|speed|volume|rate|duration|total|num|number|index|idx|radius|distance|height|width|timer|progress|damage|price|id|ticks|ms|delta|strength|power|hp|mana|xp|exp|coins|points|kills|deaths|wins|losses)$/i;
+/* names that read like text/booleans/collections: never offered for a number slot */
+const AC_NONNUMERIC_HINT=/(name|label|text|message|title|desc|key|word|str|reason|type|kind|colour|color|icon|path|url|prefix|suffix|tag|id)$|^(is|has|can|should|was|did|will|allow|enable|disable|show|hide)/i;
+function acInferTypes(){
+  const T={};
+  const note=(name,kind)=>{name=String(name||'').trim();if(!/^[A-Za-z_$][\w$]*$/.test(name))return;
+    if(!T[name])T[name]={num:0,str:0,bool:0,list:0,obj:0};
+    if(kind&&T[name][kind]!==undefined)T[name][kind]++};
+  const classify=v=>{
+    if(v&&typeof v==='object'){
+      if(v.__value==='list')return 'list';
+      if(v.__value==='object')return 'obj';
+      if(v.type&&defs[v.type]&&defs[v.type].expr)return acReturnKind(v.type);
+      return null;
+    }
+    const raw=String(v??'').trim();
+    if(!raw)return null;
+    if(/^\[/.test(raw))return 'list';
+    if(/^\{/.test(raw))return 'obj';
+    if(/^(true|false)$/.test(raw))return 'bool';
+    if(/^-?\d+(\.\d+)?$/.test(raw))return 'num';
+    if(/^(['"`]).*\1$/s.test(raw))return 'str';
+    if(/^[A-Za-z_$][\w$]*$/.test(raw))return 'ident';
+    return null;
+  };
+  const walk=(list,scope)=>{
+    (list||[]).forEach(b=>{
+      const d=defs[b.type]||{};
+      /* local numeric loop counters */
+      if(b.type==='repeat')note(scope['_i'],'num');
+      if(b.type==='assign'){
+        const names=(String(b.params[0]||'').match(/[A-Za-z_$][\w$]*/g)||[]);
+        const k=classify(b.params[1]);
+        names.forEach(nm=>{if(k)note(nm,k)});
+      }
+      (d.paramNames||[]).forEach((pn,i)=>{
+        const v=b.params[i];
+        if(classify(v)==='ident'){/* the ident inherits nothing new */}
+        if(pn&&/^(x|y|z)$/.test(pn)&&/^[A-Za-z_$][\w$]*$/.test(String(v||'').trim()))note(v,'?');
+      });
+      /* record which names get used in numeric-looking slots */
+      (d.paramNames||[]).forEach((pn,i)=>{
+        const kind=AC_PARAM_KIND[pn]||'';
+        const raw=String(b.params[i]==null?'':b.params[i]).trim();
+        if(!/^[A-Za-z_$][\w$]*$/.test(raw))return;
+        if(kind==='numberValue'||kind==='msNumber'||kind==='unitNumber'||kind==='rateNumber'||
+           kind==='coordX'||kind==='coordY'||kind==='coordZ'||kind==='opacityNumber'||
+           kind==='scaleNumber'||kind==='indexValue'||kind==='levelNumber')note(raw,'num');
+      });
+      walk(b.children,scope);walk(b.children2,scope);
+    });
+  };
+  stacks.forEach(s=>walk(s.blocks,{}));
+  /* variables listed in the sidebar count too, even when never assigned */
+  vars.forEach(v=>{if(!T[v.name])T[v.name]={num:0,str:0,bool:0,list:0,obj:0}});
+  lists.forEach(l=>{note(l.name,'list')});
+  customFns.forEach(f=>{if(!T[f.name])T[f.name]={num:0,str:0,bool:0,list:0,obj:0}});
+  return T;
+}
+/* what a reporter block evaluates to, from its return annotation */
+function acReturnKind(type){
+  const d=defs[type]||{};
+  const r=String(d.returns||'').toLowerCase();
+  if(/^number|boolean\[\]|number\[\]/.test(r))return 'num';
+  if(/^string|'|\"/.test(r))return 'str';
+  if(/^boolean/.test(r))return 'bool';
+  if(/\[\]$/.test(r))return 'list';
+  if(/^\{\}|^object/.test(r))return 'obj';
+  if(/entity|id\b/.test(r))return 'entity';
+  /* fall back to the method-name convention of the API */
+  const n=type;
+  if(/^(getNum|getHealth|getShield|getItem|getCurrency|getInventory|getEffect|getBlockId|getBlockSolidity|calc|getUnit|now$|getLifeformScale)/.test(n))return 'num';
+  if(/^(is|has|can)/.test(n))return 'bool';
+  if(/^(getPlayerIds|getMobIds|getEffects|getEntityIds|getStandardChestItems|getMoonstoneChestItems|getCraftingRecipesForPlayer)/.test(n))return 'list';
+  if(/^(getEntityName|getLobbyName|getLobbyType|getBlockName|getVariation|getItemDropName)/.test(n))return 'str';
+  if(/^(getPosition|getEntityRotation|getBlockCoordinatesPlayerStandingOn|getUnitCoordinates)/.test(n))return 'list';
+  return null;
+}
+/* which families of value a slot accepts */
+function acSlotWants(b,idx){
+  const d=defs[b.type]||{};
+  const pname=(d.paramNames&&d.paramNames[idx])||'';
+  const k=AC_PARAM_KIND[pname];
+  if(!k)return 'any';
+  if(k==='numberValue'||k==='msNumber'||k==='coordX'||k==='coordY'||k==='coordZ'||k==='indexValue'||k==='levelNumber')return 'num';
+  if(k==='unitNumber'||k==='rateNumber'||k==='opacityNumber'||k==='scaleNumber')return 'num';
+  if(k==='stringText'||k==='pathText')return 'str';
+  if(k==='boolValue')return 'bool';
+  if(k==='arrayLiteral')return 'list';
+  if(k==='objectLiteral'||k==='objectKey')return 'obj';
+  if(k==='entityRef')return 'entity';
+  return 'any';
+}
+/* dominant inferred kind of a name */
+function acKindOf(name,types){
+  const t=types[name];
+  if(!t){
+    if(AC_NONNUMERIC_HINT.test(name))return 'str';
+    return AC_NUMERIC_HINT.test(name)?'num':null;
+  }
+  const rank=[['num',t.num],['list',t.list],['obj',t.obj],['str',t.str],['bool',t.bool]];
+  rank.sort((a,b2)=>b2[1]-a[1]);
+  if(rank[0][1]>0)return rank[0][0];
+  if(AC_NONNUMERIC_HINT.test(name))return 'str';
+  return AC_NUMERIC_HINT.test(name)?'num':null;
+}
+/* does a candidate value make sense for a slot family? */
+function acCompatible(item,wants){
+  if(wants==='any')return true;
+  const k=item.kind;
+  if(wants==='num'){
+    if(k==='number')return true;
+    if(k==='variable')return item.vKind==='num'||item.vKind===null;   /* unknown vars still offered, ranked lower */
+    if(k==='template'&&/thisPos\[|getPosition/.test(item.v))return true;
+    if(k==='valueBlock')return AC_RETURN_NUM.test(item.v);
+    return false;
+  }
+  if(wants==='str'){
+    if(k==='enum'||k==='valueBlock')return true;
+    if(k==='variable')return item.vKind==='str'||item.vKind===null;
+    return false;
+  }
+  if(wants==='bool'){
+    if(k==='bool')return true;
+    if(k==='variable')return item.vKind==='bool'||item.vKind===null;
+    if(k==='valueBlock')return /^(is|has|can)/.test(item.v.replace(/^api\./,''));
+    return false;
+  }
+  if(wants==='list'){
+    if(k==='template'||k==='valueBlock')return /\n|\[\]|getPlayerIds|getMobIds|getEffects|getPosition|thisPos/.test(item.v);
+    if(k==='variable')return item.vKind==='list'||item.vKind===null;
+    return false;
+  }
+  if(wants==='obj'){
+    if(k==='template'||k==='objectKey')return true;
+    if(k==='variable')return item.vKind==='obj'||item.vKind===null;
+    return false;
+  }
+  if(wants==='entity'){
+    if(k==='entity'||k==='variable')return true;
+    return false;
+  }
+  return true;
+}
+const AC_RETURN_NUM=/^(getNum|getHealth|getShield|getItem|getCurrency|getInventory|getEffect|getBlockId|getBlockSolidity|calc|getUnit|now|getLifeformScale|getPosition|is|has|can)/;
+
+function acPriority(b,idx){
+  const d=defs[b.type]||{};
+  const pname=(d.paramNames&&d.paramNames[idx])||'';
+  const ch=(d.choices&&d.choices[idx])||null;
+  if(b.type==='callback'||b.type==='call'||b.type==='func')return 0;
+  if(ch)return 0;
+  const k=AC_PARAM_KIND[pname];
+  if(!k)return 3;
+  if(k==='keyword')return 3;
+  return 0;   /* a known dictionary/enum beats generic value hints */
+}
+function acCandidates(b,idx){
+  const {d,pname,ch}=acContext(b,idx);
+  const out=[];
+  const push=(v,kind,hint,extra)=>{if(v!==''&&v!=null)out.push(Object.assign({v:String(v),kind:kind||'value',hint:hint||''},extra||{}))};
+  /* 0. block-specific vocabularies */
+  if(b.type==='callback'&&idx===0){
+    eventFns.forEach(f=>push(f[0],'event','event'));
+    return dedupAc(out);
+  }
+  if(b.type==='func'&&idx===0){
+    push('myFunction','identifier','');push('tick','identifier','');push('onStart','identifier','');
+    customFns.forEach(f=>push(f.name,'identifier',''));
+    return dedupAc(out);
+  }
+  if(b.type==='call'&&idx===0){
+    customFns.forEach(f=>push(f.name,'function','mine'));
+    acLocalFnNames().forEach(v=>push(v,'function','mine'));
+    ['myFunction','tick','onStart'].forEach(v=>push(v,'function',''));
+    return dedupAc(out);
+  }
+  if(b.type==='call'&&idx===1){
+    const fname=String(b.params[0]||'').trim();
+    const ps=(customFns.find(c=>c.name===fname)||{}).params;
+    (ps?parseArgs(ps):[]).forEach(v=>push(v,'variable','arg'));
+    acScopeIds(b).forEach(v=>push(v,'variable','scope'));
+    return dedupAc(out);
+  }
+  if(b.type==='assign'&&idx===0){
+    vars.forEach(v=>push(v.name,'variable','variable'));
+    lists.forEach(l=>push(l.name,'variable','list'));
+    push('myVar','identifier','');push('[x, y, z]','identifier','destructure');
+    return dedupAc(out);
+  }
+  if(b.type==='assign'&&idx===2){['var','let','const'].forEach(v=>push(v,'keyword','kind'));return dedupAc(out)}
+  if((b.type==='forOf'||b.type==='forIn')&&idx===0){
+    ['item','entry','value','key','index','element'].forEach(v=>push(v,'identifier','loop variable'));
+    vars.forEach(v=>push(v.name,'variable','variable'));
+    return dedupAc(out);
+  }
+  if((b.type==='listAdd'||b.type==='listRemove'||b.type==='listClear'||b.type==='listLength'||b.type==='listGet'||b.type==='listJoin')&&idx===0){
+    lists.forEach(l=>push(l.name,'variable','list'));
+    vars.forEach(v=>push(v.name,'variable','variable'));
+    return dedupAc(out);
+  }
+  if(b.type==='func'&&idx===1){
+    push('a, b','identifier','params');push('value','identifier','params');push('playerId','identifier','params');
+    return dedupAc(out);
+  }
+  /* 1. enum given by the block definition */
+  if(ch)acEnum(ch).forEach(v=>push(v,'enum',ch,{quote:true}));
+  /* 2. specialised dynamic cases */
+  if(pname==='settingName'||pname==='setting'){
+    (pname==='setting'?acEnum('mobSetting'):acEnum('entitySetting')).forEach(v=>push(v,'enum',pname));
+  }
+  if(pname==='blockId'||pname==='blockName'){}
+  /* 3. param-name driven dictionaries */
+  const kind=AC_PARAM_KIND[pname];
+  if(kind){
+    if(kind==='entityRef')AC_ENTITY_REFS.forEach(v=>push(v,'entity',''));
+    else if(kind==='posVec'||kind==='offsetVec'||kind==='respawnVec'||kind==='dirVec'||kind==='coordsVec'||kind==='minCoords'||kind==='maxCoords'||kind==='chunkVec'){
+      push(AC_ARRAYS[kind],'template',kind);
+      if(pname==='pos'||pname==='position')push('thisPos','global','');
+    }
+    else if(kind==='objectLiteral'){
+      push('{}','template','object');
+      (AC_OBJ_KEYS[pname]||[]).forEach(k=>push('{ '+k+':  }','objectKey',k));
+    }
+    else if(kind==='boolValue'){push('true','bool','');push('false','bool','')}
+    else if(kind==='msNumber'){['0','100','250','500','1000','2000','5000','10000'].forEach(v=>push(v,'number','ms'))}
+    else if(kind==='unitNumber'){['0','0.25','0.5','1'].forEach(v=>push(v,'number',''))}
+    else if(kind==='rateNumber'){['0.5','1','1.5','2'].forEach(v=>push(v,'number','rate'))}
+    else if(kind==='opacityNumber'){['0','0.25','0.5','0.75','1'].forEach(v=>push(v,'number',''))}
+    else if(kind==='scaleNumber'){['0.5','1','1.5','2','5'].forEach(v=>push(v,'number',''))}
+    else if(kind==='levelNumber'){['1','2','3','4','5'].forEach(v=>push(v,'number',''))}
+    else if(kind==='indexValue'){['0','1','2','3','4'].forEach(v=>push(v,'number','index'))}
+    else if(kind==='numberValue'){
+      if(/amount|value|strength|radius/i.test(pname))['1','5','10','100'].forEach(v=>push(v,'number',''));
+    }
+    else if(kind==='stringText'){}
+    else if(kind==='arrayLiteral'){push('[]','template','array')}
+    else if(kind==='coordX'||kind==='coordY'||kind==='coordZ'){
+      const n={coordX:0,coordY:1,coordZ:2}[kind];
+      push('thisPos['+n+']','template','coordinate');
+      push('api.getPosition(playerId)['+n+']','template','coordinate');
+      ['0','10','32','64'].forEach(v=>push(v,'number',''));
+    }
+    else{
+      const qk=AC_QUOTE_KINDS[kind]?'q':null;
+      acEnum(kind).forEach(v=>push(v,'enum',kind,qk?{quote:true}:null));
+    }
+  }
+  /* 4. project variables first: they are the most useful thing to type,
+        and we know (or guess) their type so numeric slots only show numbers */
+  const wants=acSlotWants(b,idx);
+  const types=acInferTypes();
+  const stack=stacks.find(s=>acBlockById(b.id,s.blocks));
+  const scope=new Set(acScopeIds(b));
+  acDeclaredBefore(b,stack).forEach(n=>scope.add(n));
+  const seenVar=new Set();
+  const pushVar=(name,origin)=>{
+    const n=String(name||'').trim();
+    if(!n||seenVar.has(n)||AC_JS_KEYWORDS.includes(n))return;
+    seenVar.add(n);
+    const k=acKindOf(n,types);
+    out.push({v:n,kind:'variable',hint:k?origin+':'+k:origin,vKind:k});
+  };
+  vars.forEach(v=>pushVar(v.name,'var'));
+  lists.forEach(l=>pushVar(l.name,'list'));
+  scope.forEach(n=>pushVar(n,'scope'));
+  customFns.forEach(f=>pushVar(f.name,'fn'));
+  /* reporter blocks that yield a matching value, only when the slot wants one */
+  if(wants==='num'||wants==='str'||wants==='bool'){
+    Object.keys(defs).forEach(k=>{
+      const dd=defs[k];
+      if(!dd||!dd.valueOnly||!dd.snippet||dd.hidden)return;
+      const rk=dd.valueKind||acReturnKind(k);
+      if(rk===wants||rk===null)push(dd.snippet,'valueBlock',k);
+    });
+  }
+  /* 5. free value blocks available in the palette (thisPos, myId, ...) */
+  Object.keys(defs).forEach(k=>{
+    const dd=defs[k];
+    if(dd&&dd.valueOnly&&dd.snippet&&!dd.hidden)push(dd.snippet,'valueBlock',k);
+  });
+  /* 6. list helpers when the param looks like a list access */
+  if(/List|list/.test(pname)){
+    lists.forEach(l=>{
+      push(l.name,'variable','');
+      push(l.name+'.length','member','list');
+      push(l.name+'.push(','member','list');
+      push(l.name+'.join(", ")','member','list');
+    });
+  }
+  /* 6b. callable helpers for plain value slots: api.* methods and free functions */
+  if(!pname||pname==='value'||pname==='defaultValue'||(!d.api&&!pname)){
+    AC_API_PROPS.forEach(v=>push(v,'function','api'));
+    customFns.forEach(f=>push(f.name+'()','function','mine'));
+    acLocalFnNames().forEach(v=>push(v+'()','function','mine'));
+  }
+  /* 7. javascript keywords */
+  AC_JS_KEYWORDS.forEach(v=>push(v,'keyword',''));
+    return dedupAc(out);
+}
+function dedupAc(out){
+  const seen=new Set(),fin=[];
+  out.forEach(o=>{if(o.v!==''&&!seen.has(o.v)){seen.add(o.v);fin.push(o)}});
+  return fin;
+}
+/* how strongly a candidate matches the typed text; -1 = no match */
+const AC_KIND_RANK={enum:0,variable:1,event:2,function:3,identifier:4,number:6,bool:7,member:8,template:9,objectKey:10,entity:11,valueBlock:12,keyword:30,value:40};
+function acScore(item,text,prio){
+  if(prio===undefined)prio=3;
+  if(!text){
+    const r=AC_KIND_RANK[item.kind]!==undefined?AC_KIND_RANK[item.kind]:20;
+    /* when the param has a dictionary, its items outrank generic hints */
+    if(prio===0&&item.kind==='keyword')return 100;
+    if(prio===0&&(item.kind==='valueBlock'))return 90;
+    return r;
+  }
+  const v=item.v.toLowerCase(), t=text.toLowerCase();
+  if(v===t)return 0;
+  if(v.startsWith(t))return 1;
+  /* match on the last path segment: api.moduleThing -> 'Thing' */
+  const seg=v.split(/[.\s]/).pop();
+  if(seg&&seg.startsWith(t))return 2;
+  const idx=v.indexOf(t);
+  if(idx>0){
+    /* prefer matches right after a dot or at a word boundary */
+    const prev=v[idx-1];
+    if(prev==='.'||prev===' '||prev==='{')return 3;
+    return 5+idx/1000;
+  }
+  /* initials match: camelCase ("gpi" -> getPlayerIds) and word initials ("gb" -> Grass Block) */
+  if(t.length>=2){
+    const camel=/[a-z][A-Z]/.test(v);
+    const words=v.replace(/([a-z0-9])([A-Z])/g,'$1 $2').split(/[\s_.]+/).filter(Boolean);
+    const ini=words.map(x=>x[0]).join('');
+    if(ini.startsWith(t))return (camel?12:14)+t.length/100;
+  }
+  return -1;
+}
+
+function acLocalFnNames(){
+  const out=[];
+  const walk=list=>(list||[]).forEach(x=>{
+    if(x.type==='func'){const n=String(x.params[0]||'').trim();if(n)out.push(n)}
+    walk(x.children);walk(x.children2);
+  });
+  stacks.forEach(s=>walk(s.blocks));
+  return [...new Set(out)];
+}
+/* ---------- popup ---------- */
+let acState=null;
+function acPopup(){
+  let el=document.getElementById('acPopup');
+  if(!el){el=document.createElement('div');el.id='acPopup';el.className='acPopup';document.body.append(el)}
+  return el;
+}
+function acHide(){
+  acState=null;
+  const el=document.getElementById('acPopup');
+  if(el)el.style.display='none';
+}
+function acRender(inp,items,sel){
+  const pop=acPopup();
+  pop.innerHTML='';
+  const head=document.createElement('div');
+  head.className='acHead';
+  head.textContent=(items.length===1?fmtTpl('acOne',{'n':items.length}):fmtTpl('acMany',{'n':items.length}));
+  pop.append(head);
+  items.forEach((it,i)=>{
+    const row=document.createElement('button');
+    row.type='button';
+    row.className='acItem'+(i===sel?' sel':'');
+    row.dataset.i=String(i);
+    const k=document.createElement('span');
+    k.className='acKind ac-'+it.kind;
+    k.textContent=it.hint||it.kind;
+    const v=document.createElement('span');
+    v.className='acVal';
+    v.textContent=it.v;
+    row.append(k,v);
+    row.addEventListener('mousedown',e=>{e.preventDefault()});
+    row.addEventListener('click',e=>{e.preventDefault();acAccept(i)});
+    pop.append(row);
+  });
+  const rect=inp.getBoundingClientRect();
+  const maxH=Math.min(268,window.innerHeight-24);
+  pop.style.display='block';
+  pop.style.maxHeight=maxH+'px';
+  /* place under the input, flip above when there is no room */
+  const below=window.innerHeight-rect.bottom, above=rect.top;
+  pop.style.minWidth=Math.max(rect.width,190)+'px';
+  if(below<maxH&&above>below){pop.style.top=(rect.top-pop.offsetHeight-4)+'px'}
+  else{pop.style.top=(rect.bottom+4)+'px'}
+  pop.style.left=Math.max(6,Math.min(rect.left,window.innerWidth-pop.offsetWidth-6))+'px';
+  const selRow=pop.querySelector('.acItem.sel');
+  if(selRow&&selRow.scrollIntoView)selRow.scrollIntoView({block:'nearest'});
+}
+/* a bare word is invalid JS: quote dictionary values on insertion */
+const AC_QUOTE_KINDS={blockName:1,itemName:1,soundName:1,music:1};
+function acNeedsQuotes(it){
+  if(it.quote)return true;
+  if(it.kind==='enum'&&AC_QUOTE_KINDS[it.hint])return true;
+  return false;
+}
+function acQuoteValue(it){
+  const v=String(it.v||'');
+  if(/^(['"`]).*\1$/s.test(v))return v;              /* already a string literal */
+  if(/^-?\d+(\.\d+)?$/.test(v))return v;             /* number */
+  if(/^(true|false|null|undefined)$/.test(v))return v; /* keyword */
+  if(/^[[{()]/.test(v))return v;                       /* template / object / array / call */
+  if(/^[A-Za-z_$][\w$.]*$/.test(v)&&!acNeedsQuotes(it))return v; /* variable, api path, identifier */
+  if(acNeedsQuotes(it))return '"'+v.replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"';
+  return v;                                            /* anything else stays as typed */
+}
+function acAccept(i){
+  if(!acState)return;
+  const it=acState.items[i];
+  if(!it)return;
+  const inp=acState.inp;
+  let v=acQuoteValue(it);
+  /* keep the surrounding quotes if the user is editing an already-quoted string */
+  const cur=String(inp.value||'').trim();
+  if(/^(['"`]).*\1$/s.test(cur)&&!/^(['"`])/.test(v))v=cur[0]+v+cur[0];
+  let caret=v.length;
+  /* place the caret inside templates: { key:  } -> before the last brace, [..] alike */
+  const hole=v.indexOf('  ');
+  if(hole>=0)caret=hole+1;
+  inp.value=v;
+  inp.setSelectionRange(caret,caret);
+  acState.commit(inp.value);
+  acHide();
+  inp.focus();
+}
+/* wire an <input> so it offers contextual completions */
+function acAttach(inp,getBlock,getIdx,commit,opts){
+  opts=opts||{};
+  inp.setAttribute('autocomplete','off');
+  inp.setAttribute('spellcheck','false');
+  inp.addEventListener('input',()=>{
+    if(inp.value.length<1){acHide();return}
+    acUpdate(inp,getBlock,getIdx,commit);
+  });
+  inp.addEventListener('keydown',e=>{
+    /* ArrowDown on an empty field opens the full list for that slot */
+    if(e.key==='ArrowDown'&&(!acState||acState.inp!==inp)){
+      e.preventDefault();
+      acUpdate(inp,getBlock,getIdx,commit);
+      return;
+    }
+    if(!acState||acState.inp!==inp)return;
+    const n=acState.items.length;
+    if(e.key==='ArrowDown'){e.preventDefault();acState.sel=(acState.sel+1)%n;acRender(inp,acState.items,acState.sel)}
+    else if(e.key==='ArrowUp'){e.preventDefault();acState.sel=(acState.sel-1+n)%n;acRender(inp,acState.items,acState.sel)}
+    else if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();e.stopPropagation();acAccept(acState.sel)}
+    else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();acHide()}
+  });
+  inp.addEventListener('blur',()=>setTimeout(()=>{if(acState&&acState.inp===inp)acHide()},120));
+  return inp;
+}
+function acUpdate(inp,getBlock,getIdx,commit){
+  const b=getBlock(),idx=getIdx();
+  if(!b)return;
+  const raw=inp.value;
+  /* only complete the token under the caret's line start */
+  const caret=inp.selectionStart==null?raw.length:inp.selectionStart;
+  const upto=raw.slice(0,caret);
+  const text=(upto.match(/[A-Za-z_$.][\w$.:]*$/)||[''])[0];
+  const cands=acCandidates(b,idx),prio=acPriority(b,idx),wants=acSlotWants(b,idx);
+  const items=cands
+    .map(it=>({it,score:acScore(it,text,prio)
+        +(it.kind==='variable'?(text?0:1.5):0)
+        +(it.kind==='variable'&&wants!=='any'&&it.vKind!==wants?8:0)}))
+    .filter(x=>x.score>=0&&acCompatible(x.it,wants))
+    .sort((a,b2)=>a.score-b2.score||(text?a.it.v.length-b2.it.v.length:0))
+    .slice(0,60)
+    .map(x=>x.it);
+  if(!items.length){acHide();return}
+  acState={inp,items,sel:0,commit,text};
+  acRender(inp,items,0);
+}
+/* append typed text for tests / programmatic use */
+function acSuggestFor(b,idx,text){
+  const prio=acPriority(b,idx),wants=acSlotWants(b,idx);
+  return acCandidates(b,idx)
+    .map(it=>({it,score:acScore(it,text||'',prio)
+        +(it.kind==='variable'?((text||'').length?0:1.5):0)
+        +(it.kind==='variable'&&wants!=='any'&&it.vKind!==wants?8:0)}))
+    .filter(x=>x.score>=0&&acCompatible(x.it,wants))
+    .sort((a,b2)=>a.score-b2.score||(text?a.it.v.length-b2.it.v.length:0))
+    .map(x=>x.it);
 }
 
 /* ============================================================
