@@ -225,6 +225,43 @@
     @media(max-width:1050px){#app{--leftW:230px;--codeW:330px}.hint{display:none}}
     @media(max-width:820px){#app{grid-template-columns:1fr}.vResize,aside,#codePanel{display:none}}
 
+
+    /* ---------- Typed modules (small nested value blocks) ---------- */
+    .modBlock{display:inline-flex;flex-direction:column;gap:3px;vertical-align:top;
+      border:1px solid rgba(199,146,234,.42);border-left:3px solid #c792ea;
+      background:rgba(199,146,234,.07);border-radius:8px;padding:4px 6px;margin:1px 2px;
+      font-family:"JetBrains Mono",Consolas,monospace;font-size:11px;max-width:100%}
+    body.light .modBlock{background:rgba(124,58,237,.06);border-color:rgba(124,58,237,.3)}
+    .modBlock.mod-fx{border-left-color:#f2c98a;border-color:rgba(242,201,138,.4);background:rgba(242,201,138,.06)}
+    .modBlock.mod-mesh{border-left-color:#89ddff;border-color:rgba(137,221,255,.4);background:rgba(137,221,255,.06)}
+    .modBlock.mod-world{border-left-color:#a3e635;border-color:rgba(163,230,53,.4);background:rgba(163,230,53,.06)}
+    .modBlock.mod-game{border-left-color:#f78c6c;border-color:rgba(247,140,108,.4);background:rgba(247,140,108,.06)}
+    .modBlock.mod-item{border-left-color:#ffcb6b;border-color:rgba(255,203,107,.4);background:rgba(255,203,107,.06)}
+    .modHead{display:inline-flex;align-items:center;gap:5px;color:#e2c8ff;font-weight:800;font-size:9.5px;
+      letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+    .modBlock.mod-fx .modHead{color:#f7d9a8}
+    .modBlock.mod-mesh .modHead{color:#b5e9ff}
+    .modBlock.mod-world .modHead{color:#cdf08a}
+    .modBlock.mod-game .modHead{color:#ffb49a}
+    .modBlock.mod-item .modHead{color:#ffe0a3}
+    .modHead svg{opacity:.85}
+    .modFields,.modList{display:flex;flex-direction:column;gap:3px;min-width:0}
+    .modRow{display:flex;align-items:center;gap:5px;min-width:0;flex-wrap:wrap}
+    .modKey{color:#8b98b8;font-size:10px;min-width:0;flex-shrink:0}
+    .modKey:after{content:":";margin-left:1px}
+    .modInput{min-width:44px;max-width:210px}
+    .modPick{background:rgba(255,255,255,.05);color:#c3e88d;border:1px solid var(--line);
+      border-radius:5px;font-family:inherit;font-size:10.5px;padding:1px 3px;max-width:170px}
+    body.light .modPick{background:#fff;color:#3f6212}
+    .modAdd,.modBlock .valueAdd{width:18px;height:18px;border-radius:5px;border:1px dashed rgba(199,146,234,.5);
+      background:transparent;color:#c792ea;cursor:pointer;font-weight:900;line-height:1;padding:0}
+    .modAdd:hover,.modBlock .valueAdd:hover{background:rgba(199,146,234,.18)}
+    .modBlock .valueRemove{color:#c792ea}
+    /* chip shown before a module is expanded inside a normal slot */
+    .modChip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 8px;
+      background:rgba(199,146,234,.16);border:1px solid rgba(199,146,234,.42);color:#e2c8ff;
+      font-family:"JetBrains Mono",Consolas,monospace;font-size:11px;font-weight:700}
+
     /* ---------- Autocomplete popup ---------- */
     .acPopup{position:fixed;z-index:9999;display:none;min-width:190px;max-width:min(460px,92vw);overflow:auto;
       background:var(--panel2);border:1px solid var(--line);border-radius:11px;
@@ -566,6 +603,418 @@ function icon(name,size,cls){
   return '<svg class="svgIco'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" width="'+(size||16)+'" height="'+(size||16)+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
 }
 
+
+/* ============================================================
+   Typed modules — small value blocks that hold a whole Bloxd type
+   (CustomTextStyling, StyledText, StyledIcon, particle options, ...).
+   Modules nest, so one schema engine renders every level.
+   ============================================================ */
+
+/* field spec: [key, type, default]
+   type: str num bool colour icon vec rgba particle blend entity obj raw
+         mod:<moduleId>   list:<moduleId> */
+const MODULES={
+  styledText:{icon:'feather',label:{fr:'Texte stylé',en:'StyledText'},cat:'text',open:true,
+    desc:{fr:'{ str, style } — du texte avec couleur, graisse, taille, opacité et lien',
+          en:'{ str, style } — text with colour, weight, size, opacity and a link'},
+    fields:[
+      ['str','str','"Texte"'],
+      ['style.color','colour','"white"'],
+      ['style.fontWeight','str','"bold"'],
+      ['style.fontSize','str','"16px"'],
+      ['style.fontStyle','str','"italic"'],
+      ['style.opacity','num','1'],
+    ],
+    optional:['style.color','style.fontWeight','style.fontSize','style.fontStyle','style.opacity'],
+    extra:['clickableUrl','str','""']},
+
+  styledIcon:{icon:'sparkle',label:{fr:'Icône stylée',en:'StyledIcon'},cat:'text',open:true,
+    desc:{fr:"{ icon, style } — une des 89 icônes Bloxd, teintée et dimensionnée",
+          en:"{ icon, style } — one of Bloxd's 89 ingame icons, tinted and sized"},
+    fields:[
+      ['icon','icon','"Damage"'],
+      ['style.color','colour','"white"'],
+      ['style.fontSize','str','"16px"'],
+      ['style.opacity','num','1'],
+    ],
+    optional:['style.color','style.fontSize','style.opacity']},
+
+  entityName:{icon:'person',label:{fr:'Nom d’entité',en:'EntityName'},cat:'text',open:true,
+    desc:{fr:'{ entityName, style } — le nom d’un joueur ou d’une entité',
+          en:'{ entityName, style } — a player or entity name rendered as text'},
+    fields:[['entityName','str','""'],['style.color','colour','"yellow"']],
+    optional:['style.color']},
+
+  translatedText:{icon:'globe',label:{fr:'Texte traduit',en:'TranslatedText'},cat:'text',open:true,
+    desc:{fr:'{ translationKey, params } — une chaîne localisée avec paramètres',
+          en:'{ translationKey, params } — a localised string with placeholders'},
+    fields:[['translationKey','str','"chat.join"'],['params','obj','{}']],
+    optional:['params']},
+
+  customTextStyling:{icon:'feather',label:{fr:'CustomTextStyling',en:'CustomTextStyling'},cat:'text',open:true,
+    desc:{fr:'Un tableau de morceaux de texte : chaînes, StyledText, StyledIcon, EntityName, TranslatedText',
+          en:'An array of text parts: strings, StyledText, StyledIcon, EntityName, TranslatedText'},
+    listOf:'oneOf',of:['styledText','styledIcon','entityName','translatedText','raw'],
+    hint:{left:'[',right:']'}},
+
+  itemAttributes:{icon:'swords',label:{fr:'Attributs d’item',en:'ItemAttributes'},cat:'item',
+    desc:{fr:'{ customDisplayName, customDescription, customAttributes }',
+          en:'{ customDisplayName, customDescription, customAttributes }'},
+    fields:[
+      ['customDisplayName','str','""'],
+      ['customDescription','str','""'],
+      ['customAttributes','obj','{}'],
+    ],
+    optional:['customDisplayName','customDescription','customAttributes']},
+
+  particleOptions:{icon:'burst',label:{fr:'Options de particules',en:'Particle options'},cat:'fx',
+    desc:{fr:'Durée de vie, puissance, taille, gravité, mode de fusion',
+          en:'Lifetime, speed, size, gravity, blend mode'},
+    fields:[
+      ['texture','particle','"square_particle"'],
+      ['minLifeTime','num','0.5'],
+      ['maxLifeTime','num','1.5'],
+      ['minEmitPower','num','1'],
+      ['maxEmitPower','num','3'],
+      ['minSize','num','0.2'],
+      ['maxSize','num','0.5'],
+      ['gravity','vec','[0, -9.8, 0]'],
+      ['blendMode','blend','"Standard"'],
+      ['manualEmitCount','num','0'],
+    ],
+    optional:['manualEmitCount']},
+
+  meshScalingMap:{icon:'cube',label:{fr:'Échelles de mesh',en:'EntityMeshScalingMap'},cat:'mesh',
+    desc:{fr:'Une échelle [x, y, z] par nœud du mesh',
+          en:'A [x, y, z] scale per mesh node'},
+    fields:[
+      ['TorsoNode','vec','[1, 1, 1]'],
+      ['HeadMesh','vec','[1, 1, 1]'],
+      ['ArmRightMesh','vec','[1, 1, 1]'],
+      ['ArmLeftMesh','vec','[1, 1, 1]'],
+      ['LegRightMesh','vec','[1, 1, 1]'],
+      ['LegLeftMesh','vec','[1, 1, 1]'],
+    ],
+    optional:['TorsoNode','HeadMesh','ArmRightMesh','ArmLeftMesh','LegRightMesh','LegLeftMesh']},
+
+  posSettings:{icon:'pin',label:{fr:'Réglages de position',en:'posSettings'},cat:'world',
+    desc:{fr:'{ playerIdOrPos, maxHearDist, refDistance } — d’où un son est entendu',
+          en:'{ playerIdOrPos, maxHearDist, refDistance } — where a sound is heard from'},
+    fields:[
+      ['playerIdOrPos','entity','playerId'],
+      ['maxHearDist','num','30'],
+      ['refDistance','num','3'],
+    ],
+    optional:['maxHearDist','refDistance']},
+
+  shopItem:{icon:'cart',label:{fr:'Article de boutique',en:'Shop item'},cat:'game',
+    desc:{fr:'{ itemName, itemAmount, price, currencyId, canBuy }',
+          en:'{ itemName, itemAmount, price, currencyId, canBuy }'},
+    fields:[
+      ['itemName','item','"Iron Sword"'],
+      ['itemAmount','num','1'],
+      ['price','num','100'],
+      ['currencyId','currency','"coins"'],
+      ['canBuy','bool','true'],
+    ],
+    optional:['canBuy']},
+
+  hudText:{icon:'monitor',label:{fr:'Texte HUD',en:'HUD text'},cat:'game',
+    desc:{fr:'Emplacement HUD, joueur, contenu stylé et durée',
+          en:'HUD slot, player, styled content and duration'},
+    fields:[
+      ['option','hudOption','"middleTextUpper"'],
+      ['playerId','entity','playerId'],
+      ['text','mod:customTextStyling',null],
+      ['duration','num','2000'],
+    ],
+    optional:['duration']},
+};
+
+/* ---------- runtime ---------- */
+function modNew(modId){
+  const m=MODULES[modId];
+  const v={__mod:modId,f:{}};
+  (m.fields||[]).forEach(([key,type,def])=>{
+    if(type.indexOf('mod:')===0){v.f[key]=modNew(type.slice(4));return}
+    v.f[key]=def;
+  });
+  return modEnsureParents({__mod:modId,f:v.f});
+}
+/* a new element for a list module: raw strings are the cheapest useful default */
+function modNewElement(modId){
+  if(modId==='raw')return '"texte"';
+  return modNew(modId);
+}
+function modIsValue(v){return !!(v&&typeof v==='object'&&v.__mod&&MODULES[v.__mod])}
+/* code for one module value */
+function modCode(v,ind){
+  ind=ind||'';
+  if(v===null||v===undefined)return 'null';
+  if(typeof v==='string'||typeof v==='number'||typeof v==='boolean')return modScalar(v);
+  const m=MODULES[v.__mod];
+  if(!m)return 'null';
+  if(m.listOf){
+    const items=v.elements||[];
+    if(!items.length)return '[]';
+    return (m.hint&&m.hint.left||'[')+'\n'+items.map((e,i)=>ind+'  '+modElementCode(e,ind+'  ')+(i<items.length-1?',':'')).join('\n')+'\n'+ind+(m.hint&&m.hint.right||']');
+  }
+  /* group flat dotted keys back into their nested object: style.color -> style: { color } */
+  const top=[],groups={};
+  (m.fields||[]).forEach(([key,type,def])=>{
+    if((m.optional||[]).includes(key)&&!modHas(v,key))return;
+    const dot=key.indexOf('.');
+    if(dot<0){top.push([key,modFieldCode(modGet(v,key),type)]);return}
+    const a=key.slice(0,dot),b=key.slice(dot+1);
+    (groups[a]=groups[a]||[]).push([b,modFieldCode(modGet(v,key),type)]);
+  });
+  Object.keys(groups).forEach(a=>{
+    const inner=groups[a].map(([k,val])=>k+': '+val).join(', ');
+    if(inner)top.push([a,'{ '+inner+' }']);
+  });
+  if(m.extra&&modHas(v,m.extra[0]))top.push([m.extra[0],modScalar(modGet(v,m.extra[0]))]);
+  if(!top.length)return '{}';
+  return '{\n'+top.map(([k,val])=>ind+'  '+k+': '+val).join(',\n')+'\n'+ind+'}';
+}
+function modElementCode(e,ind){
+  if(typeof e==='string')return modScalar(e);
+  if(modIsValue(e))return modCode(e,ind);
+  return modScalar(String(e));
+}
+function modFieldCode(val,type){
+  if(type==='vec'||type==='rgba')return String(val||'[0, 0, 0]');
+  if(type==='raw')return String(val==null?'null':val);
+  if(type.indexOf('mod:')===0)return modIsValue(val)?modCode(val):'null';
+  return modScalar(val);
+}
+function modScalar(v){
+  if(v===null||v===undefined)return 'null';
+  if(typeof v==='boolean'||typeof v==='number')return String(v);
+  const s=String(v).trim();
+  if(!s)return '""';
+  if(/^([\[\{]|true$|false$|null$|-?\d+(\.\d+)?$)/.test(s))return s;
+  if(/^(["'`]).*\1$/s.test(s))return s;
+  if(/^[A-Za-z_$][\w$.]*$/.test(s)&&/^(playerId|entityId|myId|api\.|thisPos)/.test(s))return s;
+  return '"'+s.replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"';
+}
+/* dotted key access so style.color can live in one flat object */
+function modGet(v,key){
+  if(key.indexOf('.')<0)return v.f[key];
+  const [a,b]=key.split('.');
+  const st=v.f[a]&&typeof v.f[a]==='object'?v.f[a]:null;
+  return st?st[b]:undefined;
+}
+function modSet(v,key,val){
+  if(key.indexOf('.')<0){v.f[key]=val;return}
+  const [a,b]=key.split('.');
+  if(!v.f[a]||typeof v.f[a]!=='object')v.f[a]={};
+  v.f[a][b]=val;
+}
+/* make sure every dotted parent exists before the editor reads it */
+function modEnsureParents(v){
+  const m=MODULES[v.__mod];
+  if(!m||!m.fields)return v;
+  m.fields.forEach(([key])=>{
+    if(key.indexOf('.')<0)return;
+    const a=key.split('.')[0];
+    if(!v.f[a]||typeof v.f[a]!=='object')v.f[a]={};
+  });
+  return v;
+}
+function modHas(v,key){
+  if(key.indexOf('.')<0)return v.f[key]!==undefined&&v.f[key]!==null&&v.f[key]!=='';
+  const val=modGet(v,key);
+  return val!==undefined&&val!==null&&val!=='';
+}
+function modDel(v,key){
+  if(key.indexOf('.')<0){delete v.f[key];return}
+  const [a,b]=key.split('.');
+  if(v.f[a]&&typeof v.f[a]==='object'){delete v.f[a][b];if(!Object.keys(v.f[a]).length)delete v.f[a]}
+}
+
+/* ============================================================
+   Module editor — renders a module value as a small nested block
+   ============================================================ */
+function modLabel(modId,lang){
+  const m=MODULES[modId];
+  if(!m)return modId;
+  const l=m.label;
+  return typeof l==='string'?l:(l[lang]||l.en||l.fr||modId);
+}
+function modDescOf(modId,lang){
+  const m=MODULES[modId];
+  if(!m)return '';
+  const d=m.desc;
+  return typeof d==='string'?d:(d[lang]||d.en||d.fr||'');
+}
+/* short preview shown on the collapsed chip */
+function modPreview(v){
+  if(typeof v!=='object'||!v)return String(v);
+  const m=MODULES[v.__mod];
+  if(!m)return '?';
+  if(m.listOf){
+    const n=(v.elements||[]).length;
+    return n?modLabel(v.__mod,LANG())+' · '+n:n?String(n):'[]';
+  }
+  if(v.__mod==='styledText')return String(modGet(v,'str')||'""');
+  if(v.__mod==='styledIcon')return String(modGet(v,'icon')||'"icon"');
+  if(v.__mod==='entityName')return String(modGet(v,'entityName')||'"name"');
+  if(v.__mod==='translatedText')return String(modGet(v,'translationKey')||'"key"');
+  return modLabel(v.__mod,LANG());
+}
+function LANG(){return (typeof lang!=='undefined'&&lang)||'en'}
+
+/* the editor widget */
+function moduleEditor(v,setter){
+  const wrap=document.createElement('span');
+  wrap.className='modBlock mod-'+((MODULES[v.__mod]||{}).cat||'text');
+  render();
+  function update(){setter(v)}
+  function render(){
+    wrap.innerHTML='';
+    const m=MODULES[v.__mod];
+    if(!m)return;
+    const head=document.createElement('span');
+    head.className='modHead';
+    head.innerHTML=icon(m.icon||'puzzle',12)+'<span class="modName">'+esc(modLabel(v.__mod,LANG()))+'</span>';
+    head.title=modDescOf(v.__mod,LANG());
+    wrap.append(head);
+
+    if(m.listOf){
+      /* array of parts: each element is either raw text or a nested module */
+      const body=document.createElement('span');
+      body.className='modList';
+      (v.elements||[]).forEach((el,i)=>{
+        const row=document.createElement('span');
+        row.className='modRow';
+        const picker=document.createElement('select');
+        picker.className='modPick';
+        m.of.forEach(id=>{
+          const o=document.createElement('option');
+          o.value=id;o.textContent=id==='raw'?(LANG()==='fr'?'texte':'text'):modLabel(id,LANG());
+          picker.append(o);
+        });
+        picker.value=typeof el==='string'?'raw':el.__mod;
+        picker.onchange=()=>{
+          v.elements[i]=picker.value==='raw'?'"texte"':modNew(picker.value);
+          update();render();
+        };
+        picker.onmousedown=e=>e.stopPropagation();
+        row.append(picker);
+        if(typeof el==='string'){
+          const inp=document.createElement('input');
+          inp.className='slotInput modInput';
+          inp.value=el;
+          inp.placeholder='"texte"';
+          inp.size=Math.max(6,Math.min(30,String(el).length||6));
+          inp.oninput=()=>{v.elements[i]=inp.value;update()};
+          inp.onmousedown=e=>e.stopPropagation();
+          acAttach(inp,()=>null,()=>0,val=>{v.elements[i]=val});
+          row.append(inp);
+        }else if(modIsValue(el)){
+          row.append(moduleEditor(el,()=>update()));
+        }
+        const rm=document.createElement('button');
+        rm.className='valueRemove';rm.innerHTML=icon('close',10);rm.title=tr('delete');
+        rm.onclick=e=>{e.stopPropagation();v.elements.splice(i,1);update();render()};
+        row.append(rm);
+        body.append(row);
+      });
+      const add=document.createElement('button');
+      add.className='valueAdd modAdd';add.textContent='+';
+      add.title=LANG()==='fr'?'Ajouter une partie':'Add a part';
+      add.onclick=e=>{
+        e.stopPropagation();
+        v.elements=(v.elements||[]);
+        v.elements.push(modNewElement(m.of[0]));
+        update();render();
+      };
+      wrap.append(body,add);
+      return;
+    }
+
+    /* object-shaped module: one row per field */
+    const body=document.createElement('span');
+    body.className='modFields';
+    (m.fields||[]).forEach(([key,type,def])=>{
+      const opt=(m.optional||[]).includes(key);
+      const present=opt?modHas(v,key):true;
+      if(opt&&!present)return;
+      const row=document.createElement('span');
+      row.className='modRow';
+      const k=document.createElement('span');
+      k.className='modKey';
+      k.textContent=key.split('.').pop();
+      row.append(k);
+      row.append(modFieldInput(v,key,type,()=>{update()},()=>render()));
+      if(opt){
+        const rm=document.createElement('button');
+        rm.className='valueRemove';rm.innerHTML=icon('close',10);rm.title=tr('delete');
+        rm.onclick=e=>{e.stopPropagation();modDel(v,key);update();render()};
+        row.append(rm);
+      }
+      body.append(row);
+    });
+    wrap.append(body);
+    /* optional fields that are not shown yet */
+    const hidden=(m.optional||[]).filter(k=>!modHas(v,k));
+    if(hidden.length||(m.extra&&!modHas(v,m.extra[0]))){
+      const add=document.createElement('button');
+      add.className='valueAdd modAdd';add.textContent='+';
+      add.title=LANG()==='fr'?'Ajouter un champ':'Add a field';
+      add.onclick=e=>{
+        e.stopPropagation();
+        modAddMenu(v,hidden,m,(k)=>{update();render()});
+      };
+      wrap.append(add);
+    }
+  }
+  return wrap;
+}
+/* the input for one field, dispatched on its type */
+function modFieldInput(v,key,type,changed,rerender){
+  if(type.indexOf('mod:')===0){
+    const kid=type.slice(4);
+    if(!modIsValue(modGet(v,key)))modSet(v,key,modNew(kid));
+    return moduleEditor(modGet(v,key),()=>changed());
+  }
+  const enumList=MOD_ENUMS[type];
+  if(enumList&&enumList.length){
+    const sel=document.createElement('select');
+    sel.className='modPick';
+    enumList.forEach(val=>{
+      const o=document.createElement('option');o.value=val;o.textContent=val.replace(/^"|"$/g,'');sel.append(o);
+    });
+    const cur=String(modGet(v,key)==null?'':modGet(v,key));
+    if(cur&&!enumList.includes(cur)){const o=document.createElement('option');o.value=cur;o.textContent=cur;sel.append(o)}
+    sel.value=cur||enumList[0];
+    if(!cur)modSet(v,key,enumList[0]);
+    sel.onchange=()=>{modSet(v,key,sel.value);changed()};
+    sel.onmousedown=e=>e.stopPropagation();
+    return sel;
+  }
+  const inp=document.createElement('input');
+  inp.className='slotInput modInput';
+  inp.value=String(modGet(v,key)==null?'':modGet(v,key));
+  inp.size=Math.max(6,Math.min(28,String(inp.value).length||6));
+  inp.oninput=()=>{modSet(v,key,inp.value);changed()};
+  inp.onmousedown=e=>e.stopPropagation();
+  if(MOD_ENUMS[type]&&MOD_ENUMS[type].length)inp.dataset.modEnum=type;
+  acAttach(inp,()=>null,()=>0,val=>{modSet(v,key,val);changed()});
+  return inp;
+}
+/* menu of the optional fields that can still be added */
+function modAddMenu(v,hidden,m,after){
+  $$('.contextMenu').forEach(e=>e.remove());
+  const items=hidden.map(k=>{
+    const f=(m.fields||[]).find(x=>x[0]===k);
+    return {label:k,fn:()=>{modSet(v,k,f?f[2]:'""');after(k)}};
+  });
+  if(m.extra)items.push({label:m.extra[0],fn:()=>{modSet(v,m.extra[0],m.extra[2]||'""');after(m.extra[0])}});
+  const r=document.activeElement&&document.activeElement.getBoundingClientRect?document.activeElement.getBoundingClientRect():{left:120,top:120,bottom:140};
+  ctxMenu(items,r.left,r.bottom||r.top);
+}
+
 /* ---------- Categories ---------- */
 const cats=[
  {id:'variables',name:'VAR',short:'Var',icon:'package',label:'Variables',color:'#fbbf24'},
@@ -732,6 +1181,20 @@ function returnOptionsForBlock(b){
 function choiceList(arr){return arr.map(v=>({label:String(v),value:JSON.stringify(v)}))}
 const EFFECT_NAMES=['Damage','Speed','Damage Reduction','Invisible','Jump Boost','Knockback','Poisoned','Slowness','Weakness','Cleansed','Instant Damage','Health Regen','Healing Pulse','Instant Health','Haste','Shield','Double Jump','Heat Resistance','Thief','X-Ray Vision','Mining Yield','Brain Rot','Aura','Wall Climbing','Air Walk','Pickpocketer','Lifesteal','Bounciness','Blindness','Poopy','Glowing','Night Vision'];
 const PARTICLE_TEXTURES=['arrow','bubble','critical_hit','drift','effect_5','fishingFishSilhouette','generic_2','glint','heart','scary_face','soul_0','square_particle','z-particle'];
+/* enum lists for module fields */
+const MOD_ENUMS={
+  colour:['"red"','"green"','"blue"','"yellow"','"orange"','"purple"','"aqua"','"cyan"','"lime"','"pink"','"white"','"black"','"#ff5c5c"'],
+  icon:['"Damage"','"Speed"','"Fist"','"Frozen"','"Jump Boost"','"Poisoned"','"Slowness"','"Haste"','"Shield"','"Glowing"','"Night Vision"','"Invisible"','"Hydrated"','"Health Regen"','"FallDamage"','"Bunny Hop"'],
+  nodeName:['"TorsoNode"','"HeadMesh"','"ArmRightMesh"','"ArmLeftMesh"','"LegRightMesh"','"LegLeftMesh"'],
+  blend:['"OneOne"','"Standard"','"Add"','"Multiply"','"MultiplyAdd"'],
+  particle:PARTICLE_TEXTURES.map(v=>'"'+v+'"'),
+  currency:['"coins"','"gems"','"tokens"'],
+  hudOption:['"middleTextUpper"','"middleTextLower"','"crosshairText"','"RightInfoText"','"touchscreenActionButton"','"cantChangeError"','"cantBreakError"','"cantBuildError"'],
+  vec:['[0, 0, 0]','[1, 1, 1]','[0, 1, 0]','[0, 10, 0]','[0, -9.8, 0]'],
+  obj:['{}'],
+  entity:['playerId','entityId','myId','null'],
+};
+
 const PARTICLE_PRESETS=['brainRot','stomp','fertiliser','bonemeal','mobTameSuccess','mobTameFailure','mobCatch','spawnCaughtMob','mobFeedDefault','mobFeedSuperliked','mobFeedLike','mobFeedNeutral','mobFeedDisliked','mobDeath','mobDeathSoul','boardShopSuccess','mobSpawnerBlockFail','mobSpawnerBlockPassive','mobSpawnerBlockNeutral','mobSpawnerBlockHostile','mobSpawnOrb','aura',
  'yellowFirecrackerSmall','yellowFirecrackerLarge','whiteFirecrackerSmall','whiteFirecrackerLarge','redFirecrackerSmall','redFirecrackerLarge','purpleFirecrackerSmall','purpleFirecrackerLarge','pinkFirecrackerSmall','pinkFirecrackerLarge','orangeFirecrackerSmall','orangeFirecrackerLarge','magentaFirecrackerSmall','magentaFirecrackerLarge','limeFirecrackerSmall','limeFirecrackerLarge','lightGrayFirecrackerSmall','lightGrayFirecrackerLarge','lightBlueFirecrackerSmall','lightBlueFirecrackerLarge','greenFirecrackerSmall','greenFirecrackerLarge','grayFirecrackerSmall','grayFirecrackerLarge','cyanFirecrackerSmall','cyanFirecrackerLarge','brownFirecrackerSmall','brownFirecrackerLarge','blueFirecrackerSmall','blueFirecrackerLarge','blackFirecrackerSmall','blackFirecrackerLarge','defaultFirecrackerSmall','defaultFirecrackerLarge','mango',
  'speedInner','speedOuter','damageReductionInner','damageReductionOuter','damageInner','damageOuter','invisibleInner','invisibleOuter','jumpBoostInner','jumpBoostOuter','knockbackInner','knockbackOuter','poisonedInner','poisonedOuter','slownessInner','slownessOuter','weaknessInner','weaknessOuter','cleansedInner','cleansedOuter','instantDamageInner','instantDamageOuter','healthRegenInner','healthRegenOuter','healingPulseInner','healingPulseOuter','instantHealthInner','instantHealthOuter','hasteInner','hasteOuter','shieldInner','shieldOuter','doubleJumpInner','doubleJumpOuter','heatResistanceInner','heatResistanceOuter','thiefInner','thiefOuter','xRayVisionInner','xRayVisionOuter','miningYieldInner','miningYieldOuter','brainRotInner','brainRotOuter','auraInner','auraOuter','wallClimbingInner','wallClimbingOuter','airWalkInner','airWalkOuter','pickpocketerInner','pickpocketerOuter','lifestealInner','lifestealOuter','bouncinessInner','bouncinessOuter','blindnessInner','blindnessOuter','poopyInner','poopyOuter','glowingInner','glowingOuter','nightVisionInner','nightVisionOuter'];
@@ -770,6 +1233,21 @@ const BLOCK_LIST=["Dirt","Messy Dirt","Grass Block","Sand","Clay","Gravel","Snow
 const ITEM_LIST=["Wood Pickaxe","Stone Pickaxe","Iron Pickaxe","Gold Pickaxe","Diamond Pickaxe","Moonstone Pickaxe","Golem Pickaxe","Wood Axe","Stone Axe","Iron Axe","Gold Axe","Diamond Axe","Moonstone Axe","Artisan Axe","Wood Spade","Stone Spade","Iron Spade","Gold Spade","Diamond Spade","Wood Sword","Stone Sword","Iron Sword","Gold Sword","Diamond Sword","Knight Sword","Wood Hoe","Stone Hoe","Iron Hoe","Gold Hoe","Diamond Hoe","Flashlight","Mining Helmet","Wood Helmet","Iron Helmet","Gold Helmet","Diamond Helmet","Wood Chestplate","Iron Chestplate","Gold Chestplate","Diamond Chestplate","Fur Chestplate","Wood Leggings","Iron Leggings","Gold Leggings","Diamond Leggings","Wood Boots","Iron Boots","Gold Boots","Diamond Boots","Spiked Boots","Wood Gauntlets","Iron Gauntlets","Gold Gauntlets","Diamond Gauntlets","Military Helmet","Military Chestplate","Military Gauntlets","Military Leggings","Military Boots","White Wood Helmet","White Wood Chestplate","Red Wood Helmet","Blue Wood Helmet","Green Wood Helmet","Black Wood Helmet","Shears","Artisan Shears","Stick","Coal","Raw Iron","Iron Bar","Iron Fragment","Raw Gold","Gold Bar","Gold Fragment","Diamond","Diamond Fragment","Moonstone","Lunite","Moonstone Fragment","Bowl","Bowl of Cranberries","Mushroom Soup","Glowing Soup","Night Vision Soup","Cotton","Gold Crop","Bucket","Water Bucket","Lava Bucket","Boat","Obsidian Boat","Speedboat","Wood Hang Glider","Iron Hang Glider","Gold Hang Glider","Diamond Hang Glider","Hovercraft","Yellow Kart","Red Kart","Blue Kart","Black Kart","Off Roader","Gold Mining Drill","Iron Mining Drill","Diamond Mining Drill","Moonstone Mining Drill","Armored Car","Light Blue Car","Snowball","Snowball Launcher","Pebble","Reinforced Pebble","Bullet","Ball","Reinforced Ball","Frag Grenade","Mining Grenade","Smoke Grenade","Moonstone Orb","Fireball","Bouncy Bomb","RPG","Obby RPG","Super RPG","Iceball","Capitano Grenade","Scatter Pellet","Wood Bow","Stone Bow","Iron Bow","Gold Bow","Diamond Bow","Wood Crossbow","Stone Crossbow","Iron Crossbow","Gold Crossbow","Diamond Crossbow","Wood Crossbow Charged","Diamond Crossbow Charged","Arrow","Compass","Chunk Map","Bread","Bowl of Rice","Apple","Plum","Coconut","Cracked Coconut","Pear","Cherry","Banana","Watermelon Slice","Gold Watermelon Slice","Melon Slice","Gold Melon Slice","Pumpkin Pie","Corn","Cornbread","Chili Pepper","Mango","Carrot","Gold Carrot","Raw Potato","Baked Potato","Beetroot","Raw Porkchop","Cooked Porkchop","Raw Beef","Steak","Raw Mutton","Cooked Mutton","Raw Venison","Cooked Venison","Rotten Flesh","Rotten Brain","Bone","Bone Meal","Leather","Saddle","Spirit Saddle","Fur","Golem Eye","Knight Heart","Teleport Heart","Frost Shard","Molten Cog","Choir Bell","Siege Core","Flywheel","Radiant Spark","Brood Sac","Bandolier","Name Tag","Book","Empty Bottle","Water Bottle","Slowness Potion","Slowness Potion II","Splash Slowness Potion","Poison Potion","Poison Potion II","Splash Poison Potion","Weakness Potion","Weakness Potion II","Instant Damage Potion","Instant Damage Potion II","Milk Potion","Splash Milk Potion","Speed Potion","Speed Potion II","Splash Speed Potion","Defense Potion","Defense Potion II","Splash Defense Potion","Strength Potion","Strength Potion II","Splash Strength Potion","Invisibility Potion","Splash Invisibility Potion","Jump Potion","Jump Potion II","Splash Jump Potion","Knockback Potion","Splash Knockback Potion","Regeneration Potion","Regeneration Potion II","Splash Regeneration Potion","Instant Healing Potion","Instant Healing Potion II","Splash Instant Healing Potion","Haste Potion","Haste Potion II","Splash Haste Potion","Shield Potion","Shield Potion II","Splash Shield Potion","Double Jump Potion","Splash Double Jump Potion","Heat Resistance Potion","Splash Heat Resistance Potion","X-Ray Vision Potion","Splash X-Ray Vision Potion","Mining Yield Potion","Splash Mining Yield Potion","Brain Rot Potion","Splash Brain Rot Potion","Chaos Potion","Teleportation Potion","Ammo","AK-47","M16","MP40","TAR-21","M1911","One Shot Pistol","Double Barrel","AWP","Deagle","Striker-12","VSR","DMR","Minigun","FMR","SKAR","Block-19","Mini Izu","GPMG","Gold Coin","Updraft","Snowdash","Floor Creator","Moonstone Remote Explosive","Moonstone Remote","Ice Bridge","Maple Planks Bridge","Messy Stone Bridge","Yellow Balloon","Red Balloon","Blue Balloon","Yellow Paintball Gun","Red Paintball Gun","Blue Paintball Gun","Yellow Paintball","Red Paintball","Blue Paintball","Yellow Paint Bow","Red Paint Bow","Blue Paint Bow","Pig Spawn Orb","Cow Spawn Orb","Sheep Spawn Orb","Horse Spawn Orb","Camel Spawn Orb","Wolf Spawn Orb","Bear Spawn Orb","Deer Spawn Orb","Stag Spawn Orb","Gorilla Spawn Orb","Frost Golem Spawn Orb","Draugr Zombie Spawn Orb","Draugr Skeleton Spawn Orb","Draugr Knight Spawn Orb","Frost Zombie Spawn Orb","Frost Skeleton Spawn Orb","Magma Golem Spawn Orb","Spirit Golem Spawn Orb","Spirit Wolf Spawn Orb","Spirit Bear Spawn Orb","Spirit Stag Spawn Orb","Spirit Gorilla Spawn Orb","Draugr Warper Spawn Orb","Slime Spawn Orb","Iron Guardian Spawn Orb","Gold Guardian Spawn Orb","Diamond Guardian Spawn Orb","Moonstone Guardian Spawn Orb","NPC Spawn Orb","Tiki Terror Spawn Orb","Crone Spawn Orb","Cactus","Dirt","Grass Block","Stone","Sand","Wood Planks","Glass","Obsidian"];
 const SOUND_LIST=["lavaFlow","crowdAmbience","crowdCheer","refereeWhistle","cryptWhoosh","doorKnock","futureStrangePulse","hauntedHorrorImpact","horrorAccent1","horrorFright","horrorMaleDrone","intensiveRainLoop","metalDoorKnock","ominousBellHit","pulseFromTheDark","suspenseRiser","thunderRain","zapAccent1","zapAccent2","cloth1","cloth2","cloth3","cloth4","glass1","glass2","glass3","grass1","grass2","grass3","grass4","gravel1","gravel2","gravel3","gravel4","pickUp","sand1","sand2","sand3","sand4","snow1","snow2","snow3","snow4","stone1","stone2","stone3","stone4","wood1","wood2","wood3","wood4","caughtFish","reel","game_start_countdown_01","game_start_countdown_02","game_start_countdown_03","game_start_countdown_final","bullet_shell_bounce_general_07","headshot_04","headshot_06","pistol_cock_01","pistol_shot_01","pistol_shot_02","pistol_magazine_load_01","pistol_magazine_unload_01","rifle_cock_01","rifle_shot_01","rifle_shot_02","rifle_magazine_load_01","rifle_magazine_unload_01","semiAuto_cock_01","semiAuto_shot_01","semiAuto_shot_02","semiAuto_magazine_load_01","semiAuto_magazine_unload_01","shotgun_cock_01","shotgun_shot_01","shotgun_shot_02","shotgun_load_bullet_01","submachine_cock_01","submachine_shot_01","submachine_shot_02","submachine_magazine_load_01","submachine_magazine_unload_01","bearRoar1","bearRoar2","bearRoar3","bearRoar4","bearRoar5","catHiss1","catHiss2","catHurt1","catMeow1","catMeow2","catMeow3","catMeow4","catMeow5","cowHurt1","cowMoo1","cowMoo2","cowMoo3","croneAttack1","croneHurt1","croneIdle1","deerGrunt1","deerHurt1","dogBark1","dogBark2","dogBark3","dogGrowl1","dogHurt1","fennecYip1","fennecYip2","golemGrunt1","gorillaIdle1","gorillaRoar1","horseHurt1","horseIdle1","knightGrunt1","pigHurt1","pigOink1","pigOink2","pigOink3","pigOink4","pigOink5","reaverAttack1","reaverGrunt1","sheepBaa1","sheepBaa2","sheepBaa3","sheepHurt1","skeletonRattle1","skeletonRattle2","stagGrunt1","stagHurt1","stalkerAttack1","stalkerIdle1","warperGrunt1","warperPhase1","wraithGrunt1","wraithHurt","ZombieGrunt1","ZombieGrunt2","ZombieGrunt3","ZombieHurt1","ZombieHurt2","bass","bassattack","bd","bigDrumSwish1","bigDrumSwish2","bigDrumSwish3","drumSwish1","drumSwish2","harp_pling","hat","levelup","lowDrum1","lowDrum2","lowDrum3","snare","sonarBeep","trumpetFlare","trumpetNote1","trumpetNote2","trumpetNote3","beep","bow","bucketEmpty1","bucketEmpty2","bucketEmpty3","bucketFill1","bucketFill2","bucketFill3","burp","cannonFire1","cannonFire2","cannonFire3","cashRegister","chestClose","chestOpen","doorClose","doorClose2","doorOpen-bloxd1","doorOpen-bloxd2","drink","eat1","equip_leather1","exp_collect","exp_levelup","fallsmall","fireBurn","firecracker1","firecracker2","firecracker3","firecracker4","hoeTill1","hoeTill2","hoeTill3","hoeTill4","laugh1","laugh2","laugh3","magicAccent1","magicAccent2","magicAccent3","magicAccent4","splash1","successfulBowHit","trapdoorOpen","rpgBeltCloth1","rpgBeltCloth2","rpgBeltHandle1","rpgBeltHandle2","rpgBookClose","rpgBookFlip1","rpgBookFlip2","rpgBookFlip3","rpgBookOpen","rpgBookPlace1","rpgBookPlace2","rpgBookPlace3","rpgChop","rpgCloth1","rpgCloth2","rpgCloth3","rpgCloth4","rpgCreak1","rpgCreak2","rpgCreak3","rpgDoorClose1","rpgDoorClose2","rpgDoorClose3","rpgDoorClose4","rpgDoorOpen1","rpgDoorOpen2","rpgDrawKnife1","rpgDrawKnife2","rpgDrawKnife3","rpgDropLeather","rpgFootstep00","rpgFootstep01","waterfall","splash","explosion","step","hit","hurt","jump","land","click","pop","whoosh","wind","rain","thunder"];
 const MUSIC_LIST=["Adigold - A Place To Be Free","Adigold - Butterfly Effect","Adigold - Dreamless Sleep","Adigold - Frozen Pulse","Adigold - Frozen Skies","Adigold - Healing Thoughts","Adigold - Here Forever","Adigold - Just a Little Hope","Adigold - Just Like Heaven","Adigold - Memories Remain","Adigold - Place To Be","Adigold - The Riverside","Adigold - The Wonder","Adigold - Vetrar (Cut B)","Awkward Comedy Quirky","battle-ship-111902","cdk-Silence-Await","corsairs-studiokolomna-main-version-23542-02-33","ghost-Reverie-small-theme","happy","Heroic-Demise-New","I-am-the-Sea-The-Room-4","Juhani Junkala [Retro Game Music Pack] Ending","Juhani Junkala [Retro Game Music Pack] Level 1","Juhani Junkala [Retro Game Music Pack] Level 2","Juhani Junkala [Retro Game Music Pack] Level 3","Juhani Junkala [Retro Game Music Pack] Title Screen","LonePeakMusic-Highway-1","Mojo Productions - Pirates","Mojo Productions - Sneaky Jazz","Mojo Productions - The Sneaky","Mojo Productions - The Sneaky Jazz","progress","raise-the-sails-152124","ramblinglibrarian-I-Have-Often-T","Slow-Motion-Bensound","snowflake-Ethereal-Space","the-epic-adventure-131399","TownTheme","The Suspense Ambient","Epic1","Epic2","Emotional Epic","Enemy Marked","spooky","Shuffling Crypt","Tower of Doom","Wild Infernos","Molten Rift"];
+
+/* register every typed module as a droppable value block */
+function registerModules(){
+  Object.keys(MODULES).forEach(id=>{
+    const m=MODULES[id];
+    const key='mod_'+id;
+    if(defs[key])return;
+    defs[key]={cat:m.cat==='text'?'variables':(m.cat==='fx'?'variables':'variables'),
+      icon:m.icon,module:id,valueOnly:true,valueKind:'module',
+      label:modLabel(id,LANG()),
+      desc:modDescOf(id,LANG()),
+      params:[],snippet:modLabel(id,'en'),
+      hidden:false};
+  });
+}
 
 /* ---------- Helpers used by block definitions ---------- */
 const defOf=t=>defs[t];
@@ -1230,6 +1708,7 @@ function valueToCode(v){
 }
 function fmt(v){
   if(isNested(v)){const d=defs[v.type];if(!d)return '""';return d.expr?d.expr(v):'""'}
+  if(modIsValue(v))return modCode(v);
   if(isValueObj(v))return valueToCode(v);
   const s=String(v??'').trim();
   if(!s)return '""';
@@ -1568,6 +2047,19 @@ function toolEl(type,extraClass){
   el.onclick=()=>{
     const b=newBlock(type);
     if(!b)return;
+    if(d.module){
+      /* modules are only meaningful inside a slot: drop one in the first empty slot */
+      pushUndo();
+      const slot=acFirstEmptySlot();
+      if(slot){
+        slot.b.params[slot.idx]=b;
+        renderAll();
+        toast(modLabel(d.module,LANG()));
+      }else{
+        toast(LANG()==='fr'?'Glisse ce module dans un champ':'Drag this module into a slot',true);
+      }
+      return;
+    }
     pushUndo();
     let s=stacks[stacks.length-1];
     if(!s){s={id:'s'+(stacks.length+1),x:20,y:20,blocks:[]};stacks.push(s)}
@@ -1786,9 +2278,31 @@ function handleStatementDrop(e,stack,index){
   }
   renderAll();
 }
+/* first empty value slot in the workspace, used when a module is clicked in the palette */
+function acFirstEmptySlot(){
+  let found=null;
+  const walk=list=>{
+    (list||[]).forEach(b=>{
+      if(found)return;
+      const d=defs[b.type]||{};
+      (b.params||[]).forEach((v,i)=>{
+        if(found)return;
+        if(v===''||v==null){
+          const pname=(d.paramNames&&d.paramNames[i])||'';
+          const wants=acSlotWants(b,i);
+          if(pname||wants!=='any')found={b,idx:i};
+        }
+      });
+      walk(b.children);walk(b.children2);
+    });
+  };
+  stacks.forEach(st=>walk(st.blocks));
+  return found;
+}
 function newBlock(type){
   const d=defs[type];
   if(!d)return null;
+  if(d.module)return modNew(d.module);
   const b={id:newid(),type,params:clone(d.params||[])};
   if(d.container){b.children=[];if(d.twoBodies)b.children2=[]}
   return b;
@@ -1988,6 +2502,7 @@ function valueSlotEl(b,idx,choiceKey){
       wrap.append(chip);
       return;
     }
+    if(modIsValue(val)){wrap.append(moduleEditor(val,v=>{b.params[idx]=v;renderCode()}));return}
     if(isValueObj(val)){wrap.append(valueEditor(val,v=>{b.params[idx]=v;renderAll()}));return}
     if(choiceKey){
       const opts=choiceOptions(b,idx,choiceKey);
@@ -2022,6 +2537,7 @@ function valueSlotEl(b,idx,choiceKey){
       if(!moved||!defs[moved.type]||!defs[moved.type].expr)return;
       if(moved.id===b.id)return;
     }
+    /* dropping a brand-new module or reporter is always allowed */
     e.preventDefault();e.stopPropagation();
     wrap.classList.add('dragover');
   });
@@ -2040,7 +2556,7 @@ function valueSlotEl(b,idx,choiceKey){
       }
     }else if(newType){
       const d=defs[newType];
-      if(d&&d.expr){b.params[idx]=newBlock(newType)}
+      if(d&&(d.expr||d.module)){b.params[idx]=newBlock(newType)}
     }
     renderAll();
   });
@@ -2877,6 +3393,8 @@ function acAncestors(targetId,list,chain){
 /* identifiers visible where block b sits: globals + locals introduced by ancestor hats and loops */
 function acScopeIds(b){
   const ids=new Set();
+  if(!b){vars.forEach(v=>ids.add(v.name));lists.forEach(l=>ids.add(l.name));
+    customFns.forEach(f=>ids.add(f.name));['thisPos','playerId','myId','api'].forEach(x=>ids.add(x));return [...ids]}
   const add=v=>{const s=String(v||'').trim();if(/^[A-Za-z_$][\w$]*$/.test(s))ids.add(s)};
   vars.forEach(v=>add(v.name));
   lists.forEach(l=>add(l.name));
@@ -3280,6 +3798,19 @@ function acLocalFnNames(){
   stacks.forEach(s=>walk(s.blocks));
   return [...new Set(out)];
 }
+/* candidates for an input that is not a block slot (module fields) */
+function acGenericCandidates(inp){
+  const out=[];
+  const push=(v,kind)=>{if(v!==''&&v!=null)out.push({v:String(v),kind:kind||'value',hint:''})};
+  vars.forEach(v=>push(v.name,'variable'));
+  lists.forEach(l=>push(l.name,'variable'));
+  customFns.forEach(f=>push(f.name+'()','function'));
+  acScopeIds(null).forEach(v=>push(v,'variable'));
+  push('playerId','identifier');push('myId','identifier');push('thisPos','identifier');push('null','keyword');
+  const dataset=inp&&inp.dataset?inp.dataset.modEnum:null;
+  if(dataset&&MOD_ENUMS[dataset])MOD_ENUMS[dataset].forEach(v=>push(v,'enum'));
+  return dedupAc(out);
+}
 /* ---------- popup ---------- */
 let acState=null;
 function acPopup(){
@@ -3392,13 +3923,12 @@ function acAttach(inp,getBlock,getIdx,commit,opts){
 }
 function acUpdate(inp,getBlock,getIdx,commit){
   const b=getBlock(),idx=getIdx();
-  if(!b)return;
   const raw=inp.value;
   /* only complete the token under the caret's line start */
   const caret=inp.selectionStart==null?raw.length:inp.selectionStart;
   const upto=raw.slice(0,caret);
   const text=(upto.match(/[A-Za-z_$.][\w$.:]*$/)||[''])[0];
-  const cands=acCandidates(b,idx),prio=acPriority(b,idx),wants=acSlotWants(b,idx);
+  const cands=b?acCandidates(b,idx):acGenericCandidates(inp),prio=b?acPriority(b,idx):3,wants=b?acSlotWants(b,idx):'any';
   const items=cands
     .map(it=>({it,score:acScore(it,text,prio)
         +(it.kind==='variable'?(text?0:1.5):0)
@@ -3434,6 +3964,7 @@ function paintIconSlots(root){
 }
 function boot(){
   paintIconSlots();
+  registerModules();
   registerApiMethods(API_METHODS);
   registerApiValueSnippets(API_METHODS);
   applyLangStatic();
