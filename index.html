@@ -262,6 +262,11 @@
       background:rgba(199,146,234,.16);border:1px solid rgba(199,146,234,.42);color:#e2c8ff;
       font-family:"JetBrains Mono",Consolas,monospace;font-size:11px;font-weight:700}
 
+
+    .modBadge{display:inline-block;margin-left:6px;padding:1px 5px;border-radius:4px;font-size:8px;
+      letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:#c792ea;
+      border:1px solid rgba(199,146,234,.45);background:rgba(199,146,234,.12);vertical-align:middle}
+
     /* ---------- Autocomplete popup ---------- */
     .acPopup{position:fixed;z-index:9999;display:none;min-width:190px;max-width:min(460px,92vw);overflow:auto;
       background:var(--panel2);border:1px solid var(--line);border-radius:11px;
@@ -719,7 +724,7 @@ const MODULES={
     ],
     optional:['canBuy']},
 
-  hudText:{icon:'monitor',label:{fr:'Texte HUD',en:'HUD text'},cat:'game',
+  hudText:{icon:'monitor',label:{fr:'Texte HUD',en:'HUD text'},cat:'game',standalone:true,
     desc:{fr:'Emplacement HUD, joueur, contenu stylé et durée',
           en:'HUD slot, player, styled content and duration'},
     fields:[
@@ -830,6 +835,68 @@ function modDel(v,key){
   if(key.indexOf('.')<0){delete v.f[key];return}
   const [a,b]=key.split('.');
   if(v.f[a]&&typeof v.f[a]==='object'){delete v.f[a][b];if(!Object.keys(v.f[a]).length)delete v.f[a]}
+}
+
+
+/* ============================================================
+   Module compatibility — which typed modules may sit in which slot
+   ============================================================ */
+
+/* param names that hold rich text */
+const MOD_TEXT_PARAMS=/^(text|message|title|subtext|label|content|requestText|displayName|reason|info|desc|description|customDisplayName|customDescription|middleText|headerText|chatText|playerName|killerName|body|prompt|notice)$/i;
+/* param name pattern -> module ids accepted */
+const MOD_PARAM_RULES=[
+  [/^style$/i,                    ['styledText','styledIcon','entityName','translatedText','customTextStyling']],
+  [/^posSettings$/i,              ['posSettings']],
+  [/^nodeScales$/i,               ['meshScalingMap']],
+  [/^item$/i,                     ['itemAttributes','shopItem']],
+  [/^customAttributes$|^attributes$/i,['itemAttributes']],
+  [/^physicsOptions$|^opts$/i,    ['particleOptions']],
+  [/^updates$/i,                  ['particleOptions']],
+  [/^particleOptions$/i,          ['particleOptions']],
+  [/^colour$|^color$/i,           ['styledText']],
+];
+/* whole blocks whose specific params are typed */
+const MOD_BLOCK_RULES={
+  playParticleEffect:{0:['particleOptions']},
+  attemptCreateMeshEntity:{3:['meshScalingMap']},
+  setClientOption:  {2:['customTextStyling','styledText','styledIcon','entityName','translatedText']},
+  setClientOptions: {1:['customTextStyling']},
+  sendMessage:      {1:['customTextStyling','styledText','entityName','translatedText']},
+  broadcastMessage: {0:['customTextStyling','styledText','entityName','translatedText']},
+  attemptCreateAudioEntity:{5:['posSettings']},
+  playSound:        {4:['posSettings']},
+  broadcastSound:   {3:['posSettings']},
+  configureShopItem:{2:['shopItem']},
+  addShopItem:      {1:['shopItem']},
+  updateShopItem:   {2:['shopItem']},
+};
+/* ids of the modules a slot accepts; null means "no module allowed" */
+function modAllowedIn(b,idx){
+  if(!b)return null;
+  const d=defs[b.type]||{};
+  const pname=(d.paramNames&&d.paramNames[idx])||'';
+  const br=MOD_BLOCK_RULES[b.type];
+  if(br&&br[idx])return br[idx].slice();
+  for(const rule of MOD_PARAM_RULES){
+    if(rule[0].test(pname))return rule[1].slice();
+  }
+  if(MOD_TEXT_PARAMS.test(pname))return ['customTextStyling','styledText','styledIcon','entityName','translatedText'];
+  return null;
+}
+function modFitsSlot(id,b,idx){
+  const allowed=modAllowedIn(b,idx);
+  return !!allowed&&allowed.indexOf(id)>=0;
+}
+function modSlotLabel(b,idx){
+  const allowed=modAllowedIn(b,idx);
+  if(!allowed)return null;
+  return allowed.map(id=>modLabel(id,LANG())).join(', ');
+}
+function modElementAllowed(listId,childId){
+  const m=MODULES[listId];
+  if(!m||!m.listOf)return false;
+  return (m.of||[]).indexOf(childId)>=0;
 }
 
 /* ============================================================
@@ -1244,7 +1311,7 @@ function registerModules(){
       icon:m.icon,module:id,valueOnly:true,valueKind:'module',
       label:modLabel(id,LANG()),
       desc:modDescOf(id,LANG()),
-      params:[],snippet:modLabel(id,'en'),
+      params:[],snippet:modLabel(id,LANG()),
       hidden:false};
   });
 }
@@ -2037,7 +2104,8 @@ function toolEl(type,extraClass){
   el.style.setProperty('--cat',c.color);
   el.draggable=true;
   el.dataset.type=type;
-  el.innerHTML='<span class="ico">'+icon(d.icon||'plug',17)+'</span><span style="min-width:0;display:block"><span class="name">'+(d.expr&&!d.container?d.label||type:blockLabel(type,d))+'</span><span class="desc">'+blockDesc(type,d)+'</span></span>';
+  const modBadge=d.module?'<span class="modBadge">module</span>':'';
+  el.innerHTML='<span class="ico">'+icon(d.icon||'plug',17)+'</span><span style="min-width:0;display:block"><span class="name">'+(d.expr&&!d.container?d.label||type:blockLabel(type,d))+'</span>'+modBadge+'<span class="desc">'+blockDesc(type,d)+'</span></span>';
   el.addEventListener('dragstart',e=>{
     e.dataTransfer.setData('application/x-block-type',type);
     e.dataTransfer.effectAllowed='copy';
@@ -2048,15 +2116,17 @@ function toolEl(type,extraClass){
     const b=newBlock(type);
     if(!b)return;
     if(d.module){
-      /* modules are only meaningful inside a slot: drop one in the first empty slot */
+      /* modules only fit slots whose parameter accepts that type */
       pushUndo();
-      const slot=acFirstEmptySlot();
+      const slot=acFirstSlotFor(d.module);
       if(slot){
         slot.b.params[slot.idx]=b;
         renderAll();
-        toast(modLabel(d.module,LANG()));
+        toast(modLabel(d.module,LANG())+' -> '+slotLabelText(slot));
       }else{
-        toast(LANG()==='fr'?'Glisse ce module dans un champ':'Drag this module into a slot',true);
+        toast(LANG()==='fr'
+          ?'Aucun champ compatible : glisse-le sur un champ de texte'
+          :'No compatible empty slot: drag it onto a text field',true);
       }
       return;
     }
@@ -2277,6 +2347,40 @@ function handleStatementDrop(e,stack,index){
     stacks.push(s);
   }
   renderAll();
+}
+function slotLabelText(slot){
+  const d=defs[slot.b.type]||{};
+  return (d.label||slot.b.type)+'['+((d.paramNames&&d.paramNames[slot.idx])||slot.idx)+']';
+}
+/* tell the user why a module could not go in that slot */
+function acSlotReject(b,idx,modId){
+  const allowed=modAllowedIn(b,idx);
+  const d=defs[b.type]||{};
+  const where=(d.label||b.type)+'.'+((d.paramNames&&d.paramNames[idx])||idx);
+  let msg;
+  if(allowed)msg=LANG()==='fr'
+    ?modLabel(modId,LANG())+' ne va pas dans '+where+' — attendu : '+modSlotLabel(b,idx)
+    :modLabel(modId,LANG())+' does not fit '+where+' — expected: '+modSlotLabel(b,idx);
+  else msg=LANG()==='fr'
+    ?where+' n’accepte pas de module (texte structuré uniquement)'
+    :where+' does not accept a module (structured text only)';
+  toast(msg,true);
+}
+/* first empty value slot that accepts this module */
+function acFirstSlotFor(modId){
+  let found=null;
+  const walk=list=>{
+    (list||[]).forEach(b=>{
+      if(found)return;
+      (b.params||[]).forEach((v,i)=>{
+        if(found)return;
+        if((v===''||v==null)&&modFitsSlot(modId,b,i))found={b,idx:i};
+      });
+      walk(b.children);walk(b.children2);
+    });
+  };
+  stacks.forEach(st=>walk(st.blocks));
+  return found;
 }
 /* first empty value slot in the workspace, used when a module is clicked in the palette */
 function acFirstEmptySlot(){
@@ -2556,7 +2660,11 @@ function valueSlotEl(b,idx,choiceKey){
       }
     }else if(newType){
       const d=defs[newType];
-      if(d&&(d.expr||d.module)){b.params[idx]=newBlock(newType)}
+      if(d&&d.module){
+        if(modFitsSlot(d.module,b,idx))b.params[idx]=newBlock(newType);
+        else{acSlotReject(b,idx,d.module);pushUndo();undoSilent();}
+      }
+      else if(d&&d.expr){b.params[idx]=newBlock(newType)}
     }
     renderAll();
   });
@@ -3532,6 +3640,8 @@ function acReturnKind(type){
 function acSlotWants(b,idx){
   const d=defs[b.type]||{};
   const pname=(d.paramNames&&d.paramNames[idx])||'';
+  /* a slot that takes a typed module is a rich-text/options slot, not a scalar one */
+  if(modAllowedIn(b,idx))return 'str';
   const k=AC_PARAM_KIND[pname];
   if(!k)return 'any';
   if(k==='numberValue'||k==='msNumber'||k==='coordX'||k==='coordY'||k==='coordZ'||k==='indexValue'||k==='levelNumber')return 'num';
@@ -3723,13 +3833,17 @@ function acCandidates(b,idx){
       const dd=defs[k];
       if(!dd||!dd.valueOnly||!dd.snippet||dd.hidden)return;
       const rk=dd.valueKind||acReturnKind(k);
+      if(dd.module&&!modFitsSlot(dd.module,b,idx))return;
       if(rk===wants||rk===null)push(dd.snippet,'valueBlock',k);
     });
   }
   /* 5. free value blocks available in the palette (thisPos, myId, ...) */
   Object.keys(defs).forEach(k=>{
     const dd=defs[k];
-    if(dd&&dd.valueOnly&&dd.snippet&&!dd.hidden)push(dd.snippet,'valueBlock',k);
+    if(dd&&dd.valueOnly&&dd.snippet&&!dd.hidden){
+      if(dd.module&&!modFitsSlot(dd.module,b,idx))return;
+      push(dd.snippet,'valueBlock',k);
+    }
   });
   /* 6. list helpers when the param looks like a list access */
   if(/List|list/.test(pname)){
